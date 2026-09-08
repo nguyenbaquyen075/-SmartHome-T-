@@ -76,18 +76,10 @@ app.get('/api/products', (req, res) => {
     );
   }
 
-  // Filter by category (Tất cả, Thiết bị điện, Thiết bị mạng, Thiết bị nước)
+  // Filter by category
   if (category && category !== 'Tất cả') {
     const cat = category.toLowerCase();
-    if (cat === 'thiết bị mạng') {
-      products = products.filter(
-        (p) =>
-          p.category.toLowerCase() === 'thiết bị mạng' ||
-          p.category.toLowerCase() === 'camera an ninh' ||
-          p.name.toLowerCase().includes('camera') ||
-          p.name.toLowerCase().includes('wifi')
-      );
-    } else if (cat === 'thiết bị điện') {
+    if (cat === 'điện dân dụng' || cat === 'thiết bị điện') {
       products = products.filter(
         (p) =>
           p.category.toLowerCase() === 'thiết bị điện' ||
@@ -97,7 +89,7 @@ app.get('/api/products', (req, res) => {
           p.name.toLowerCase().includes('đèn') ||
           p.name.toLowerCase().includes('cadivi')
       );
-    } else if (cat === 'thiết bị nước') {
+    } else if (cat === 'nước & thiết bị vệ sinh' || cat === 'thiết bị nước') {
       products = products.filter(
         (p) =>
           p.category.toLowerCase() === 'thiết bị nước' ||
@@ -105,6 +97,32 @@ app.get('/api/products', (req, res) => {
           p.name.toLowerCase().includes('nước') ||
           p.name.toLowerCase().includes('bơm') ||
           p.name.toLowerCase().includes('vòi') ||
+          p.name.toLowerCase().includes('ống')
+      );
+    } else if (cat === 'camera & an ninh' || cat === 'camera an ninh' || cat === 'thiết bị mạng') {
+      products = products.filter(
+        (p) =>
+          p.category.toLowerCase() === 'camera an ninh' ||
+          p.category.toLowerCase() === 'thiết bị mạng' ||
+          p.name.toLowerCase().includes('camera') ||
+          p.name.toLowerCase().includes('wifi')
+      );
+    } else if (cat === 'thiết bị thông minh') {
+      products = products.filter(
+        (p) =>
+          p.category.toLowerCase() === 'camera an ninh' ||
+          p.category.toLowerCase() === 'thiết bị điện' ||
+          p.name.toLowerCase().includes('camera') ||
+          p.name.toLowerCase().includes('wifi') ||
+          p.name.toLowerCase().includes('imou')
+      );
+    } else if (cat === 'phụ kiện & linh kiện' || cat === 'phụ kiện') {
+      products = products.filter(
+        (p) =>
+          p.category.toLowerCase() === 'phụ kiện' ||
+          p.category.toLowerCase() === 'vật tư phụ' ||
+          p.name.toLowerCase().includes('phụ kiện') ||
+          p.name.toLowerCase().includes('dây') ||
           p.name.toLowerCase().includes('ống')
       );
     } else {

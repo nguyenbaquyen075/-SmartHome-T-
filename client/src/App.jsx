@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
-import MobileCategoryGrid from './components/MobileCategoryGrid';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
 import ProductDetailPage from './components/ProductDetailPage';
@@ -225,27 +224,14 @@ export default function App() {
 
           {/* Main Catalog Section */}
           <main ref={productsRef} className="container" style={{ flex: 1, paddingTop: '10px' }}>
-            {/* Mobile 8-Category Grid from Mobile Screenshot */}
-            <div className="mobile-only">
-              <MobileCategoryGrid
-                onSelectCategory={(cat) => {
-                  setSelectedCategory(cat);
-                  scrollToProducts();
-                }}
-                onShowAll={() => {
-                  setSelectedCategory('Tất cả');
-                  scrollToProducts();
-                }}
-              />
-            </div>
-
-            {/* Desktop Horizontal Category Pill Tabs */}
-            <div className="desktop-only">
-              <CategoryFilter
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-              />
-            </div>
+            {/* Category Section (Matching user design: DANH MỤC SẢN PHẨM + 4 cards) */}
+            <CategoryFilter
+              selectedCategory={selectedCategory}
+              setSelectedCategory={(cat) => {
+                setSelectedCategory(cat);
+                scrollToProducts();
+              }}
+            />
 
             {/* Section Heading: SẢN PHẨM NỔI BẬT */}
             <div style={{
