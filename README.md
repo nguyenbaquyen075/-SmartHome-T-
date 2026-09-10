@@ -56,7 +56,7 @@ npm run install:all
 Chạy cả frontend + backend cùng lúc:
 
 ```bash
-npm start
+npm run dev
 ```
 
 Mở trình duyệt: **http://localhost:5174**
@@ -80,8 +80,11 @@ npm run dev:backend     # chỉ API        → cổng 5001
 2. **New +** → **Web Service** → chọn repo này
 3. Render tự đọc `render.yaml`. Nếu phải điền tay:
    - Build Command: `npm run build`
-   - Start Command: `node backend/index.js`
+   - Start Command: `node backend/index.js` (hoặc `npm start`)
 4. **Create Web Service** → đợi ~3-5 phút
+
+> ⚠️ Nếu service đã tạo từ trước bằng nút *New → Web Service*, Render **không đọc** `render.yaml`.
+> Muốn đổi lệnh chạy phải vào **Settings → Build & Deploy → Start Command** sửa tay.
 
 Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục vụ bản build của React. Nhờ vậy không cần cấu hình CORS hay biến môi trường nào cả.
 
