@@ -195,7 +195,7 @@ export default function CheckoutModal({
         ) : (
           /* Form View */
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '4px', paddingRight: '44px' }}>
               Thông Tin Giao Hàng & Đặt Hàng
             </h2>
             <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>
@@ -209,7 +209,7 @@ export default function CheckoutModal({
             )}
 
             <form onSubmit={handleSubmitOrder}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '20px', marginBottom: '20px' }}>
                 {/* Customer Details */}
                 <div>
                   <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0066cc', marginBottom: '12px' }}>

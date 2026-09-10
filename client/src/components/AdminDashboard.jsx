@@ -216,7 +216,7 @@ export default function AdminDashboard({ onClose, onProductChange }) {
         {stats && (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
             gap: '14px',
             marginBottom: '20px'
           }}>
@@ -364,7 +364,7 @@ export default function AdminDashboard({ onClose, onProductChange }) {
                 Nhập thông số máy ảnh mới
               </h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
                 <div>
                   <label style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Tên sản phẩm *</label>
                   <input

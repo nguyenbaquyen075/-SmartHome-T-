@@ -136,7 +136,7 @@ export default function ProductDetailPage({
         {/* 2. Top Main Product Grid (Gallery + Buy Box) */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
           gap: '36px',
           marginBottom: '35px'
         }}>
@@ -344,7 +344,7 @@ export default function ProductDetailPage({
             {/* 4 Feature Badges Strip (Matching Screenshot) */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))',
               backgroundColor: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '10px',
@@ -598,7 +598,7 @@ export default function ProductDetailPage({
               {/* 2-Column Section from Screenshot */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
                 gap: '28px',
                 alignItems: 'start'
               }}>
@@ -791,7 +791,7 @@ export default function ProductDetailPage({
           {/* Related Cards Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))',
             gap: '16px'
           }}>
             {displayRelated.map((rel) => {

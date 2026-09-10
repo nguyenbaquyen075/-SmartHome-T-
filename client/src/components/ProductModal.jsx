@@ -62,7 +62,7 @@ export default function ProductModal({
         {/* Modal Body */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
           gap: '30px',
           marginBottom: '24px'
         }}>
@@ -232,7 +232,7 @@ export default function ProductModal({
           {product.specs && (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))',
               gap: '10px'
             }}>
               {Object.entries(product.specs).map(([key, value]) => (
