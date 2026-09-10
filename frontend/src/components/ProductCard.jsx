@@ -4,9 +4,13 @@ import { formatPrice } from '../utils/api';
 
 export default function ProductCard({
   product,
+  index = 0,
   onViewDetails,
   onAddToCart
 }) {
+  // 4 anh dau nam ngay trong man hinh dau tien -> tai ngay, dung lazy.
+  // loading="lazy" tren anh trong viewport lam trinh duyet hoan tai => LCP cham.
+  const isAboveFold = index < 4;
   const discountPercent = product.discountPercent || (
     product.originalPrice && product.originalPrice > product.price
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -40,7 +44,9 @@ export default function ProductCard({
         <img
           src={product.image}
           alt={product.name}
-          loading="lazy"
+          loading={isAboveFold ? 'eager' : 'lazy'}
+          fetchPriority={isAboveFold ? 'high' : 'auto'}
+          decoding="async"
           style={{
             maxHeight: '100%',
             maxWidth: '100%',

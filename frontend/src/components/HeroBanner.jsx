@@ -32,8 +32,12 @@ export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
           title="Xem danh mục sản phẩm"
         >
           <img
-            src="/images/banner_hero_2x.jpg"
+            src="/images/banner_hero_1024.jpg"
+            srcSet="/images/banner_hero_640.jpg 640w, /images/banner_hero_1024.jpg 1024w, /images/banner_hero_2x.jpg 2048w"
+            sizes="(max-width: 768px) 100vw, 1024px"
             alt="SmartHome T&D Banner"
+            fetchPriority="high"
+            decoding="async"
             style={{
               width: '100%',
               height: '100%',

@@ -13,7 +13,7 @@ export default function CategoryFilter({
       name: 'Tất cả',
       label: 'Tất cả',
       icon: LayoutGrid,
-      image: '/images/cat_style_new/prod_all.png',
+      image: '/images/cat_style_new/prod_all.jpg',
       alt: 'Tất cả sản phẩm điện nước camera mạng'
     },
     {
