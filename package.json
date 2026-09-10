@@ -4,11 +4,11 @@
   "description": "CameraTD - Premium Camera E-Commerce Store",
   "scripts": {
     "start": "node start.js",
-    "server": "cd server && npm start",
-    "client": "cd client && npm run dev",
-    "install:all": "cd server && npm install && cd ../client && npm install",
-    "build": "npm --prefix server ci && npm --prefix client ci && npm --prefix client run build",
-    "start:prod": "node server/index.js"
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend start",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix backend ci && npm --prefix frontend ci && npm --prefix frontend run build",
+    "start:prod": "node backend/index.js"
   },
   "keywords": [
     "camera",
