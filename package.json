@@ -1,14 +1,14 @@
 {
-  "name": "cameratd-root",
+  "name": "diennuoc-camera",
   "version": "1.0.0",
-  "description": "CameraTD - Premium Camera E-Commerce Store",
+  "description": "ĐIỆN NƯỚC CAMERA - Website bán camera an ninh & thiết bị điện nước",
   "scripts": {
-    "start": "node start.js",
+    "start": "node backend/index.js",
+    "dev": "node start.js",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend start",
     "install:all": "npm --prefix backend install && npm --prefix frontend install",
-    "build": "npm --prefix backend ci && npm --prefix frontend ci && npm --prefix frontend run build",
-    "start:prod": "node backend/index.js"
+    "build": "npm --prefix backend ci && npm --prefix frontend ci && npm --prefix frontend run build"
   },
   "keywords": [
     "camera",
