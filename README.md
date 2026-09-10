@@ -26,6 +26,7 @@ cameraTD/
 │   │   └── orders.json      Đơn hàng khách đặt
 │   └── package.json         Thư viện riêng của backend
 │
+├── server/index.js      ⚠️ File cầu nối tạm (xem mục Deploy) — không chứa code
 ├── start.js             Chạy cả 2 phần cùng lúc (dùng khi code)
 ├── render.yaml          Cấu hình deploy lên Render
 └── package.json         Script chung
@@ -85,6 +86,17 @@ npm run dev:backend     # chỉ API        → cổng 5001
 
 > ⚠️ Nếu service đã tạo từ trước bằng nút *New → Web Service*, Render **không đọc** `render.yaml`.
 > Muốn đổi lệnh chạy phải vào **Settings → Build & Deploy → Start Command** sửa tay.
+
+### 🔗 Về file `server/index.js`
+
+Service hiện tại trên Render được tạo từ lúc thư mục còn tên `server/`, nên Start Command của
+nó vẫn là `node server/index.js`. Sau khi đổi tên thành `backend/`, lệnh đó chết → deploy fail.
+
+[server/index.js](server/index.js) là **file cầu nối 1 dòng** để lệnh cũ vẫn chạy, không chứa
+logic gì cả. Muốn dọn cho sạch:
+
+1. Render → **Settings → Build & Deploy → Start Command** → đổi thành `npm start` → Save
+2. Xóa thư mục `server/` đi
 
 Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục vụ bản build của React. Nhờ vậy không cần cấu hình CORS hay biến môi trường nào cả.
 
