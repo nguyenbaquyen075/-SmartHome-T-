@@ -52,7 +52,7 @@
     "inStock": 35,
     "unit": "chiếc",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1557597774-9d273605dfa9.jpg",
     "description": "Camera IP Dome Hikvision 2MP chất lượng cao, vỏ kim loại chống va đập IK10, tiêu chuẩn chống nước IP67, tầm xa hồng ngoại 30m.",
     "specs": {
       "doPhanGiai": "2.0 Megapixel (1920x1080) Full HD",
@@ -77,7 +77,7 @@
     "inStock": 50,
     "unit": "chiếc",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1558002038-1055907df827.jpg",
     "description": "Camera IP thân trụ chuyên lắp đặt ngoài trời chịu mưa nắng, giảm nhiễu kỹ thuật số 3D DNR, bù sáng ngược DWDR.",
     "specs": {
       "doPhanGiai": "2.0 Megapixel 1080p sắc nét",
@@ -102,7 +102,7 @@
     "inStock": 42,
     "unit": "chiếc",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1549465220-1a8b9238cd48.jpg",
     "description": "Camera wifi trong nhà quay quét 360 độ, phát hiện chuyển động con người thông minh AI, đàm thoại 2 chiều to rõ, báo động còi hú.",
     "specs": {
       "doPhanGiai": "3.0 Megapixel 2K siêu nét",
@@ -127,7 +127,7 @@
     "inStock": 150,
     "unit": "cái",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1558346490-a72e53ae2d4f.jpg",
     "description": "Cầu dao tự động MCB Schneider Easy9 bảo vệ quá tải và ngắn mạch mạng điện gia đình, tiếp điểm bền bỉ độ an toàn tuyệt đối.",
     "specs": {
       "soCuc": "2P (2 Pha)",
@@ -151,7 +151,7 @@
     "inStock": 300,
     "unit": "bóng",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1507668077129-56e32842fceb.jpg",
     "description": "Bóng đèn LED Bulb Rạng Đông tiết kiệm điện 88%, chip LED Hàn Quốc tuổi thọ cao 15.000 giờ, không nhấp nháy bảo vệ thị lực.",
     "specs": {
       "congSuat": "9W",
@@ -175,7 +175,7 @@
     "inStock": 500,
     "unit": "mét",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1544716278-ca5e3f4abd8c.jpg",
     "description": "Dây điện đôi lõi đồng nguyên chất 99.99% Cadivi VCmd 2x1.5mm2 dẫn điện tốt, chịu nhiệt cao, tiêu chuẩn quốc gia TCVN.",
     "specs": {
       "tietDien": "2 lõi x 1.5 mm²",
@@ -199,7 +199,7 @@
     "inStock": 60,
     "unit": "bộ",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1584622650111-993a426fbf0a.jpg",
     "description": "Vòi cắm chậu rửa bát Inox SUS 304 mạ mờ sang trọng, đầu tạo bọt chống bắn nước, cần cổ ngỗng xoay nhẹ nhàng 360 độ.",
     "specs": {
       "chatLieu": "Inox SUS 304 nguyên khối chống ăn mòn",
@@ -223,7 +223,7 @@
     "inStock": 20,
     "unit": "chiếc",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1581092160607-ee22621dd758.jpg",
     "description": "Máy bơm nước đẩy cao Panasonic công suất 200W thích hợp cho nhà 1-4 tầng, buồng bơm bằng đồng thau siêu bền, rơle nhiệt chống quá tải.",
     "specs": {
       "congSuat": "200W",
@@ -247,7 +247,7 @@
     "inStock": 400,
     "unit": "mét",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1607400201889-565b1dd75f8e?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/cat_pipes.jpg",
     "description": "Ống nhựa PVC cứng Bình Minh chuyên dẫn nước sinh hoạt và thoát nước thải công trình, chịu được va đập và áp suất cao.",
     "specs": {
       "kichCo": "D21, D27, D34, D42, D49, D60, D90, D110",
@@ -270,7 +270,7 @@
     "inStock": 350,
     "unit": "cái",
     "featured": false,
-    "image": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1557597774-9d273605dfa9.jpg",
     "description": "Hộp nối kỹ thuật đúc nhựa ABS dày dặn chống tia UV, zoăng cao su chống nước xâm nhập tuyệt đối, bảo vệ đầu nối camera ngoài trời.",
     "specs": {
       "kichThuoc": "11cm x 11cm x 5cm",
@@ -292,7 +292,7 @@
     "inStock": 180,
     "unit": "chiếc",
     "featured": false,
-    "image": "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1558346490-a72e53ae2d4f.jpg",
     "description": "Nguồn adaptor điện áp ổn định DC 12V 2A có IC tự ngắt khi chập điện, chống sốc xung sét lan truyền bảo vệ cảm biến camera.",
     "specs": {
       "dauVao": "AC 100-240V 50/60Hz",
@@ -314,7 +314,7 @@
     "inStock": 15,
     "unit": "chiếc",
     "featured": true,
-    "image": "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80",
+    "image": "/images/products/1557597774-9d273605dfa9.jpg",
     "description": "Đầu ghi 4 kênh hỗ trợ camera 2MP-4MP, chuẩn nén H.265 Pro+ tiết kiệm 80% dung lượng ổ cứng, xem trực tiếp qua app Hik-Connect mượt mà.",
     "specs": {
       "soKenh": "4 kênh BNC + 1 kênh IP",

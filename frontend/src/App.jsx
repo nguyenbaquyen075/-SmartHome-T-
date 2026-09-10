@@ -1,18 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
-import ProductDetailPage from './components/ProductDetailPage';
-import ComparisonModal from './components/ComparisonModal';
 import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import OrderTrackerModal from './components/OrderTrackerModal';
-import AdminDashboard from './components/AdminDashboard';
 import BottomBanner from './components/BottomBanner';
 import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
 import { api } from './utils/api';
+
+// Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
+// nho vay trang chu khong phai tai ~70KB code khong dung toi.
+const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
+const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 import { Flame, ArrowRight, Check, Info } from 'lucide-react';
 
 export default function App() {
@@ -203,6 +206,7 @@ export default function App() {
 
       {/* CONDITIONAL: Product Detail Page OR Home Catalog View */}
       {viewingProduct ? (
+        <Suspense fallback={null}>
         <ProductDetailPage
           product={viewingProduct}
           allProducts={products}
@@ -211,6 +215,7 @@ export default function App() {
           onBuyNow={handleBuyNow}
           onSelectProduct={handleSelectProduct}
         />
+        </Suspense>
       ) : (
         <>
           {/* Hero Banner (Desktop 3-column + Mobile Slider) */}
@@ -300,10 +305,11 @@ export default function App() {
               </div>
             ) : (
               <div className="products-grid">
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <ProductCard
                     key={product.id}
                     product={product}
+                    index={index}
                     onViewDetails={handleSelectProduct}
                     onAddToCart={handleAddToCart}
                   />
@@ -341,6 +347,7 @@ export default function App() {
 
       {/* Comparison Modal */}
       {isCompareOpen && (
+        <Suspense fallback={null}>
         <ComparisonModal
           compareList={compareList}
           onClose={() => setIsCompareOpen(false)}
@@ -352,6 +359,7 @@ export default function App() {
             setIsCartOpen(true);
           }}
         />
+        </Suspense>
       )}
 
       {/* Cart Drawer */}
@@ -388,10 +396,12 @@ export default function App() {
 
       {/* Admin Dashboard */}
       {isAdmin && (
+        <Suspense fallback={null}>
         <AdminDashboard
           onClose={() => setIsAdmin(false)}
           onProductChange={fetchProductsList}
         />
+        </Suspense>
       )}
     </div>
   );
