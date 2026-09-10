@@ -340,7 +340,16 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
+// ================= SERVE REACT BUILD =================
+// ponytail: don gian nhat - 1 service, Express serve luon client/dist.
+// Tach frontend/backend rieng chi khi can CDN hoac scale doc lap.
+const CLIENT_DIST = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(CLIENT_DIST));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(CLIENT_DIST, 'index.html'));
+});
+
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`CameraTD Backend Server is running on http://localhost:${PORT}`);
 });

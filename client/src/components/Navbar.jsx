@@ -61,7 +61,7 @@ export default function Navbar({
         color: '#fff',
         padding: '12px 0'
       }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+        <div className="container navbar-main-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
           {/* Logo */}
           <div 
             onClick={() => {
@@ -69,6 +69,7 @@ export default function Navbar({
               setSearchTerm('');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            className="navbar-brand"
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flexShrink: 0 }}
           >
             <div style={{
@@ -99,7 +100,7 @@ export default function Navbar({
           </div>
 
           {/* Search Bar in Header */}
-          <div style={{ flex: 1, maxWidth: '520px', position: 'relative' }}>
+          <div className="navbar-search" style={{ flex: 1, maxWidth: '520px', position: 'relative' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -338,7 +339,7 @@ export default function Navbar({
         >
           <div 
             style={{
-              width: '280px',
+              width: 'min(280px, 86vw)',
               backgroundColor: '#fff',
               height: '100%',
               display: 'flex',
