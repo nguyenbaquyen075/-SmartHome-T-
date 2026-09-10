@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,6 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
+app.use(compression());
 app.use(cors());
 app.use(express.json());
 
@@ -341,10 +343,11 @@ app.get('/api/stats', (req, res) => {
 });
 
 // ================= SERVE REACT BUILD =================
-// ponytail: don gian nhat - 1 service, Express serve luon client/dist.
+// ponytail: don gian nhat - 1 service, Express serve luon frontend/dist.
 // Tach frontend/backend rieng chi khi can CDN hoac scale doc lap.
-const CLIENT_DIST = path.join(__dirname, '..', 'client', 'dist');
-app.use(express.static(CLIENT_DIST));
+const CLIENT_DIST = path.join(__dirname, '..', 'frontend', 'dist');
+// Asset co hash trong ten -> cache 1 nam; index.html luon lay moi
+app.use(express.static(CLIENT_DIST, { maxAge: '1y', index: false }));
 app.get('*', (req, res) => {
   res.sendFile(path.join(CLIENT_DIST, 'index.html'));
 });

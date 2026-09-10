@@ -1,24 +1,24 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-console.log('🚀 Đang khởi động CameraTD Pro Store (Backend & Frontend)...');
+console.log('🚀 Đang khởi động ĐIỆN NƯỚC CAMERA (Backend & Frontend)...');
 
-// Start Express Server
-const server = spawn('node', ['index.js'], {
-  cwd: path.join(__dirname, 'server'),
+// Backend: Express API (cổng 5001)
+const backend = spawn('node', ['index.js'], {
+  cwd: path.join(__dirname, 'backend'),
   stdio: 'inherit',
   shell: true
 });
 
-// Start Vite Client
-const client = spawn('npm', ['run', 'dev', '--', '--host'], {
-  cwd: path.join(__dirname, 'client'),
+// Frontend: Vite dev server (cổng 5174)
+const frontend = spawn('npm', ['run', 'dev', '--', '--host'], {
+  cwd: path.join(__dirname, 'frontend'),
   stdio: 'inherit',
   shell: true
 });
 
 process.on('SIGINT', () => {
-  server.kill();
-  client.kill();
+  backend.kill();
+  frontend.kill();
   process.exit();
 });

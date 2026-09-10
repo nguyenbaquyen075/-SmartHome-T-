@@ -1,102 +1,127 @@
-# CameraTD Pro - Hệ Thống Bán Thiết Bị Máy Ảnh & Ống Kính Điện Tử
+# ĐIỆN NƯỚC CAMERA
 
-Trang web thương mại điện tử chuyên nghiệp dành cho thiết bị máy ảnh cao cấp (Mirrorless, Cinema, Medium Format, Lens, Gimbal, Phụ kiện) được xây dựng với kiến trúc Full-stack:
-- **Frontend**: React (Vite) + Lucide Icons + Design System Dark Pro Titanium & Amber Studio.
-- **Backend**: Node.js + Express RESTful API + JSON Database bền vững lưu trữ cục bộ.
+Website thương mại điện tử bán camera an ninh, thiết bị điện dân dụng, thiết bị nước và đèn chiếu sáng.
 
 ---
 
-## 📸 Các Tính Năng Nổi Bật
+## 📁 Cấu trúc dự án
 
-### 1. Phía Khách Hàng (Customer Experience)
-- **Hero Banner Đỉnh Cao**: Trình chiếu dòng máy ảnh Flagship, thông số cảm biến, quay phim 8K/4K và các cam kết chính hãng (Giao 2H, BH 24 tháng, 1 đổi 1 trong 15 ngày).
-- **Bộ Lọc Thông Số Máy Ảnh (Camera Specs Filter)**:
-  - Lọc theo thương hiệu: Sony, Canon, Fujifilm, Nikon, DJI, Blackmagic.
-  - Lọc theo danh mục: Mirrorless, Cinema, Medium Format, Action/Vlog, Ống Kính, Phụ Kiện.
-  - Lọc theo loại cảm biến: Full-Frame, APS-C, Medium Format, Super 35, 1-inch.
-  - Lọc theo khoảng giá & sắp xếp linh hoạt.
-- **Xem Chi Tiết Máy Ảnh (Product Details Modal)**:
-  - Thư viện ảnh sản phẩm nhiều góc chụp.
-  - Bảng thông số kỹ thuật chi tiết (Cảm biến, Bộ xử lý, ISO, Video, IBIS, AF, Ngàm, Khối lượng).
-  - Đánh giá sao & gửi nhận xét đánh giá thực tế.
-- **So Sánh Máy Ảnh Chuyên Sâu (Side-by-side Spec Comparison)**:
-  - Cho phép chọn tối đa 3 máy ảnh để đặt cạnh nhau so sánh trực tiếp từng thông số kỹ thuật.
-- **Giỏ Hàng & Mã Giảm Giá (Cart Drawer)**:
-  - Tăng/giảm số lượng, xóa sản phẩm, lưu giỏ hàng vào `localStorage`.
-  - Hỗ trợ mã voucher: nhập `CAMERATD` (giảm 500.000₫) hoặc `PROVIP` (giảm 1.000.000₫).
-- **Quy Trình Đặt Hàng & VietQR (Checkout Modal)**:
-  - Điền thông tin giao hàng & nhận mã đơn hàng tự động (VD: `CAM-829103`).
-  - Thanh toán COD (nhận hàng kiểm tra thanh toán).
-  - **Tích hợp mã QR VietQR NAPAS 24/7**: Tự động sinh mã QR với số tiền chính xác và nội dung chuyển khoản là mã đơn hàng.
-- **Tra Cứu Tiến Độ Đơn Hàng (Order Tracker)**:
-  - Tra cứu theo Mã đơn hoặc Số điện thoại đặt hàng.
-  - Hiển thị thanh tiến trình 3 bước (Tiếp nhận -> Vận chuyển -> Giao thành công).
-
-### 2. Phía Quản Trị Viên (Admin Portal)
-- Bật/Tắt chế độ Quản trị trực tiếp bằng nút **"Vào Quản Trị"** ở thanh điều hướng trên cùng.
-- **Thống kê tổng quan**: Tổng số thiết bị, số lượng tồn kho, cảnh báo hàng sắp hết (≤ 5 máy), số đơn hàng, tổng doanh thu.
-- **Quản lý sản phẩm**: Thêm mới máy ảnh với đầy đủ thông số kỹ thuật, sửa giá bán và tồn kho trực tiếp, xóa sản phẩm.
-- **Quản lý đơn hàng**: Xem chi tiết đơn khách đặt, cập nhật trạng thái đơn hàng (Đang xử lý, Đang giao, Đã hoàn thành) và trạng thái thanh toán.
-
----
-
-## 🚀 Hướng Dẫn Khởi Động Dự Án
-
-### Cách 1: Khởi động nhanh cả Backend & Frontend bằng 1 lệnh duy nhất
-Tại thư mục gốc của dự án:
-```bash
-npm start
-```
-*(Lệnh này sẽ tự động chạy cả server Node.js tại cổng 5001 và client React Vite tại cổng 5173).*
-
-### Cách 2: Chạy riêng từng phần
-- **Khởi động Backend (Node.js)**:
-  ```bash
-  cd server
-  npm start
-  ```
-  *(API chạy tại: `http://localhost:5001/api`)*
-
-- **Khởi động Frontend (React)**:
-  ```bash
-  cd client
-  npm run dev
-  ```
-  *(Giao diện web mở tại: `http://localhost:5174`)*
-
----
-
-## 🛠 Cấu Trúc Thư Mục
+Dự án chia làm 2 phần độc lập:
 
 ```
 cameraTD/
-├── package.json               # Cấu hình script gốc
-├── start.js                   # Script khởi chạy đồng thời Client & Server
-├── server/
-│   ├── package.json
-│   ├── index.js               # REST API Express (Sản phẩm, Đơn hàng, Thống kê)
-│   └── data/
-│       ├── products.json      # Dữ liệu máy ảnh, lens, phụ kiện mẫu
-│       └── orders.json        # Dữ liệu đơn hàng & thanh toán
-└── client/
-    ├── package.json
-    ├── vite.config.js         # Cấu hình proxy /api -> http://localhost:5001
-    ├── index.html             # Google Fonts Plus Jakarta Sans, Icons
-    └── src/
-        ├── App.jsx            # State điều phối chính của ứng dụng
-        ├── index.css          # Design System Pro Dark Cyber & Glassmorphism
-        ├── components/
-        │   ├── Navbar.jsx           # Header, tìm kiếm, giỏ hàng, nút quản trị
-        │   ├── HeroBanner.jsx       # Banner công nghệ máy ảnh cao cấp
-        │   ├── CategoryFilter.jsx   # Thanh lọc danh mục, hãng, cảm biến & giá
-        │   ├── ProductCard.jsx      # Thẻ sản phẩm với spec chips
-        │   ├── ProductModal.jsx     # Chi tiết & bảng thông số kỹ thuật đầy đủ
-        │   ├── ComparisonModal.jsx  # So sánh 2-3 máy ảnh song song
-        │   ├── CartDrawer.jsx       # Giỏ hàng & áp dụng mã voucher
-        │   ├── CheckoutModal.jsx    # Đặt hàng, COD & quét mã VietQR tự động
-        │   ├── OrderTrackerModal.jsx# Tra cứu đơn hàng theo mã/SĐT
-        │   ├── AdminDashboard.jsx   # Quản lý kho, giá, đơn hàng & doanh thu
-        │   └── Footer.jsx           # Hệ thống showroom, chính sách bảo hành
-        └── utils/
-            └── api.js               # Tiện ích gọi API backend & định dạng tiền tệ VNĐ
+├── frontend/            👉 GIAO DIỆN (React + Vite)
+│   ├── public/images/       Ảnh sản phẩm, banner
+│   ├── src/
+│   │   ├── components/      Các khối giao diện (Navbar, ProductCard, Footer...)
+│   │   ├── utils/api.js     Nơi duy nhất gọi API xuống backend
+│   │   ├── App.jsx          Khung trang chính
+│   │   └── index.css        CSS chung + responsive cho điện thoại
+│   └── package.json         Thư viện riêng của frontend
+│
+├── backend/             👉 API & DỮ LIỆU (Node.js + Express)
+│   ├── index.js             Toàn bộ API + phục vụ bản build của frontend
+│   ├── data/
+│   │   ├── products.json    Danh sách sản phẩm
+│   │   └── orders.json      Đơn hàng khách đặt
+│   └── package.json         Thư viện riêng của backend
+│
+├── start.js             Chạy cả 2 phần cùng lúc (dùng khi code)
+├── render.yaml          Cấu hình deploy lên Render
+└── package.json         Script chung
 ```
+
+**Quy tắc phân chia:**
+
+| | Frontend | Backend |
+|---|---|---|
+| Chịu trách nhiệm | Hiển thị, giao diện, tương tác | Dữ liệu, lưu trữ, xử lý đơn |
+| Ngôn ngữ | React (JSX) | Node.js (CommonJS) |
+| Cổng khi dev | `5174` | `5001` |
+| Sửa giao diện, màu sắc, layout | ✅ sửa ở đây | ❌ |
+| Thêm/sửa sản phẩm, đơn hàng | ❌ | ✅ sửa ở đây |
+
+Frontend **không bao giờ** gọi thẳng đến database. Mọi dữ liệu đi qua [frontend/src/utils/api.js](frontend/src/utils/api.js) → gọi `/api/...` → [backend/index.js](backend/index.js).
+
+---
+
+## 🚀 Cách chạy khi code
+
+Cài thư viện lần đầu:
+
+```bash
+npm run install:all
+```
+
+Chạy cả frontend + backend cùng lúc:
+
+```bash
+npm start
+```
+
+Mở trình duyệt: **http://localhost:5174**
+
+### Chạy riêng từng phần
+
+Khi chỉ muốn sửa giao diện, hoặc chỉ muốn test API:
+
+```bash
+npm run dev:frontend    # chỉ giao diện  → cổng 5174
+npm run dev:backend     # chỉ API        → cổng 5001
+```
+
+---
+
+## 🌐 Deploy lên Render
+
+Đã cấu hình sẵn trong [render.yaml](render.yaml). Chỉ cần:
+
+1. Vào [render.com](https://render.com) → đăng nhập bằng GitHub
+2. **New +** → **Web Service** → chọn repo này
+3. Render tự đọc `render.yaml`. Nếu phải điền tay:
+   - Build Command: `npm run build`
+   - Start Command: `node backend/index.js`
+4. **Create Web Service** → đợi ~3-5 phút
+
+Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục vụ bản build của React. Nhờ vậy không cần cấu hình CORS hay biến môi trường nào cả.
+
+### ⚠️ Lưu ý gói Free
+
+- **Đơn hàng sẽ mất khi deploy lại.** Đơn được lưu vào `backend/data/orders.json`, mà ổ đĩa Render là tạm thời — mỗi lần deploy hoặc restart, file quay về trạng thái trong Git. Muốn giữ đơn thật thì phải chuyển sang database (Render có Postgres miễn phí).
+- **Service ngủ sau 15 phút** không có ai truy cập. Lần mở tiếp theo mất ~50 giây khởi động lại.
+
+---
+
+## 🔌 Danh sách API
+
+| Method | Đường dẫn | Công dụng |
+|---|---|---|
+| GET | `/api/health` | Kiểm tra server sống |
+| GET | `/api/products` | Danh sách sản phẩm (lọc theo `category`, `brand`, `search`...) |
+| GET | `/api/products/:id` | Chi tiết 1 sản phẩm |
+| POST | `/api/products` | Thêm sản phẩm |
+| PUT | `/api/products/:id` | Sửa sản phẩm |
+| DELETE | `/api/products/:id` | Xóa sản phẩm |
+| GET | `/api/categories` | Danh sách danh mục |
+| GET | `/api/brands` | Danh sách thương hiệu |
+| GET | `/api/orders` | Danh sách đơn hàng |
+| POST | `/api/orders` | Tạo đơn hàng mới |
+| PUT | `/api/orders/:id` | Cập nhật trạng thái đơn |
+| GET | `/api/stats` | Số liệu tổng quan cho trang quản trị |
+
+---
+
+## 🖼️ Lưu ý về ảnh
+
+Ảnh đặt trong `frontend/public/images/`, gọi trong code bằng đường dẫn `/images/tên-file.jpg`.
+
+Trước khi thêm ảnh mới, **nén lại** để trang không bị chậm (macOS có sẵn `sips`, không cần cài gì):
+
+```bash
+sips -Z 900 -s formatOptions 75 anh-moi.jpg
+```
+
+- `-Z 900` — thu chiều lớn nhất về 900px (ảnh sản phẩm hiển thị tối đa ~600px, không cần to hơn)
+- `-s formatOptions 75` — nén chất lượng 75, mắt thường không thấy khác
+
+Ảnh chụp thì luôn dùng `.jpg`, đừng dùng `.png` — cùng một tấm banner, PNG nặng gấp 4 lần JPG.
