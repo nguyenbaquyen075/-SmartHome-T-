@@ -5,7 +5,8 @@ import { formatPrice } from '../utils/api';
 export default function ProductCard({
   product,
   index = 0,
-  onViewDetails
+  onViewDetails,
+  showPrice = true   // trang chi tiet khong hien gia/danh gia -> truyen false
 }) {
   // 4 anh dau nam ngay trong man hinh dau tien -> tai ngay, dung lazy.
   // loading="lazy" tren anh trong viewport lam trinh duyet hoan tai => LCP cham.
@@ -19,7 +20,7 @@ export default function ProductCard({
   return (
     <div className="store-product-card">
       {/* Top Right Discount Badge */}
-      {discountPercent > 0 && (
+      {showPrice && discountPercent > 0 && (
         <span className="discount-badge">
           -{discountPercent}%
         </span>
@@ -93,6 +94,7 @@ export default function ProductCard({
       </p>
 
       {/* Price section */}
+      {showPrice && (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
         <span className="price-tag" style={{ fontSize: '1rem', fontWeight: 800, color: '#e11d48' }}>
           {formatPrice(product.price)}{product.unit === 'mét' ? '/m' : ''}
@@ -103,8 +105,10 @@ export default function ProductCard({
           </span>
         )}
       </div>
+      )}
 
       {/* Rating & Review count */}
+      {showPrice && (
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
         <div style={{ display: 'flex', color: '#f59e0b', gap: '1px' }}>
           {[...Array(5)].map((_, i) => (
@@ -115,6 +119,7 @@ export default function ProductCard({
           ({product.reviewsCount || 50})
         </span>
       </div>
+      )}
 
       {/* Xem chi tiet */}
       <div style={{ marginTop: 'auto' }}>

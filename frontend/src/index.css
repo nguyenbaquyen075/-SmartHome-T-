@@ -338,48 +338,26 @@ body {
   display: none;
 }
 
-.rel-card {
-  flex: 0 0 168px;
+/* Dung chung the .store-product-card nhu phan san pham, chi neu them
+   be ngang co dinh + diem dung khi vuot */
+.rel-track .store-product-card {
+  flex: 0 0 178px;
   scroll-snap-align: start;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s, transform 0.2s;
+  padding: 10px;
+  /* khong co dong nay, chu nowrap ben trong se ep the rong ra bang min-content */
+  min-width: 0;
 }
-.rel-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 102, 204, 0.12);
-  transform: translateY(-2px);
+/* Anh trong the o day thap hon luoi san pham cho gon */
+.rel-track .store-product-card > div:first-of-type {
+  height: 104px !important;
 }
-
-.rel-thumb {
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  margin-bottom: 8px;
+.rel-track .store-product-card h3 {
+  font-size: 0.8rem !important;
+  min-height: 34px !important;
 }
-.rel-thumb img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-.rel-card h4 {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #1e293b;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 34px;
+.rel-track .store-product-card .btn-primary {
+  padding: 6px !important;
+  font-size: 0.75rem !important;
 }
 
 /* ================= 3 NHÓM SẢN PHẨM Ở TRANG CHỦ ================= */
@@ -861,13 +839,12 @@ body {
     min-height: 38px;
   }
 
-  /* Sản phẩm liên quan: thẻ nhỏ lại, hở mép phải để biết còn thẻ bên cạnh */
-  .rel-card {
-    flex-basis: 140px;
-    padding: 10px;
+  /* Sản phẩm liên quan: thẻ hẹp lại, hở mép phải để biết còn thẻ bên cạnh */
+  .rel-track .store-product-card {
+    flex-basis: 142px;
   }
-  .rel-thumb {
-    height: 92px;
+  .rel-track .store-product-card > div:first-of-type {
+    height: 88px !important;
   }
 
   /* Thanh tab: 4 nhãn tiếng Việt không đủ chỗ trên 1 hàng -> xếp lưới 2x2
