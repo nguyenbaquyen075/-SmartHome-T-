@@ -146,7 +146,43 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 
 ---
 
+## 🔐 Trang quản trị
+
+Bấm **Tài khoản** (thanh dưới trên điện thoại, góc phải trên máy tính) → nhập mật khẩu.
+
+### Đặt mật khẩu
+
+Mật khẩu đọc từ biến môi trường `ADMIN_PASSWORD`, **không nằm trong code** nên
+không ai xem được qua GitHub.
+
+| Nơi chạy | Cách đặt |
+|---|---|
+| Máy của anh | `ADMIN_PASSWORD=matkhaucuaanh npm run dev` |
+| Render | **Settings → Environment → Add Environment Variable**: key `ADMIN_PASSWORD` |
+
+> ⚠️ Chưa đặt thì hệ thống dùng mật khẩu tạm `diennuoc@2026` và in cảnh báo ra log.
+> **Nhớ đặt biến này trên Render trước khi đưa web cho khách.**
+
+### Làm được gì
+
+| Tab | Nội dung |
+|---|---|
+| **Sản phẩm** | Thêm / sửa / xóa sản phẩm, xem tồn kho |
+| **Nhật ký thi công** | Thêm / sửa / xóa công trình, tải ảnh lên trực tiếp |
+| **Banner & thanh chạy** | Sửa các dòng chữ chạy, thay ảnh banner trang chủ |
+
+Ảnh tải lên lưu vào `frontend/public/images/tai-len/`. Nén ảnh dưới 400KB trước
+khi tải để trang không bị chậm (tối đa 6MB).
+
+Phiên đăng nhập lưu trong tab trình duyệt — đóng tab là phải đăng nhập lại.
+Server khởi động lại cũng vậy.
+
+---
+
 ## 🏗️ Thêm công trình vào Nhật ký thi công
+
+> Cách nhanh nhất là dùng **trang quản trị** (xem mục trên). Phần dưới đây dành cho
+> khi anh muốn sửa thẳng file.
 
 Mở [backend/data/projects.json](backend/data/projects.json), thêm một khối như sau vào danh sách:
 
@@ -203,8 +239,10 @@ trang không bị vỡ.
 
 ## 📢 Sửa nội dung thanh chạy trên banner
 
-Mở [frontend/src/components/PromoTicker.jsx](frontend/src/components/PromoTicker.jsx),
-sửa danh sách `MESSAGES` ở đầu file:
+Sửa trong **trang quản trị** → tab *Banner & thanh chạy* (cách khuyên dùng).
+
+Hoặc sửa thẳng danh sách mặc định trong
+[frontend/src/components/PromoTicker.jsx](frontend/src/components/PromoTicker.jsx):
 
 ```js
 const MESSAGES = [

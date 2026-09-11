@@ -186,7 +186,7 @@ export default function Navbar({
 
             {/* Tai khoan / Admin */}
             <div 
-              onClick={() => setIsAdmin(!isAdmin)}
+              onClick={() => setIsAdmin()}
               style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', padding: '4px 8px', borderRadius: '6px', backgroundColor: isAdmin ? 'rgba(255,255,255,0.2)' : 'transparent' }}
             >
               <User size={16} />

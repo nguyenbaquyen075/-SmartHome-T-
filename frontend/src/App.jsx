@@ -16,6 +16,7 @@ const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const ProductsPage = lazy(() => import('./components/ProductsPage'));
+const AdminLogin = lazy(() => import('./components/AdminLogin'));
 import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
 
 // 3 nhom hien o trang chu, ten khop voi 4 o DANH MUC SAN PHAM
@@ -49,6 +50,14 @@ export default function App() {
   // Modals state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  // Bam "Tài khoản" -> hien man dang nhap truoc, dung mat khau moi vao quan tri
+  const [dangDangNhap, setDangDangNhap] = useState(false);
+
+  const moQuanTri = async () => {
+    if (isAdmin) { setIsAdmin(false); return; }
+    if (await api.checkLogin()) setIsAdmin(true);   // con phien thi vao thang
+    else setDangDangNhap(true);
+  };
 
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
   const [homeGroups, setHomeGroups] = useState([]);
@@ -174,7 +183,7 @@ export default function App() {
         compareList={compareList}
         setIsCompareOpen={setIsCompareOpen}
         isAdmin={isAdmin}
-        setIsAdmin={setIsAdmin}
+        setIsAdmin={moQuanTri}
         setSelectedCategory={(cat) => {
           setSelectedCategory(cat);
           setViewingProduct(null);
@@ -357,7 +366,7 @@ export default function App() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onOpenProducts={() => openProductsPage('Tất cả')}
-          onToggleAdmin={() => setIsAdmin(!isAdmin)}
+          onToggleAdmin={moQuanTri}
         />
       </div>
 
@@ -370,6 +379,15 @@ export default function App() {
           onRemoveFromCompare={(id) => setCompareList((prev) => prev.filter((p) => p.id !== id))}
           onClearCompare={() => setCompareList([])}
         />
+        </Suspense>
+      )}
+
+      {dangDangNhap && (
+        <Suspense fallback={null}>
+          <AdminLogin
+            onSuccess={() => { setDangDangNhap(false); setIsAdmin(true); }}
+            onClose={() => setDangDangNhap(false)}
+          />
         </Suspense>
       )}
 

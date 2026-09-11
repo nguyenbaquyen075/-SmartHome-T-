@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
+  // Anh banner thay duoc trong trang quan tri
+  const [banner, setBanner] = useState(null);
+  useEffect(() => {
+    api.getSettings().then((s) => setBanner(s.banner || null)).catch(() => {});
+  }, []);
+
   return (
     <div style={{ paddingTop: '10px', paddingBottom: '16px' }}>
       <div className="container">
@@ -32,9 +39,9 @@ export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
           title="Xem danh mục sản phẩm"
         >
           <img
-            src="/images/banner_hero_1024.jpg"
-            srcSet="/images/banner_hero_640.jpg 640w, /images/banner_hero_1024.jpg 1024w, /images/banner_hero_2x.jpg 2048w"
-            sizes="(max-width: 768px) 100vw, 1024px"
+            src={banner || '/images/banner_hero_1024.jpg'}
+            srcSet={banner ? undefined : '/images/banner_hero_640.jpg 640w, /images/banner_hero_1024.jpg 1024w, /images/banner_hero_2x.jpg 2048w'}
+            sizes={banner ? undefined : '(max-width: 768px) 100vw, 1024px'}
             alt="SmartHome T&D Banner"
             fetchPriority="high"
             decoding="async"
