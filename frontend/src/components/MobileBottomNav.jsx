@@ -1,11 +1,10 @@
 import React from 'react';
-import { Home, LayoutGrid, PackageCheck, User } from 'lucide-react';
+import { Home, LayoutGrid, User } from 'lucide-react';
 
 export default function MobileBottomNav({
   activeTab = 'home',
   onGoHome,
   onOpenProducts,
-  onOpenTracker,
   onToggleAdmin
 }) {
   return (
@@ -65,28 +64,7 @@ export default function MobileBottomNav({
         </span>
       </button>
 
-      {/* 3. Tra cứu */}
-      <button
-        onClick={onOpenTracker}
-        style={{
-          background: 'none',
-          border: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '3px',
-          color: '#64748b',
-          cursor: 'pointer',
-          padding: '4px 12px'
-        }}
-      >
-        <PackageCheck size={22} />
-        <span style={{ fontSize: '0.72rem', fontWeight: 500 }}>
-          Tra cứu
-        </span>
-      </button>
-
-      {/* 4. Tài khoản / Quản trị */}
+      {/* 3. Tài khoản / Quản trị */}
       <button
         onClick={onToggleAdmin}
         style={{

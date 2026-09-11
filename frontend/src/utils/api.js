@@ -73,40 +73,6 @@ export const api = {
     return res.json();
   },
 
-  // Orders
-  async createOrder(orderData) {
-    const res = await fetch(`${API_BASE}/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData)
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Đặt hàng thất bại');
-    }
-    return res.json();
-  },
-
-  async getOrders() {
-    const res = await fetch(`${API_BASE}/orders`);
-    return res.json();
-  },
-
-  async getOrderById(id) {
-    const res = await fetch(`${API_BASE}/orders/${id}`);
-    if (!res.ok) throw new Error('Không tìm thấy thông tin đơn hàng');
-    return res.json();
-  },
-
-  async updateOrderStatus(id, status) {
-    const res = await fetch(`${API_BASE}/orders/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(status)
-    });
-    return res.json();
-  },
-
   // Stats
   async getStats() {
     const res = await fetch(`${API_BASE}/stats`);

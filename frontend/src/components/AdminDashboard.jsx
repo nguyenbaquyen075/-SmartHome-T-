@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Package, 
-  ShoppingBag, 
   TrendingUp, 
   AlertTriangle, 
   Plus, 
@@ -16,9 +15,8 @@ import {
 import { formatPrice } from '../utils/api';
 
 export default function AdminDashboard({ onClose, onProductChange }) {
-  const [activeTab, setActiveTab] = useState('products'); // 'products', 'orders'
+  const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -49,13 +47,11 @@ export default function AdminDashboard({ onClose, onProductChange }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prodsRes, ordsRes, statsRes] = await Promise.all([
+      const [prodsRes, statsRes] = await Promise.all([
         fetch('/api/products').then((r) => r.json()),
-        fetch('/api/orders').then((r) => r.json()),
         fetch('/api/stats').then((r) => r.json())
       ]);
       setProducts(prodsRes);
-      setOrders(ordsRes);
       setStats(statsRes);
     } catch (err) {
       console.error(err);
@@ -157,19 +153,6 @@ export default function AdminDashboard({ onClose, onProductChange }) {
     }
   };
 
-  const handleUpdateOrderStatus = async (orderId, orderStatus, paymentStatus) => {
-    try {
-      await fetch(`/api/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderStatus, paymentStatus })
-      });
-      loadData();
-    } catch (err) {
-      alert('Lỗi cập nhật đơn: ' + err.message);
-    }
-  };
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
@@ -199,7 +182,7 @@ export default function AdminDashboard({ onClose, onProductChange }) {
               <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Quản Trị Hệ Thống CameraTD</h2>
             </div>
             <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-              Quản lý kho máy ảnh, cập nhật giá bán, đơn đặt hàng và doanh thu
+              Quản lý kho hàng và cập nhật giá bán
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -247,44 +230,6 @@ export default function AdminDashboard({ onClose, onProductChange }) {
               alignItems: 'center',
               gap: '12px'
             }}>
-              <div style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '10px', borderRadius: '10px', color: '#06b6d4' }}>
-                <ShoppingBag size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Đơn Đặt Hàng</div>
-                <div style={{ fontSize: '1.3rem', fontWeight: 800 }}>{stats.totalOrders} đơn</div>
-              </div>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '12px',
-              padding: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '10px', color: '#10b981' }}>
-                <TrendingUp size={22} />
-              </div>
-              <div>
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Doanh Thu</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10b981' }}>
-                  {formatPrice(stats.totalRevenue)}
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '12px',
-              padding: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
               <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '10px', borderRadius: '10px', color: '#f43f5e' }}>
                 <AlertTriangle size={22} />
               </div>
@@ -320,20 +265,6 @@ export default function AdminDashboard({ onClose, onProductChange }) {
               }}
             >
               Danh Mục Sản Phẩm ({products.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('orders')}
-              style={{
-                padding: '8px 16px',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === 'orders' ? '2px solid #f59e0b' : '2px solid transparent',
-                color: activeTab === 'orders' ? '#f59e0b' : '#94a3b8',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              Quản Lý Đơn Hàng ({orders.length})
             </button>
           </div>
 
@@ -587,92 +518,6 @@ export default function AdminDashboard({ onClose, onProductChange }) {
             </div>
           )}
 
-          {/* Orders List Table */}
-          {activeTab === 'orders' && (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#94a3b8', fontSize: '0.8rem' }}>
-                    <th style={{ padding: '10px' }}>Mã Đơn</th>
-                    <th style={{ padding: '10px' }}>Khách Hàng</th>
-                    <th style={{ padding: '10px' }}>Sản Phẩm</th>
-                    <th style={{ padding: '10px' }}>Tổng Tiền</th>
-                    <th style={{ padding: '10px' }}>Trạng Thái Đơn</th>
-                    <th style={{ padding: '10px' }}>Thanh Toán</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((ord) => (
-                    <tr 
-                      key={ord.id}
-                      style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }}
-                    >
-                      <td style={{ padding: '10px', fontWeight: 700, color: '#fbbf24' }}>
-                        {ord.id}
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                          {new Date(ord.createdAt).toLocaleDateString('vi-VN')}
-                        </div>
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <div style={{ fontWeight: 600, color: '#f8fafc' }}>{ord.customer?.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{ord.customer?.phone}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{ord.customer?.address}</div>
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        {ord.items?.map((it) => (
-                          <div key={it.id} style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
-                            • {it.name} (x{it.quantity})
-                          </div>
-                        ))}
-                      </td>
-                      <td style={{ padding: '10px', fontWeight: 700, color: '#f59e0b' }}>
-                        {formatPrice(ord.finalAmount)}
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <select
-                          value={ord.orderStatus}
-                          onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value, ord.paymentStatus)}
-                          style={{
-                            background: '#0a0e17',
-                            color: ord.orderStatus === 'completed' ? '#10b981' : ord.orderStatus === 'shipping' ? '#06b6d4' : '#f59e0b',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '6px',
-                            padding: '4px 8px',
-                            fontSize: '0.8rem',
-                            fontWeight: 600
-                          }}
-                        >
-                          <option value="processing">Đang xử lý</option>
-                          <option value="shipping">Đang giao hàng</option>
-                          <option value="completed">Đã giao thành công</option>
-                          <option value="cancelled">Đã hủy</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <select
-                          value={ord.paymentStatus}
-                          onChange={(e) => handleUpdateOrderStatus(ord.id, ord.orderStatus, e.target.value)}
-                          style={{
-                            background: '#0a0e17',
-                            color: ord.paymentStatus === 'paid' ? '#10b981' : '#f59e0b',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '6px',
-                            padding: '4px 8px',
-                            fontSize: '0.8rem',
-                            fontWeight: 600
-                          }}
-                        >
-                          <option value="pending">Chờ thanh toán (COD)</option>
-                          <option value="waiting_payment">Chờ chuyển khoản</option>
-                          <option value="paid">Đã thanh toán (Hoàn tất)</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </div>
     </div>

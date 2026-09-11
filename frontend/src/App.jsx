@@ -3,9 +3,6 @@ import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
 import CategoryFilter from './components/CategoryFilter';
 import ProductCard from './components/ProductCard';
-import CartDrawer from './components/CartDrawer';
-import CheckoutModal from './components/CheckoutModal';
-import OrderTrackerModal from './components/OrderTrackerModal';
 import BottomBanner from './components/BottomBanner';
 import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
@@ -45,26 +42,11 @@ export default function App() {
     window.scrollTo({ top: 0 });
   };
 
-  // Cart state persisted to localStorage
-  const [cart, setCart] = useState(() => {
-    try {
-      const saved = localStorage.getItem('cameratd_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [discount, setDiscount] = useState(0);
-  const [voucherCode, setVoucherCode] = useState('');
-
   // Comparison state (up to 3 items)
   const [compareList, setCompareList] = useState([]);
 
   // Modals state
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
-  const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
@@ -80,11 +62,6 @@ export default function App() {
       setToast(null);
     }, 3000);
   };
-
-  // Sync cart to localStorage
-  useEffect(() => {
-    localStorage.setItem('cameratd_cart', JSON.stringify(cart));
-  }, [cart]);
 
   // Fetch products
   const fetchProductsList = async () => {
@@ -154,50 +131,11 @@ export default function App() {
     }
   };
 
-  // Cart handlers
-  const handleAddToCart = (product, quantity = 1) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.id === product.id);
-      if (existing) {
-        return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-        );
-      }
-      return [...prevCart, { ...product, quantity }];
-    });
-    showToast(`Đã thêm ${quantity} x ${product.name} vào giỏ hàng!`);
-  };
-
-  const handleUpdateQuantity = (productId, newQuantity) => {
-    setCart((prevCart) =>
-      prevCart.map((item) => (item.id === productId ? { ...item, quantity: newQuantity } : item))
-    );
-  };
-
-  const handleRemoveFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
-  };
-
-  const handleBuyNow = (product, quantity = 1) => {
-    handleAddToCart(product, quantity);
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
-  };
-
-  const handleOrderSuccess = () => {
-    setCart([]);
-    setDiscount(0);
-    setVoucherCode('');
-    fetchProductsList();
-  };
-
   const scrollToProducts = () => {
     if (productsRef.current) {
       productsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f4f6f9' }}>
@@ -232,11 +170,8 @@ export default function App() {
           setSearchTerm(term);
           if (viewingProduct) setViewingProduct(null);
         }}
-        cart={cart}
-        setIsCartOpen={setIsCartOpen}
         compareList={compareList}
         setIsCompareOpen={setIsCompareOpen}
-        setIsTrackerOpen={setIsTrackerOpen}
         isAdmin={isAdmin}
         setIsAdmin={setIsAdmin}
         setSelectedCategory={(cat) => {
@@ -252,8 +187,6 @@ export default function App() {
           product={viewingProduct}
           allProducts={products}
           onBack={() => handleSelectProduct(null)}
-          onAddToCart={handleAddToCart}
-          onBuyNow={handleBuyNow}
           onSelectProduct={handleSelectProduct}
         />
         </Suspense>
@@ -262,7 +195,6 @@ export default function App() {
           <ProductsPage
             initialCategory={productsPageCat}
             onViewDetails={handleSelectProduct}
-            onAddToCart={handleAddToCart}
             onGoHome={() => setProductsPageCat(null)}
           />
         </Suspense>
@@ -373,7 +305,6 @@ export default function App() {
                         product={product}
                         index={gi * 2 + i}
                         onViewDetails={handleSelectProduct}
-                        onAddToCart={handleAddToCart}
                       />
                     ))}
                   </div>
@@ -387,7 +318,6 @@ export default function App() {
                     product={product}
                     index={index}
                     onViewDetails={handleSelectProduct}
-                    onAddToCart={handleAddToCart}
                   />
                 ))}
               </div>
@@ -423,7 +353,6 @@ export default function App() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onOpenProducts={() => openProductsPage('Tất cả')}
-          onOpenTracker={() => setIsTrackerOpen(true)}
           onToggleAdmin={() => setIsAdmin(!isAdmin)}
         />
       </div>
@@ -436,46 +365,9 @@ export default function App() {
           onClose={() => setIsCompareOpen(false)}
           onRemoveFromCompare={(id) => setCompareList((prev) => prev.filter((p) => p.id !== id))}
           onClearCompare={() => setCompareList([])}
-          onAddToCart={(product) => {
-            handleAddToCart(product);
-            setIsCompareOpen(false);
-            setIsCartOpen(true);
-          }}
         />
         </Suspense>
       )}
-
-      {/* Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveFromCart}
-        onOpenCheckout={() => {
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
-        discount={discount}
-        setDiscount={setDiscount}
-        voucherCode={voucherCode}
-        setVoucherCode={setVoucherCode}
-      />
-
-      {/* Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cart={cart}
-        discount={discount}
-        onOrderSuccess={handleOrderSuccess}
-      />
-
-      {/* Order Tracker Modal */}
-      <OrderTrackerModal
-        isOpen={isTrackerOpen}
-        onClose={() => setIsTrackerOpen(false)}
-      />
 
       {/* Admin Dashboard */}
       {isAdmin && (

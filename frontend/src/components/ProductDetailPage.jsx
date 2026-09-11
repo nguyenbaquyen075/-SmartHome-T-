@@ -4,7 +4,6 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Star, 
-  ShoppingCart, 
   Zap, 
   ShieldCheck, 
   Truck, 
@@ -28,12 +27,9 @@ export default function ProductDetailPage({
   product,
   allProducts = [],
   onBack,
-  onAddToCart,
-  onBuyNow,
   onSelectProduct
 }) {
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('intro');
   const [isLiked, setIsLiked] = useState(false);
 
@@ -49,7 +45,6 @@ export default function ProductDetailPage({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedImgIdx(0);
-    setQuantity(1);
     setActiveTab('intro');
   }, [product?.id]);
 
@@ -429,60 +424,6 @@ export default function ProductDetailPage({
                 <Check size={12} strokeWidth={3} />
               </div>
               <span><strong>Còn hàng</strong> - Giao hàng nhanh 1 - 3 ngày trên toàn quốc</span>
-            </div>
-
-            {/* Quantity Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
-              <span style={{ fontSize: '0.9rem', color: '#64748b' }}>Số lượng</span>
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden' }}>
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  style={{ background: '#f8fafc', border: 'none', padding: '6px 14px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
-                >
-                  -
-                </button>
-                <span style={{ minWidth: '40px', textAlign: 'center', fontWeight: 700, fontSize: '0.95rem' }}>
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  style={{ background: '#f8fafc', border: 'none', padding: '6px 14px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-              <button
-                onClick={() => onAddToCart(product, quantity)}
-                className="btn-primary"
-                style={{ padding: '12px', fontSize: '0.95rem', fontWeight: 700, borderRadius: '8px' }}
-              >
-                <ShoppingCart size={18} />
-                <span>Thêm vào giỏ hàng</span>
-              </button>
-
-              <button
-                onClick={() => onBuyNow(product, quantity)}
-                style={{
-                  backgroundColor: '#fff',
-                  color: '#0066cc',
-                  border: '2px solid #0066cc',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Zap size={18} fill="#0066cc" />
-                <span>Mua ngay</span>
-              </button>
             </div>
 
             {/* Extra Utilities */}
@@ -873,27 +814,6 @@ export default function ProductDetailPage({
                       <span style={{ fontSize: '0.68rem', color: '#94a3b8', marginLeft: '3px' }}>({rel.reviewsCount || 40})</span>
                     </div>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddToCart(rel, 1);
-                      }}
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
-                        backgroundColor: '#eff6ff',
-                        border: '1px solid #bfdbfe',
-                        color: '#0066cc',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer'
-                      }}
-                      title="Thêm giỏ hàng"
-                    >
-                      <ShoppingCart size={14} />
-                    </button>
                   </div>
                 </div>
               );

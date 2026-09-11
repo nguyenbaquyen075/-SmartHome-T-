@@ -1,13 +1,12 @@
 import React from 'react';
-import { X, ShoppingCart, Trash2, SlidersHorizontal, Check } from 'lucide-react';
+import { X, Trash2, SlidersHorizontal, Check } from 'lucide-react';
 import { formatPrice } from '../utils/api';
 
 export default function ComparisonModal({
   compareList,
   onClose,
   onRemoveFromCompare,
-  onClearCompare,
-  onAddToCart
+  onClearCompare
 }) {
   if (compareList.length === 0) {
     return (
@@ -158,14 +157,6 @@ export default function ComparisonModal({
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginBottom: '8px' }}>
                       {product.name}
                     </div>
-                    <button
-                      onClick={() => onAddToCart(product)}
-                      className="btn-primary"
-                      style={{ width: '100%', padding: '6px 10px', fontSize: '0.8rem' }}
-                    >
-                      <ShoppingCart size={13} />
-                      Thêm Giỏ
-                    </button>
                   </th>
                 ))}
               </tr>
