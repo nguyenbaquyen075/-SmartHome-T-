@@ -263,6 +263,65 @@ body {
   min-width: 0;
 }
 
+/* ================= 3 NHÓM SẢN PHẨM Ở TRANG CHỦ ================= */
+.home-group {
+  margin-bottom: 26px;
+}
+.home-group:last-of-type {
+  margin-bottom: 8px;
+}
+
+.home-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 14px;
+}
+.home-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0066cc;
+  min-width: 0;
+}
+.home-group-title h2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-group-head button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #0066cc;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.home-group-head button:hover {
+  background: #eff6ff;
+}
+
+/* Mỗi nhóm chỉ 2 sản phẩm nên giữ đúng 2 cột, không để lưới tự dàn ra thưa thớt */
+.home-group-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  max-width: 640px;
+}
+
 /* ================= TRANG SẢN PHẨM ================= */
 .pp-wrap {
   padding-top: 14px;
@@ -681,6 +740,17 @@ body {
 
   .navbar-search > div {
     min-height: 38px;
+  }
+
+  /* 3 nhóm ở trang chủ: thẻ dùng hết bề ngang màn hình */
+  .home-group-grid {
+    max-width: none;
+  }
+  .home-group-title h2 {
+    font-size: 0.95rem;
+  }
+  .home-group {
+    margin-bottom: 20px;
   }
 
   /* Trang sản phẩm trên điện thoại: bỏ cột lọc, dùng bảng lọc trượt lên */

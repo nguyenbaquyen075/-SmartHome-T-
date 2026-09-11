@@ -18,7 +18,14 @@ const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const ProductsPage = lazy(() => import('./components/ProductsPage'));
-import { Flame, ArrowRight, Check, Info } from 'lucide-react';
+import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
+
+// 3 nhom hien o trang chu, ten khop voi 4 o DANH MUC SAN PHAM
+const HOME_GROUPS = [
+  { name: 'Thiết bị mạng', icon: Camera },
+  { name: 'Thiết bị điện', icon: Zap },
+  { name: 'Thiết bị nước', icon: Droplets }
+];
 
 export default function App() {
   const [products, setProducts] = useState([]);
@@ -60,6 +67,9 @@ export default function App() {
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
+  const [homeGroups, setHomeGroups] = useState([]);
+
   // Toast Notification
   const [toast, setToast] = useState(null);
   const productsRef = useRef(null);
@@ -100,6 +110,26 @@ export default function App() {
     }, 200);
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory]);
+
+  // Lay 2 san pham dau moi nhom. Goi API thay vi loc o client vi backend
+  // gom nhieu danh muc con vao 1 nhom (vd Thiết bị điện gom ca Đèn chiếu sáng).
+  useEffect(() => {
+    if (selectedCategory !== 'Tất cả' || searchTerm.trim()) {
+      setHomeGroups([]);
+      return;
+    }
+    let huy = false;
+    Promise.all(
+      HOME_GROUPS.map((g) =>
+        api.getProducts({ category: g.name })
+          .then((list) => ({ ...g, items: list.slice(0, 2) }))
+          .catch(() => ({ ...g, items: [] }))
+      )
+    ).then((res) => {
+      if (!huy) setHomeGroups(res.filter((g) => g.items.length > 0));
+    });
+    return () => { huy = true; };
+  }, [selectedCategory, searchTerm]);
 
   // Sync with URL hash for direct product view
   useEffect(() => {
@@ -259,9 +289,9 @@ export default function App() {
               onViewAll={openProductsPage}
             />
 
-            {/* Section Heading: SẢN PHẨM NỔI BẬT */}
+            {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
             <div style={{
-              display: 'flex',
+              display: homeGroups.length > 0 ? 'none' : 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: '14px'
@@ -321,6 +351,34 @@ export default function App() {
                   Xem toàn bộ danh mục
                 </button>
               </div>
+            ) : homeGroups.length > 0 ? (
+              /* Mục "Tất cả": 3 nhóm, mỗi nhóm 2 sản phẩm + nút sang trang sản phẩm của nhóm đó */
+              homeGroups.map((group, gi) => (
+                <section key={group.name} className="home-group">
+                  <div className="home-group-head">
+                    <div className="home-group-title">
+                      <group.icon size={18} />
+                      <h2>{group.name.toUpperCase()}</h2>
+                    </div>
+                    <button onClick={() => openProductsPage(group.name)}>
+                      <span>Xem thêm</span>
+                      <ArrowRight size={13} />
+                    </button>
+                  </div>
+
+                  <div className="products-grid home-group-grid">
+                    {group.items.map((product, i) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        index={gi * 2 + i}
+                        onViewDetails={handleSelectProduct}
+                        onAddToCart={handleAddToCart}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))
             ) : (
               <div className="products-grid">
                 {products.map((product, index) => (
