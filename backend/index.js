@@ -102,6 +102,7 @@ app.post('/api/projects', canQuyen, (req, res) => {
     startDate: req.body.startDate || new Date().toISOString().slice(0, 10),
     durationDays: Number(req.body.durationDays) || 0,
     status: req.body.status || 'Hoàn thành',
+    description: req.body.description || '',
     image: req.body.image || '/images/cat_tools.jpg'
   };
   projects.push(moi);

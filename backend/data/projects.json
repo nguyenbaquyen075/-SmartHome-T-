@@ -7,7 +7,8 @@
     "startDate": "2026-08-14",
     "durationDays": 2,
     "status": "Hoàn thành",
-    "image": "/images/camera_day.jpg"
+    "image": "/images/camera_day.jpg",
+    "description": "Khảo sát mặt bằng 4 tầng, tư vấn vị trí đặt 8 mắt camera phủ kín cổng, sân, hành lang và cầu thang. Đi dây âm tường toàn bộ, lắp đầu ghi 8 kênh kèm ổ cứng 1TB lưu trữ liên tục 30 ngày. Cài đặt app xem từ xa trên điện thoại cho 4 thành viên trong gia đình, hướng dẫn chủ nhà cách trích xuất video khi cần."
   },
   {
     "id": "ct-2026-07",
@@ -17,7 +18,8 @@
     "startDate": "2026-07-28",
     "durationDays": 6,
     "status": "Hoàn thành",
-    "image": "/images/cat_wires.jpg"
+    "image": "/images/cat_wires.jpg",
+    "description": "Thi công tủ điện tổng 3 pha cho nhà xưởng 600m², lắp aptomat Schneider phân nhánh theo từng khu vực máy móc. Đi 450m dây Cadivi trong máng cáp công nghiệp dọc trần, đảm bảo tải ổn định khi chạy đồng thời toàn bộ dây chuyền. Kiểm tra cách điện và bàn giao hồ sơ hoàn công."
   },
   {
     "id": "ct-2026-06",
@@ -27,7 +29,8 @@
     "startDate": "2026-06-19",
     "durationDays": 3,
     "status": "Hoàn thành",
-    "image": "/images/cat_lighting.jpg"
+    "image": "/images/cat_lighting.jpg",
+    "description": "Bố trí ánh sáng cho showroom 200m² theo 4 vùng điều khiển riêng: khu trưng bày chính, kệ sản phẩm, quầy thu ngân và lối đi. Lắp 60 đèn LED âm trần chống chói kết hợp đèn rọi ray làm nổi bật sản phẩm. Ánh sáng đồng đều, không đổ bóng lên mặt hàng."
   },
   {
     "id": "ct-2026-05",
@@ -37,7 +40,8 @@
     "startDate": "2026-05-06",
     "durationDays": 8,
     "status": "Hoàn thành",
-    "image": "/images/cat_pipes.jpg"
+    "image": "/images/cat_pipes.jpg",
+    "description": "Cải tạo toàn bộ đường ống cấp thoát nước cho khách sạn 9 phòng đang xuống cấp. Thay ống PVC Bình Minh D21-D110, lắp mới 9 bộ vòi sen và thiết bị vệ sinh. Bổ sung máy bơm tăng áp giải quyết tình trạng nước yếu ở tầng trên cùng vào giờ cao điểm."
   },
   {
     "id": "ct-2026-04",
@@ -47,7 +51,8 @@
     "startDate": "2026-04-22",
     "durationDays": 2,
     "status": "Hoàn thành",
-    "image": "/images/camera_night.jpg"
+    "image": "/images/camera_night.jpg",
+    "description": "Lắp 4 camera Imou xoay 360° phủ sân vườn, hồ bơi và hai cổng ra vào của biệt thự song lập. Kết hợp chuông hình tại cổng chính cho phép chủ nhà nhìn và nói chuyện với khách qua điện thoại. Phủ sóng wifi mesh 3 điểm đảm bảo camera không mất kết nối ở khu vực sân xa nhà."
   },
   {
     "id": "ct-2026-03",
@@ -57,6 +62,7 @@
     "startDate": "2026-03-11",
     "durationDays": 4,
     "status": "Hoàn thành",
-    "image": "/images/cat_water.jpg"
+    "image": "/images/cat_water.jpg",
+    "description": "Xử lý tình trạng nước yếu và đục tại chung cư mini 12 phòng. Lắp máy bơm tăng áp Panasonic kết hợp bồn chứa 2000L trên mái, bổ sung bộ lọc thô đầu nguồn loại bỏ cặn và rỉ sét. Sau thi công, nước ổn định ở cả 12 phòng kể cả giờ cao điểm sáng và tối."
   }
 ]

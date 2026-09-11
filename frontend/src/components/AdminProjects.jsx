@@ -3,7 +3,7 @@ import { Plus, Pencil, Trash2, X, Upload } from 'lucide-react';
 import { api } from '../utils/api';
 
 const RONG = {
-  title: '', address: '', customerType: '',
+  title: '', address: '', customerType: '', description: '',
   startDate: new Date().toISOString().slice(0, 10),
   durationDays: '', status: 'Hoàn thành', image: ''
 };
@@ -118,6 +118,16 @@ export default function AdminProjects({ projects, onReload, onBao }) {
               </select>
             </label>
           </div>
+
+          <label className="adm-mota">
+            <span>Nội dung thi công (hiện khi khách bấm vào công trình)</span>
+            <textarea
+              rows={4}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="Mô tả công việc đã làm: khảo sát, đi dây, lắp đặt, bàn giao…"
+            />
+          </label>
 
           <div className="adm-anh">
             <div className="adm-anh-xem">

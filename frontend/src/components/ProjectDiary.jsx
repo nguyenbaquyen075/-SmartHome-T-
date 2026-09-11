@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HardHat, MapPin, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../utils/api';
+import ProjectDetail from './ProjectDetail';
 
 const formatDate = (iso) => {
   const d = new Date(iso);
@@ -9,6 +10,7 @@ const formatDate = (iso) => {
 
 export default function ProjectDiary() {
   const [projects, setProjects] = useState([]);
+  const [dangXem, setDangXem] = useState(null);   // công trình đang mở chi tiết
   const trackRef = useRef(null);
 
   useEffect(() => {
@@ -68,7 +70,14 @@ export default function ProjectDiary() {
       {/* Bang luot ngang */}
       <div className="diary-track" ref={trackRef}>
         {projects.map((p) => (
-          <article key={p.id} className="diary-card">
+          <article
+            key={p.id}
+            className="diary-card"
+            onClick={() => setDangXem(p)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setDangXem(p)}
+            role="button"
+            tabIndex={0}
+          >
             <div className="diary-thumb">
               <img src={p.image} alt={p.title} loading="lazy" decoding="async" />
               <span className="diary-status">
@@ -92,10 +101,16 @@ export default function ProjectDiary() {
               </div>
 
               {p.customerType ? <div className="diary-type">{p.customerType}</div> : null}
+
+              <span className="diary-xem">Xem chi tiết →</span>
             </div>
           </article>
         ))}
       </div>
+
+      {dangXem && (
+        <ProjectDetail project={dangXem} onClose={() => setDangXem(null)} />
+      )}
     </section>
   );
 }

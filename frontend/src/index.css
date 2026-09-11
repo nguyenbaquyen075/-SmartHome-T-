@@ -657,6 +657,22 @@ body {
 .adm-anh-duongdan:focus { border-color: #f59e0b; }
 .adm-grid select option { background: #0f172a; }
 
+.adm-mota { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+.adm-mota span { font-size: 0.76rem; color: #94a3b8; font-weight: 600; }
+.adm-mota textarea {
+  padding: 10px 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font: inherit;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  outline: none;
+  resize: vertical;
+}
+.adm-mota textarea:focus { border-color: #f59e0b; }
+
 .adm-anh { display: flex; gap: 14px; margin-top: 14px; align-items: flex-start; flex-wrap: wrap; }
 .adm-anh-xem {
   width: 128px;
@@ -1182,6 +1198,113 @@ body {
   cursor: pointer;
 }
 
+/* ================= CHI TIẾT CÔNG TRÌNH ================= */
+.ct-chitiet {
+  /* Mở toàn màn hình, thoát khỏi khung .modal-overlay có padding */
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  border-radius: 0;
+  width: 100vw;
+  max-height: none;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ct-dong {
+  /* Chỉ dấu X, không nền tròn. Bóng đổ để nổi trên ảnh sáng */
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  padding: 6px;
+  border: none;
+  background: none;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
+  transition: transform 0.15s, color 0.15s;
+}
+.ct-dong:hover { color: #b91c1c; transform: scale(1.12); }
+
+.ct-anh {
+  position: relative;
+  height: min(46vh, 420px);
+  background: #f1f5f9;
+}
+.ct-anh img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ct-trangthai {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 20px;
+}
+
+.ct-than {
+  padding: 26px 24px 60px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.ct-than h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.35;
+  margin-bottom: 16px;
+}
+
+.ct-tt {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  gap: 2px 24px;
+  border-top: 1px solid #f1f5f9;
+}
+.ct-tt > div {
+  padding: 11px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.ct-tt dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.ct-tt dt svg { color: #0066cc; flex-shrink: 0; }
+.ct-tt dd {
+  font-size: 0.88rem;
+  color: #1e293b;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ct-mota { margin-top: 18px; }
+.ct-mota h3 {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0066cc;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+.ct-mota p {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.7;
+}
+
 /* ================= NHẬT KÝ THI CÔNG ================= */
 /* Lướt ngang bằng scroll-snap có sẵn của trình duyệt, không cần thư viện carousel */
 .diary-track {
@@ -1199,6 +1322,7 @@ body {
 
 .diary-card {
   flex: 0 0 460px;
+  cursor: pointer;
   scroll-snap-align: start;
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -1283,6 +1407,15 @@ body {
   flex-shrink: 0;
   margin-top: 2px;
 }
+.diary-xem {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #0066cc;
+}
+.diary-card:hover .diary-xem { text-decoration: underline; }
+
 .diary-type {
   align-self: flex-start;
   background: #eff6ff;
@@ -1458,6 +1591,12 @@ body {
   }
   .pd-ts dt { max-width: none; font-size: 0.76rem; }
   .pd-ts dd { text-align: left; font-size: 0.86rem; }
+
+  /* Chi tiết công trình trên điện thoại */
+  .ct-anh { height: 34vh; }
+  .ct-than { padding: 20px 16px calc(70px + env(safe-area-inset-bottom)); }
+  .ct-than h2 { font-size: 1.12rem; }
+  .ct-tt { grid-template-columns: 1fr; gap: 0; }
 
   /* Mô tả trên điện thoại */
   .pd-camket { grid-template-columns: 1fr; gap: 0; }
