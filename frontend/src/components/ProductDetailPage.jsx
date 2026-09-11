@@ -143,8 +143,6 @@ export default function ProductDetailPage({
           <span style={{ cursor: 'pointer' }} onClick={onBack}>Camera</span>
           <ChevronRight size={13} color="#94a3b8" />
           <span style={{ cursor: 'pointer' }} onClick={onBack}>{product.category}</span>
-          <ChevronRight size={13} color="#94a3b8" />
-          <span style={{ color: '#0066cc', fontWeight: 600 }}>{product.name}</span>
           </div>
 
           <button className="nut-tro-ve" onClick={onBack}>
