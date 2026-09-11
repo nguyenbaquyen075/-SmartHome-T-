@@ -627,51 +627,19 @@ export default function ProductDetailPage({
             </button>
           </div>
 
-          {/* Related Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))',
-            gap: '16px'
-          }}>
+          {/* Chay ngang: vuot tay tren dien thoai, truot ngang tren may tinh */}
+          <div className="rel-track">
             {displayRelated.map((rel) => {
               return (
                 <div
                   key={rel.id}
-                  style={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '10px',
-                    padding: '14px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                  }}
+                  className="rel-card"
                   onClick={() => onSelectProduct(rel)}
-                  onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 102, 204, 0.12)'}
-                  onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)'}
                 >
-                  <div style={{ width: '100%', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', marginBottom: '8px' }}>
-                    <img src={rel.image} alt={rel.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+                  <div className="rel-thumb">
+                    <img src={rel.image} alt={rel.name} loading="lazy" decoding="async" />
                   </div>
-
-                  <h4 style={{
-                    fontSize: '0.82rem',
-                    fontWeight: 600,
-                    color: '#1e293b',
-                    lineHeight: 1.3,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    minHeight: '34px',
-                    marginBottom: '6px'
-                  }}>
-                    {rel.name}
-                  </h4>
-
+                  <h4>{rel.name}</h4>
                 </div>
               );
             })}
