@@ -636,7 +636,6 @@ export default function ProductDetailPage({
                 product={rel}
                 index={99}
                 onViewDetails={onSelectProduct}
-                showPrice={false}
               />
             ))}
           </div>

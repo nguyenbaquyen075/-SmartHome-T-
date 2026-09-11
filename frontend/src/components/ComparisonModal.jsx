@@ -1,6 +1,5 @@
 import React from 'react';
 import { X, Trash2, SlidersHorizontal, Check } from 'lucide-react';
-import { formatPrice } from '../utils/api';
 
 export default function ComparisonModal({
   compareList,
@@ -42,7 +41,6 @@ export default function ComparisonModal({
   }
 
   const specRows = [
-    { key: 'price', label: 'Giá niêm yết', isCustom: (p) => formatPrice(p.price) },
     { key: 'sensor', label: 'Cảm biến hình ảnh', isCustom: (p) => p.specs?.sensor || 'N/A' },
     { key: 'processor', label: 'Bộ vi xử lý', isCustom: (p) => p.specs?.processor || 'N/A' },
     { key: 'video', label: 'Quay phim Video', isCustom: (p) => p.specs?.video || 'N/A' },
