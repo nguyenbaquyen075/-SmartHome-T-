@@ -7,6 +7,7 @@ import BottomBanner from './components/BottomBanner';
 import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
 import ProjectDiary from './components/ProjectDiary';
+import PromoTicker from './components/PromoTicker';
 import { api } from './utils/api';
 
 // Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
@@ -200,6 +201,9 @@ export default function App() {
         </Suspense>
       ) : (
         <>
+          {/* Thanh chạy thông báo, nằm ngay trên banner */}
+          <PromoTicker />
+
           {/* Hero Banner (Desktop 3-column + Mobile Slider) */}
           <HeroBanner
             onSelectCategory={(cat) => {
