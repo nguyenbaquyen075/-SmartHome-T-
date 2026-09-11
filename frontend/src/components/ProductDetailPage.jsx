@@ -5,6 +5,8 @@ import {
   ChevronLeft, 
   Zap, 
   ShieldCheck, 
+  RotateCcw,
+  Headphones,
   Truck, 
   Wrench, 
   Heart, 
@@ -573,12 +575,22 @@ export default function ProductDetailPage({
                 </h2>
               </div>
 
-              <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', fontSize: '0.88rem', color: '#334155', lineHeight: 1.7 }}>
-                <div style={{ marginBottom: '8px' }}>• <strong>Bước 1:</strong> Cố định camera lên tường và cắm nguồn điện 12V hoặc dây mạng PoE.</div>
-                <div style={{ marginBottom: '8px' }}>• <strong>Bước 2:</strong> Tải ứng dụng trên điện thoại qua App Store hoặc Google Play.</div>
-                <div style={{ marginBottom: '8px' }}>• <strong>Bước 3:</strong> Quét mã QR code in trên tem thân máy để kết nối.</div>
-                <div>• <strong>Bước 4:</strong> Đặt mật khẩu và bắt đầu xem video trực tiếp từ xa 24/7.</div>
-              </div>
+              <ol className="pd-buoc">
+                {[
+                  'Cố định camera lên tường và cắm nguồn điện 12V hoặc dây mạng PoE.',
+                  'Tải ứng dụng trên điện thoại qua App Store hoặc Google Play.',
+                  'Quét mã QR code in trên tem thân máy để kết nối.',
+                  'Đặt mật khẩu và bắt đầu xem video trực tiếp từ xa 24/7.'
+                ].map((noiDung, i) => (
+                  <li key={i}>
+                    <span className="pd-buoc-so">{i + 1}</span>
+                    <div>
+                      <strong>Bước {i + 1}</strong>
+                      <p>{noiDung}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </section>
 
             <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
@@ -592,10 +604,31 @@ export default function ProductDetailPage({
                 </h2>
               </div>
 
-              <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '16px', fontSize: '0.88rem', color: '#1e3a8a', lineHeight: 1.7 }}>
-                <p style={{ marginBottom: '8px' }}>• <strong>Bảo hành:</strong> 24 tháng chính hãng tại tất cả trung tâm bảo hành toàn quốc.</p>
-                <p style={{ marginBottom: '8px' }}>• <strong>Đổi mới:</strong> 1 đổi 1 trong vòng 7 ngày nếu lỗi phần cứng từ nhà sản xuất.</p>
-                <p>• <strong>Hỗ trợ kỹ thuật:</strong> Gọi ngay hotline <strong style={{ color: '#0066cc' }}>0987 654 321</strong> phục vụ từ 8:00 đến 22:00 hàng ngày.</p>
+              <div className="pd-camket">
+                <div className="pd-camket-o">
+                  <div className="pd-camket-icon"><ShieldCheck size={20} /></div>
+                  <div className="pd-camket-tt">
+                    <strong>Bảo hành 24 tháng</strong>
+                    <p>Chính hãng tại tất cả trung tâm bảo hành trên toàn quốc</p>
+                  </div>
+                </div>
+                <div className="pd-camket-o">
+                  <div className="pd-camket-icon"><RotateCcw size={20} /></div>
+                  <div className="pd-camket-tt">
+                    <strong>1 đổi 1 trong 7 ngày</strong>
+                    <p>Áp dụng khi lỗi phần cứng từ nhà sản xuất</p>
+                  </div>
+                </div>
+                <div className="pd-camket-o">
+                  <div className="pd-camket-icon"><Headphones size={20} /></div>
+                  <div className="pd-camket-tt">
+                    <strong>Hỗ trợ kỹ thuật</strong>
+                    <p>
+                      Gọi <a href="tel:0987654321">0987 654 321</a><br />
+                      Phục vụ 8:00 - 22:00 hàng ngày
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
           </div>
