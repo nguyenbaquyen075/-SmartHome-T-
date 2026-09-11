@@ -20,6 +20,7 @@ import {
   Compass,
   CheckCircle2
 } from 'lucide-react';
+import ProductCard from './ProductCard';
 
 export default function ProductDetailPage({
   product,
@@ -629,20 +630,15 @@ export default function ProductDetailPage({
 
           {/* Chay ngang: vuot tay tren dien thoai, truot ngang tren may tinh */}
           <div className="rel-track">
-            {displayRelated.map((rel) => {
-              return (
-                <div
-                  key={rel.id}
-                  className="rel-card"
-                  onClick={() => onSelectProduct(rel)}
-                >
-                  <div className="rel-thumb">
-                    <img src={rel.image} alt={rel.name} loading="lazy" decoding="async" />
-                  </div>
-                  <h4>{rel.name}</h4>
-                </div>
-              );
-            })}
+            {displayRelated.map((rel) => (
+              <ProductCard
+                key={rel.id}
+                product={rel}
+                index={99}
+                onViewDetails={onSelectProduct}
+                showPrice={false}
+              />
+            ))}
           </div>
         </div>
       </div>
