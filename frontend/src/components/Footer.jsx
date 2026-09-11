@@ -90,7 +90,6 @@ export default function Footer() {
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
               <li>• Chính sách bảo hành chính hãng 24 tháng</li>
               <li>• Dịch vụ tư vấn & khảo sát lắp đặt tận nơi</li>
-              <li>• Giao hàng hỏa tốc trong ngày</li>
               <li>• Đổi mới 100% trong 7 ngày nếu lỗi sản xuất</li>
               <li>• Hỗ trợ cài đặt phần mềm camera qua điện thoại</li>
             </ul>
