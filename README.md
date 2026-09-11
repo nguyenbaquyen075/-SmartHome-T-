@@ -23,6 +23,7 @@ cameraTD/
 │   ├── index.js             Toàn bộ API + phục vụ bản build của frontend
 │   ├── data/
 │   │   ├── products.json    Danh sách sản phẩm
+│   │   ├── projects.json    Nhật ký thi công (các công trình đã làm)
 │   │   └── orders.json      Đơn hàng khách đặt
 │   └── package.json         Thư viện riêng của backend
 │
@@ -122,7 +123,47 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 | GET | `/api/orders` | Danh sách đơn hàng |
 | POST | `/api/orders` | Tạo đơn hàng mới |
 | PUT | `/api/orders/:id` | Cập nhật trạng thái đơn |
+| GET | `/api/projects` | Nhật ký thi công (tự sắp xếp mới nhất trước) |
 | GET | `/api/stats` | Số liệu tổng quan cho trang quản trị |
+
+---
+
+## 🏗️ Thêm công trình vào Nhật ký thi công
+
+Mở [backend/data/projects.json](backend/data/projects.json), thêm một khối như sau vào danh sách:
+
+```json
+{
+  "id": "ct-2026-09",
+  "title": "Lắp đặt hệ thống 6 camera cho kho hàng",
+  "address": "Số 10 Lê Lợi, P. Bến Nghé, Quận 1, TP.HCM",
+  "customerType": "Kho hàng 300m²",
+  "startDate": "2026-09-05",
+  "durationDays": 3,
+  "status": "Hoàn thành",
+  "items": ["6 camera Dahua 4MP", "Đầu ghi 8 kênh", "200m cáp"],
+  "image": "/images/cong-trinh/kho-le-loi.jpg"
+}
+```
+
+| Trường | Ý nghĩa | Bắt buộc |
+|---|---|---|
+| `id` | Mã riêng, không trùng công trình khác | ✅ |
+| `title` | Lắp đặt gì — hiện làm tiêu đề thẻ | ✅ |
+| `address` | Địa chỉ công trình | ✅ |
+| `startDate` | Ngày khởi công, dạng `NĂM-THÁNG-NGÀY` | ✅ |
+| `image` | Đường dẫn ảnh trong `frontend/public/images/` | ✅ |
+| `status` | Chữ trên nhãn xanh (VD: `Hoàn thành`, `Đang thi công`) | ✅ |
+| `customerType` | Loại công trình (nhà phố, nhà xưởng...) | không |
+| `durationDays` | Thi công mấy ngày | không |
+| `items` | Các hạng mục, hiện thành các ô nhỏ phía dưới | không |
+
+Lưu file là xong, **không cần build lại** — chỉ cần tải lại trang. Danh sách tự sắp xếp
+công trình mới nhất lên đầu theo `startDate`.
+
+> ⚠️ Ảnh 6 công trình hiện tại là **ảnh minh hoạ lấy tạm** từ kho ảnh có sẵn của dự án.
+> Anh thay bằng ảnh chụp thực tế: bỏ ảnh vào `frontend/public/images/cong-trinh/`,
+> nén trước theo hướng dẫn mục dưới, rồi sửa `image` trong `projects.json`.
 
 ---
 

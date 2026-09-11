@@ -21,6 +21,13 @@ export const api = {
     return res.json();
   },
 
+  // Nhat ky thi cong
+  async getProjects() {
+    const res = await fetch(`${API_BASE}/projects`);
+    if (!res.ok) throw new Error('Không thể tải nhật ký thi công');
+    return res.json();
+  },
+
   async getProduct(id) {
     const res = await fetch(`${API_BASE}/products/${id}`);
     if (!res.ok) throw new Error('Không thể tải chi tiết sản phẩm');
