@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Phone, Mail, Clock, MapPin, ShieldCheck, Zap, Droplet } from 'lucide-react';
+import { Home, Phone, Mail, Clock, Zap, Droplet } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -52,68 +52,6 @@ export default function Footer() {
                 <Clock size={15} color="#0066cc" />
                 <span>Giờ mở cửa: 8:00 - 22:00 hàng ngày</span>
               </div>
-            </div>
-          </div>
-
-          {/* Col 2: Showroom */}
-          <div>
-            <h4 style={{ color: '#1e293b', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px' }}>
-              Địa Chỉ Cửa Hàng
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <MapPin size={16} color="#0066cc" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Cơ sở 1:</strong> 120 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <MapPin size={16} color="#0066cc" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Cơ sở 2:</strong> 84 Trần Quang Khải, P. Tân Định, Quận 1, TP.HCM
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <MapPin size={16} color="#0066cc" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Cơ sở 3:</strong> 45 Nguyễn Văn Linh, Hải Châu, Đà Nẵng
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Col 3: Policy */}
-          <div>
-            <h4 style={{ color: '#1e293b', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px' }}>
-              Chính Sách & Dịch Vụ
-            </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
-              <li>• Chính sách bảo hành chính hãng 24 tháng</li>
-              <li>• Dịch vụ tư vấn & khảo sát lắp đặt tận nơi</li>
-              <li>• Đổi mới 100% trong 7 ngày nếu lỗi sản xuất</li>
-              <li>• Hỗ trợ cài đặt phần mềm camera qua điện thoại</li>
-            </ul>
-          </div>
-
-          {/* Col 4: Authorized brands */}
-          <div>
-            <h4 style={{ color: '#1e293b', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px' }}>
-              Thương Hiệu Hợp Tác
-            </h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              {['HIKVISION', 'IMOU', 'DAHUA', 'SCHNEIDER', 'CADIVI', 'PANASONIC', 'RẠNG ĐÔNG', 'BÌNH MINH'].map((b) => (
-                <span key={b} style={{
-                  backgroundColor: '#f1f5f9',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '4px',
-                  padding: '4px 8px',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  color: '#334155'
-                }}>
-                  {b}
-                </span>
-              ))}
             </div>
           </div>
         </div>
