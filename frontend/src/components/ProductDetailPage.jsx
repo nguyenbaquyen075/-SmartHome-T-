@@ -33,10 +33,10 @@ export default function ProductDetailPage({
 
   // 4 Main Tabs: Giới thiệu, Thông số kỹ thuật, Hướng dẫn sử dụng, Chính sách bảo hành
   const tabs = [
-    { id: 'sec-intro', key: 'intro', label: 'Giới thiệu', icon: FileText },
-    { id: 'sec-specs', key: 'specs', label: 'Thông số kỹ thuật', icon: Cog },
-    { id: 'sec-guide', key: 'guide', label: 'Hướng dẫn sử dụng', icon: BookOpen },
-    { id: 'sec-warranty', key: 'warranty', label: 'Chính sách bảo hành', icon: ShieldCheck }
+    { id: 'sec-intro', key: 'intro', label: 'Giới thiệu', short: 'Giới thiệu', icon: FileText },
+    { id: 'sec-specs', key: 'specs', label: 'Thông số kỹ thuật', short: 'Thông số', icon: Cog },
+    { id: 'sec-guide', key: 'guide', label: 'Hướng dẫn sử dụng', short: 'Hướng dẫn', icon: BookOpen },
+    { id: 'sec-warranty', key: 'warranty', label: 'Chính sách bảo hành', short: 'Bảo hành', icon: ShieldCheck }
   ];
 
   // Scroll to top when product changes
@@ -84,10 +84,10 @@ export default function ProductDetailPage({
   // Multiple gallery images
   const images = product.images && product.images.length > 1 ? product.images : [
     product.image,
-    'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+    '/images/products/1558002038-1055907df827.jpg',
+    '/images/products/1557597774-9d273605dfa9.jpg',
+    '/images/products/1584622650111-993a426fbf0a.jpg',
+    '/images/products/1581092160607-ee22621dd758.jpg'
   ];
 
   // Related products
@@ -404,23 +404,7 @@ export default function ProductDetailPage({
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
           {/* Sticky Tab Navigation Bar - Stays permanently pinned at top while scrolling */}
-          <div style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 1000,
-            backgroundColor: '#f0f7ff',
-            borderBottom: '1px solid #bfdbfe',
-            borderTopLeftRadius: '11px',
-            borderTopRightRadius: '11px',
-            padding: '10px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            overflowX: 'auto',
-            boxShadow: '0 4px 14px rgba(0, 102, 204, 0.1)',
-            WebkitOverflowScrolling: 'touch',
-            backdropFilter: 'blur(8px)'
-          }}>
+          <div className="pd-tabbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -428,37 +412,11 @@ export default function ProductDetailPage({
                 <button
                   key={tab.key}
                   onClick={() => scrollToTabSection(tab.id, tab.key)}
-                  style={{
-                    backgroundColor: isActive ? '#0066cc' : 'transparent',
-                    color: isActive ? '#fff' : '#475569',
-                    border: 'none',
-                    padding: '9px 18px',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.88rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.15s ease',
-                    boxShadow: isActive ? '0 2px 8px rgba(0, 102, 204, 0.28)' : 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = '#e0f2fe';
-                      e.currentTarget.style.color = '#0066cc';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#475569';
-                    }
-                  }}
+                  className={`pd-tab ${isActive ? 'on' : ''}`}
                 >
-                  <Icon size={16} color={isActive ? '#fff' : '#64748b'} />
-                  <span>{tab.label}</span>
+                  <Icon size={16} />
+                  <span className="pd-tab-full">{tab.label}</span>
+                  <span className="pd-tab-short">{tab.short}</span>
                 </button>
               );
             })}
