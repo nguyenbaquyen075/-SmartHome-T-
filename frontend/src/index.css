@@ -907,23 +907,64 @@ body {
   }
 
   .navbar-name-main {
-    font-size: clamp(0.86rem, 4.3vw, 1.08rem);
+    font-size: clamp(0.82rem, 4.1vw, 1.02rem);
     letter-spacing: -0.2px;
   }
   .navbar-name-sub {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
   }
 
-  /* Logo + ô tìm kiếm + nút danh mục nằm chung 1 hàng */
+  /* ===== Hiệu ứng mở/đóng ô tìm kiếm =====
+     Chữ bị hút về phía logo rồi mờ đi, ô tìm kiếm trượt vào từ bên phải */
+  .navbar-name {
+    overflow: hidden;
+    transform-origin: left center;
+    transition:
+      max-width 0.34s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease,
+      transform 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 60vw;
+    opacity: 1;
+  }
+  .navbar-main-row.searching .navbar-name {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-18px) scale(0.35);
+  }
+
+  /* Ô tìm kiếm nằm đè lên hàng, mặc định đẩy khuất sang phải */
   .navbar-search {
-    flex: 1 1 auto !important;
-    max-width: none !important;
-    min-width: 0;
-    margin-top: 0;
+    position: absolute !important;
+    /* chua cho ben trai de van thay logo - chu thu ve "trong ngoi nha" */
+    left: 68px;
+    right: 76px;
+    z-index: 4;
+    flex: none !important;
+    transform: translateX(115%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.34s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.22s ease;
+  }
+  .navbar-main-row.searching .navbar-search {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Máy nào bật giảm chuyển động thì đổi trạng thái tức thì */
+  @media (prefers-reduced-motion: reduce) {
+    .navbar-name,
+    .navbar-search {
+      transition: none;
+    }
   }
 
   .navbar-main-row {
     flex-wrap: nowrap;
+    /* o tim kiem luc an bi day ra ngoai man -> phai chan lai keo trang tran ngang */
+    overflow: hidden;
   }
 
   .navbar-main-row > .mobile-flex {
