@@ -185,15 +185,19 @@ công trình mới nhất lên đầu theo `startDate`.
 
 ## 🏷️ Thay logo trên header
 
-Đặt file logo vào đúng đường dẫn sau, trang tự nhận, **không cần sửa code**:
+Có 2 file logo trong `frontend/public/images/`:
 
-```
-frontend/public/images/logo.png
-```
+| File | Dùng ở đâu | Nội dung |
+|---|---|---|
+| `logoTD.png` | Header | **Chỉ phần hình** (nhà + TĐ + phích cắm), 132×63px |
+| `logoTD-full.png` | Chưa dùng | Bản đầy đủ có chữ, 400×400px — để dành cho footer |
 
-- Nên dùng ảnh **vuông** (VD 512×512), nền trong suốt hoặc nền trắng
-- Chưa có file thì header tự hiện biểu tượng dự phòng, trang không bị vỡ
-- Nhớ nén ảnh trước khi bỏ vào (xem mục *Lưu ý về ảnh* ở dưới)
+Header chỉ dùng phần hình vì bên cạnh đã có chữ "ĐIỆN NƯỚC CAMERA" rồi — để thêm
+chữ trong logo nữa thì rối, mà thu nhỏ còn 38px thì cũng không đọc được.
+
+Thay logo mới: ghi đè `logoTD.png`, **không cần sửa code**. Nhớ nén trước
+(xem mục *Lưu ý về ảnh*). Chưa có file thì header tự hiện biểu tượng dự phòng,
+trang không bị vỡ.
 
 ---
 

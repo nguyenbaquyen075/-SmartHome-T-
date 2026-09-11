@@ -326,12 +326,13 @@ body {
 
 /* ================= LOGO & TÊN TRÊN HEADER ================= */
 .navbar-logo {
-  width: 52px;
-  height: 52px;
+  /* Logo là hình ngang (nhà + TĐ), để cao cố định cho chiều rộng tự co */
+  height: 46px;
+  width: auto;
   object-fit: contain;
-  border-radius: 10px;
+  border-radius: 9px;
   background: #fff;
-  padding: 3px;
+  padding: 4px 7px;
   flex-shrink: 0;
 }
 
@@ -893,10 +894,13 @@ body {
     min-width: 0;
   }
 
-  .navbar-logo,
+  .navbar-logo {
+    height: 38px;
+    padding: 3px 6px;
+  }
   .navbar-logo-fallback {
-    width: 40px !important;
-    height: 40px !important;
+    width: 38px !important;
+    height: 38px !important;
   }
   .navbar-logo-fallback svg {
     width: 19px;
