@@ -141,7 +141,6 @@ Mở [backend/data/projects.json](backend/data/projects.json), thêm một khố
   "startDate": "2026-09-05",
   "durationDays": 3,
   "status": "Hoàn thành",
-  "items": ["6 camera Dahua 4MP", "Đầu ghi 8 kênh", "200m cáp"],
   "image": "/images/cong-trinh/kho-le-loi.jpg"
 }
 ```
@@ -156,7 +155,6 @@ Mở [backend/data/projects.json](backend/data/projects.json), thêm một khố
 | `status` | Chữ trên nhãn xanh (VD: `Hoàn thành`, `Đang thi công`) | ✅ |
 | `customerType` | Loại công trình (nhà phố, nhà xưởng...) | không |
 | `durationDays` | Thi công mấy ngày | không |
-| `items` | Các hạng mục, hiện thành các ô nhỏ phía dưới | không |
 
 Lưu file là xong, **không cần build lại** — chỉ cần tải lại trang. Danh sách tự sắp xếp
 công trình mới nhất lên đầu theo `startDate`.

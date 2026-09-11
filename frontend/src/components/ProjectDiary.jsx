@@ -80,7 +80,7 @@ export default function ProjectDiary() {
             <div className="diary-body">
               <div className="diary-date">
                 <CalendarDays size={13} />
-                <span>Khởi công {formatDate(p.startDate)}</span>
+                <span>{formatDate(p.startDate)}</span>
                 {p.durationDays ? <span className="diary-dur">· {p.durationDays} ngày</span> : null}
               </div>
 
@@ -92,14 +92,6 @@ export default function ProjectDiary() {
               </div>
 
               {p.customerType ? <div className="diary-type">{p.customerType}</div> : null}
-
-              {p.items?.length ? (
-                <div className="diary-items">
-                  {p.items.map((it) => (
-                    <span key={it} className="diary-chip">{it}</span>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </article>
         ))}

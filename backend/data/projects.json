@@ -7,7 +7,6 @@
     "startDate": "2026-08-14",
     "durationDays": 2,
     "status": "Hoàn thành",
-    "items": ["8 camera Hikvision 2MP", "Đầu ghi 8 kênh", "Ổ cứng 1TB", "120m cáp mạng"],
     "image": "/images/camera_day.jpg"
   },
   {
@@ -18,7 +17,6 @@
     "startDate": "2026-07-28",
     "durationDays": 6,
     "status": "Hoàn thành",
-    "items": ["Tủ điện 3 pha", "Aptomat Schneider", "450m dây Cadivi", "Máng cáp công nghiệp"],
     "image": "/images/cat_wires.jpg"
   },
   {
@@ -29,7 +27,6 @@
     "startDate": "2026-06-19",
     "durationDays": 3,
     "status": "Hoàn thành",
-    "items": ["60 đèn LED âm trần", "Đèn rọi ray", "Hệ điều khiển 4 vùng"],
     "image": "/images/cat_lighting.jpg"
   },
   {
@@ -40,7 +37,6 @@
     "startDate": "2026-05-06",
     "durationDays": 8,
     "status": "Hoàn thành",
-    "items": ["Ống PVC Bình Minh D21-D110", "9 bộ vòi sen", "Máy bơm tăng áp"],
     "image": "/images/cat_pipes.jpg"
   },
   {
@@ -51,7 +47,6 @@
     "startDate": "2026-04-22",
     "durationDays": 2,
     "status": "Hoàn thành",
-    "items": ["4 camera Imou 360°", "Chuông hình cổng", "Wifi mesh 3 điểm"],
     "image": "/images/camera_night.jpg"
   },
   {
@@ -62,7 +57,6 @@
     "startDate": "2026-03-11",
     "durationDays": 4,
     "status": "Hoàn thành",
-    "items": ["Máy bơm Panasonic", "Bồn chứa 2000L", "Lọc thô đầu nguồn"],
     "image": "/images/cat_water.jpg"
   }
 ]
