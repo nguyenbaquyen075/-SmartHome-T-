@@ -482,55 +482,26 @@ export default function ProductDetailPage({
                   </p>
                 </div>
 
-                {/* Right: Đặc điểm nổi bật Box */}
-                <div style={{
-                  backgroundColor: '#f0f7ff',
-                  border: '1px solid #bfdbfe',
-                  borderRadius: '12px',
-                  padding: '18px 20px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 800, color: '#0066cc', marginBottom: '14px' }}>
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      border: '2px solid #0066cc',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#0066cc',
-                      flexShrink: 0
-                    }}>
-                      <Check size={11} strokeWidth={3} />
+                {/* Đặc điểm nổi bật: lấy từ dữ liệu, thiếu thì rút từ thông số */}
+                {(() => {
+                  const diem = product.highlights?.length
+                    ? product.highlights
+                    : Object.values(product.specs || {}).slice(0, 4);
+                  if (!diem.length) return null;
+                  return (
+                    <div className="pd-diem">
+                      <h4>Đặc điểm nổi bật</h4>
+                      <ul>
+                        {diem.map((d, i) => (
+                          <li key={i}>
+                            <Check size={14} strokeWidth={3} />
+                            <span>{d}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <span>Đặc điểm nổi bật</span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {[
-                      'Độ phân giải Full HD 2MP sắc nét',
-                      'Hồng ngoại 30m, quan sát đêm hiệu quả',
-                      'Chuẩn chống nước IP67, lắp đặt ngoài trời',
-                      'Thiết kế bền bỉ, hoạt động ổn định'
-                    ].map((bullet, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.86rem', color: '#1e3a8a' }}>
-                        <div style={{
-                          width: '16px',
-                          height: '16px',
-                          borderRadius: '50%',
-                          backgroundColor: '#0066cc',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <Check size={10} color="#fff" strokeWidth={3.5} />
-                        </div>
-                        <span>{bullet}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
             </section>
 
