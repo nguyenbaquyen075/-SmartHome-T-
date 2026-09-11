@@ -67,16 +67,28 @@ export default function Navbar({
             className="navbar-brand"
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flexShrink: 0 }}
           >
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '8px',
+            {/* Logo: thay file o frontend/public/images/logo.png.
+                Chua co file thi tu quay ve bieu tuong cu, trang khong bi vo. */}
+            <img
+              src="/images/logo.png"
+              alt="Thiết bị điện SmartHome TĐ"
+              className="navbar-logo"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling.style.display = 'flex';
+              }}
+            />
+            <div className="navbar-logo-fallback" style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '10px',
               border: '2px solid #fff',
-              display: 'flex',
+              display: 'none',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#fff',
-              position: 'relative'
+              position: 'relative',
+              flexShrink: 0
             }}>
               <Home size={22} />
               <div style={{ position: 'absolute', bottom: '4px', display: 'flex', gap: '1px' }}>
@@ -84,13 +96,10 @@ export default function Navbar({
                 <Droplet size={10} fill="#fff" />
               </div>
             </div>
-            <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.2px', lineHeight: 1.1 }}>
-                ĐIỆN NƯỚC CAMERA
-              </div>
-              <div style={{ fontSize: '0.72rem', color: '#bae6fd' }}>
-                Chất lượng tạo nên niềm tin
-              </div>
+
+            <div className="navbar-name">
+              <div className="navbar-name-main">ĐIỆN NƯỚC CAMERA</div>
+              <div className="navbar-name-sub">Chất lượng tạo nên niềm tin</div>
             </div>
           </div>
 
