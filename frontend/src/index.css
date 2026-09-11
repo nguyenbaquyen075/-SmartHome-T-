@@ -264,6 +264,46 @@ body {
 }
 
 /* ================= PHẦN MÔ TẢ TRANG CHI TIẾT ================= */
+/* --- Bảng thông số kỹ thuật --- */
+.pd-ts {
+  display: grid;
+  /* 2 cot tren man rong; chat hon thi tu xuong 1 cot */
+  grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr));
+  gap: 0 36px;
+  border-top: 2px solid #0066cc;
+}
+.pd-ts-o {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 4px;
+  border-bottom: 1px solid #eef2f7;
+}
+.pd-ts dt {
+  font-size: 0.84rem;
+  color: #64748b;
+  font-weight: 600;
+  flex-shrink: 0;
+  max-width: 42%;
+}
+.pd-ts dd {
+  font-size: 0.88rem;
+  color: #1e293b;
+  font-weight: 600;
+  text-align: right;
+  line-height: 1.5;
+  min-width: 0;
+}
+.pd-ts-trong {
+  color: #94a3b8;
+  font-size: 0.88rem;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-align: center;
+}
+
 /* --- Các bước hướng dẫn --- */
 .pd-buoc {
   list-style: none;
@@ -1388,6 +1428,17 @@ body {
   .navbar-search > div {
     min-height: 36px;
   }
+
+  /* Thông số trên điện thoại: nhãn trên, giá trị dưới cho khỏi chen ngang */
+  .pd-ts { grid-template-columns: 1fr; gap: 0; }
+  .pd-ts-o {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 11px 2px;
+  }
+  .pd-ts dt { max-width: none; font-size: 0.76rem; }
+  .pd-ts dd { text-align: left; font-size: 0.86rem; }
 
   /* Mô tả trên điện thoại: các bước xếp 1 cột cho dễ đọc */
   .pd-buoc { grid-template-columns: 1fr; gap: 10px; }
