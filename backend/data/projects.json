@@ -1,0 +1,68 @@
+[
+  {
+    "id": "ct-2026-08",
+    "title": "Lắp đặt hệ thống 8 camera an ninh Hikvision",
+    "address": "Số 120 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội",
+    "customerType": "Nhà phố 4 tầng",
+    "startDate": "2026-08-14",
+    "durationDays": 2,
+    "status": "Hoàn thành",
+    "items": ["8 camera Hikvision 2MP", "Đầu ghi 8 kênh", "Ổ cứng 1TB", "120m cáp mạng"],
+    "image": "/images/camera_day.jpg"
+  },
+  {
+    "id": "ct-2026-07",
+    "title": "Thi công tủ điện tổng & đi dây toàn nhà xưởng",
+    "address": "Lô B4, KCN Quang Minh, Mê Linh, Hà Nội",
+    "customerType": "Nhà xưởng 600m²",
+    "startDate": "2026-07-28",
+    "durationDays": 6,
+    "status": "Hoàn thành",
+    "items": ["Tủ điện 3 pha", "Aptomat Schneider", "450m dây Cadivi", "Máng cáp công nghiệp"],
+    "image": "/images/cat_wires.jpg"
+  },
+  {
+    "id": "ct-2026-06",
+    "title": "Lắp đặt hệ thống đèn LED chiếu sáng showroom",
+    "address": "84 Trần Quang Khải, P. Tân Định, Quận 1, TP.HCM",
+    "customerType": "Showroom 200m²",
+    "startDate": "2026-06-19",
+    "durationDays": 3,
+    "status": "Hoàn thành",
+    "items": ["60 đèn LED âm trần", "Đèn rọi ray", "Hệ điều khiển 4 vùng"],
+    "image": "/images/cat_lighting.jpg"
+  },
+  {
+    "id": "ct-2026-05",
+    "title": "Cải tạo toàn bộ đường ống nước & thiết bị vệ sinh",
+    "address": "45 Nguyễn Văn Linh, Hải Châu, Đà Nẵng",
+    "customerType": "Khách sạn 9 phòng",
+    "startDate": "2026-05-06",
+    "durationDays": 8,
+    "status": "Hoàn thành",
+    "items": ["Ống PVC Bình Minh D21-D110", "9 bộ vòi sen", "Máy bơm tăng áp"],
+    "image": "/images/cat_pipes.jpg"
+  },
+  {
+    "id": "ct-2026-04",
+    "title": "Lắp camera giám sát sân vườn & cổng ra vào",
+    "address": "Khu đô thị Ecopark, Văn Giang, Hưng Yên",
+    "customerType": "Biệt thự song lập",
+    "startDate": "2026-04-22",
+    "durationDays": 2,
+    "status": "Hoàn thành",
+    "items": ["4 camera Imou 360°", "Chuông hình cổng", "Wifi mesh 3 điểm"],
+    "image": "/images/camera_night.jpg"
+  },
+  {
+    "id": "ct-2026-03",
+    "title": "Lắp máy bơm tăng áp & xử lý nước sinh hoạt",
+    "address": "Ngõ 78 Duy Tân, Cầu Giấy, Hà Nội",
+    "customerType": "Chung cư mini 12 phòng",
+    "startDate": "2026-03-11",
+    "durationDays": 4,
+    "status": "Hoàn thành",
+    "items": ["Máy bơm Panasonic", "Bồn chứa 2000L", "Lọc thô đầu nguồn"],
+    "image": "/images/cat_water.jpg"
+  }
+]

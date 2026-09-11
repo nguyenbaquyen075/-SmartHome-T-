@@ -9,6 +9,7 @@ import OrderTrackerModal from './components/OrderTrackerModal';
 import BottomBanner from './components/BottomBanner';
 import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
+import ProjectDiary from './components/ProjectDiary';
 import { api } from './utils/api';
 
 // Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
@@ -316,6 +317,9 @@ export default function App() {
                 ))}
               </div>
             )}
+
+            {/* Nhật ký thi công */}
+            <ProjectDiary />
 
             {/* Bottom Banner on Desktop */}
             <div className="desktop-only">

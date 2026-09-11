@@ -15,6 +15,7 @@ app.use(express.json());
 // Paths
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
 const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
+const PROJECTS_FILE = path.join(__dirname, 'data', 'projects.json');
 
 // Helper to read/write JSON safely
 const readJson = (filePath) => {
@@ -45,6 +46,13 @@ const writeJson = (filePath, data) => {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// GET /api/projects (Nhat ky thi cong - moi nhat truoc)
+app.get('/api/projects', (req, res) => {
+  const projects = readJson(PROJECTS_FILE);
+  projects.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  res.json(projects);
 });
 
 // GET /api/categories
