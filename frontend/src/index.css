@@ -369,22 +369,6 @@ body {
   padding: 3px 8px;
   border-radius: 6px;
 }
-.diary-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: auto;
-  padding-top: 6px;
-}
-.diary-chip {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  font-size: 0.68rem;
-  padding: 3px 7px;
-  border-radius: 5px;
-}
-
 .diary-nav-btn {
   width: 32px;
   height: 32px;
@@ -500,14 +484,6 @@ body {
   }
   .diary-addr {
     font-size: 0.72rem;
-  }
-  .diary-chip {
-    font-size: 0.62rem;
-    padding: 2px 5px;
-  }
-  /* Cot phai hep, hien het hang muc se lam the cao gap doi man hinh */
-  .diary-chip:nth-child(n + 4) {
-    display: none;
   }
 
   /* Lưới sản phẩm điện thoại: đúng chuẩn 2 cột không bị tràn vỡ */
