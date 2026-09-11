@@ -263,6 +263,103 @@ body {
   min-width: 0;
 }
 
+/* ================= PHẦN MÔ TẢ TRANG CHI TIẾT ================= */
+/* --- Các bước hướng dẫn --- */
+.pd-buoc {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 12px;
+  counter-reset: buoc;
+}
+.pd-buoc li {
+  display: flex;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pd-buoc li:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 14px rgba(0, 102, 204, 0.08);
+}
+.pd-buoc-so {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0066cc;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pd-buoc li > div { min-width: 0; }
+.pd-buoc strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #0066cc;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.pd-buoc p {
+  font-size: 0.86rem;
+  color: #475569;
+  line-height: 1.55;
+}
+
+/* --- 3 ô cam kết bảo hành --- */
+.pd-camket {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: 12px;
+}
+.pd-camket-o {
+  background: linear-gradient(180deg, #f0f7ff 0%, #fff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 18px 16px;
+  text-align: center;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.pd-camket-o:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 102, 204, 0.1);
+}
+.pd-camket-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #0066cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pd-camket-o strong {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 5px;
+}
+.pd-camket-o p {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.55;
+}
+.pd-camket-o a {
+  color: #0066cc;
+  font-weight: 800;
+  text-decoration: none;
+}
+.pd-camket-o a:hover { text-decoration: underline; }
+
 /* ================= THANH TAB TRANG CHI TIẾT ================= */
 .pd-tabbar {
   position: sticky;
@@ -1291,6 +1388,14 @@ body {
   .navbar-search > div {
     min-height: 36px;
   }
+
+  /* Mô tả trên điện thoại: các bước xếp 1 cột cho dễ đọc */
+  .pd-buoc { grid-template-columns: 1fr; gap: 10px; }
+  .pd-buoc li { padding: 12px; }
+  .pd-camket { grid-template-columns: 1fr; }
+  .pd-camket-o { display: flex; align-items: flex-start; gap: 12px; text-align: left; padding: 14px; }
+  .pd-camket-icon { width: 38px; height: 38px; margin: 0; flex-shrink: 0; }
+  .pd-camket-tt { min-width: 0; }
 
   /* Quản trị trên điện thoại: xếp dọc cho khỏi chen chúc */
   .adm-modal { padding: 16px !important; height: 92vh !important; }
