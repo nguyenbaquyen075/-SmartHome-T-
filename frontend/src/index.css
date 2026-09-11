@@ -326,14 +326,14 @@ body {
 
 /* ================= LOGO & TÊN TRÊN HEADER ================= */
 .navbar-logo {
-  /* Logo là hình ngang (nhà + TĐ), để cao cố định cho chiều rộng tự co */
-  height: 46px;
+  /* Logo nền trong suốt, để cao cố định cho chiều rộng tự co */
+  height: 42px;
+  margin: 5px 0;
   width: auto;
   object-fit: contain;
-  border-radius: 9px;
-  background: #fff;
-  padding: 4px 7px;
   flex-shrink: 0;
+  /* bóng nhẹ để phần mái nhà màu xanh không chìm vào nền xanh của header */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28));
 }
 
 .navbar-name {
@@ -895,8 +895,7 @@ body {
   }
 
   .navbar-logo {
-    height: 38px;
-    padding: 3px 6px;
+    height: 36px;
   }
   .navbar-logo-fallback {
     width: 38px !important;
@@ -915,15 +914,16 @@ body {
     font-size: 0.6rem;
   }
 
+  /* Logo + ô tìm kiếm + nút danh mục nằm chung 1 hàng */
   .navbar-search {
-    order: 3;
-    /* !important vi inline style flex:1 (flex-basis:0) se thang class thuong */
-    flex: 1 0 100% !important;
+    flex: 1 1 auto !important;
     max-width: none !important;
+    min-width: 0;
+    margin-top: 0;
   }
 
   .navbar-main-row {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .navbar-main-row > .mobile-flex {
@@ -937,9 +937,6 @@ body {
 
   .navbar-search > div {
     min-height: 36px;
-  }
-  .navbar-search {
-    margin-top: 2px;
   }
 
   /* Thanh chạy: chữ nhỏ lại, khoảng cách hẹp hơn cho vừa màn điện thoại */
