@@ -1,31 +1,16 @@
 import React from 'react';
-import { Star } from 'lucide-react';
-import { formatPrice } from '../utils/api';
 
 export default function ProductCard({
   product,
   index = 0,
-  onViewDetails,
-  showPrice = true   // trang chi tiet khong hien gia/danh gia -> truyen false
+  onViewDetails
 }) {
   // 4 anh dau nam ngay trong man hinh dau tien -> tai ngay, dung lazy.
   // loading="lazy" tren anh trong viewport lam trinh duyet hoan tai => LCP cham.
   const isAboveFold = index < 4;
-  const discountPercent = product.discountPercent || (
-    product.originalPrice && product.originalPrice > product.price
-      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-      : 0
-  );
 
   return (
     <div className="store-product-card">
-      {/* Top Right Discount Badge */}
-      {showPrice && discountPercent > 0 && (
-        <span className="discount-badge">
-          -{discountPercent}%
-        </span>
-      )}
-
       {/* Product Image */}
       <div 
         onClick={() => onViewDetails(product)}
@@ -92,34 +77,6 @@ export default function ProductCard({
       }}>
         {product.subTitle || product.description || 'Chính hãng 100%'}
       </p>
-
-      {/* Price section */}
-      {showPrice && (
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
-        <span className="price-tag" style={{ fontSize: '1rem', fontWeight: 800, color: '#e11d48' }}>
-          {formatPrice(product.price)}{product.unit === 'mét' ? '/m' : ''}
-        </span>
-        {product.originalPrice && product.originalPrice > product.price && (
-          <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-            {formatPrice(product.originalPrice)}{product.unit === 'mét' ? '/m' : ''}
-          </span>
-        )}
-      </div>
-      )}
-
-      {/* Rating & Review count */}
-      {showPrice && (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
-        <div style={{ display: 'flex', color: '#f59e0b', gap: '1px' }}>
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={12} fill="#f59e0b" color="#f59e0b" />
-          ))}
-        </div>
-        <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-          ({product.reviewsCount || 50})
-        </span>
-      </div>
-      )}
 
       {/* Xem chi tiet */}
       <div style={{ marginTop: 'auto' }}>

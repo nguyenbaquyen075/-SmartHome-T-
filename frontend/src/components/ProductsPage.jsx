@@ -3,20 +3,9 @@ import { Home, ChevronRight, SlidersHorizontal, X, Search, PackageSearch } from 
 import ProductCard from './ProductCard';
 import { api } from '../utils/api';
 
-const PRICE_RANGES = [
-  { label: 'Tất cả mức giá', min: null, max: null },
-  { label: 'Dưới 100.000₫', min: null, max: 100000 },
-  { label: '100.000₫ - 500.000₫', min: 100000, max: 500000 },
-  { label: '500.000₫ - 1 triệu', min: 500000, max: 1000000 },
-  { label: '1 - 2 triệu', min: 1000000, max: 2000000 },
-  { label: 'Trên 2 triệu', min: 2000000, max: null }
-];
 
 const SORTS = [
   { value: '', label: 'Mặc định' },
-  { value: 'price-asc', label: 'Giá thấp đến cao' },
-  { value: 'price-desc', label: 'Giá cao đến thấp' },
-  { value: 'rating-desc', label: 'Đánh giá cao nhất' },
   { value: 'name-asc', label: 'Tên A → Z' }
 ];
 
@@ -32,7 +21,6 @@ export default function ProductsPage({
 
   const [category, setCategory] = useState(initialCategory);
   const [brand, setBrand] = useState('Tất cả');
-  const [priceIdx, setPriceIdx] = useState(0);
   const [sort, setSort] = useState('');
   const [search, setSearch] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);   // chi dung tren dien thoai
@@ -46,13 +34,10 @@ export default function ProductsPage({
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const range = PRICE_RANGES[priceIdx];
         const params = {};
         if (search.trim()) params.search = search.trim();
         if (category !== 'Tất cả') params.category = category;
         if (brand !== 'Tất cả') params.brand = brand;
-        if (range.min) params.minPrice = range.min;
-        if (range.max) params.maxPrice = range.max;
         if (sort) params.sort = sort;
         setProducts(await api.getProducts(params));
       } catch {
@@ -62,18 +47,16 @@ export default function ProductsPage({
       }
     }, 200);
     return () => clearTimeout(timer);
-  }, [category, brand, priceIdx, sort, search]);
+  }, [category, brand, sort, search]);
 
   const activeCount =
     (category !== 'Tất cả' ? 1 : 0) +
     (brand !== 'Tất cả' ? 1 : 0) +
-    (priceIdx !== 0 ? 1 : 0) +
     (search.trim() ? 1 : 0);
 
   const clearAll = () => {
     setCategory('Tất cả');
     setBrand('Tất cả');
-    setPriceIdx(0);
     setSearch('');
     setSort('');
   };
@@ -101,15 +84,6 @@ export default function ProductsPage({
         ))}
       </div>
 
-      <div className="pp-filter-group">
-        <h4>Khoảng giá</h4>
-        {PRICE_RANGES.map((r, i) => (
-          <label key={r.label} className={`pp-radio ${priceIdx === i ? 'on' : ''}`}>
-            <input type="radio" name="pp-price" checked={priceIdx === i} onChange={() => setPriceIdx(i)} />
-            <span>{r.label}</span>
-          </label>
-        ))}
-      </div>
     </>
   );
 
