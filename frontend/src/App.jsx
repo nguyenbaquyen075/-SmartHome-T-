@@ -17,6 +17,7 @@ import { api } from './utils/api';
 const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const ProductsPage = lazy(() => import('./components/ProductsPage'));
 import { Flame, ArrowRight, Check, Info } from 'lucide-react';
 
 export default function App() {
@@ -27,6 +28,15 @@ export default function App() {
 
   // Active view product state (When user clicks a product, switch to detailed page)
   const [viewingProduct, setViewingProduct] = useState(null);
+
+  // Trang danh sach san pham: null = dang o trang chu, chuoi = danh muc dang mo
+  const [productsPageCat, setProductsPageCat] = useState(null);
+
+  const openProductsPage = (cat = 'Tất cả') => {
+    setViewingProduct(null);
+    setProductsPageCat(cat);
+    window.scrollTo({ top: 0 });
+  };
 
   // Cart state persisted to localStorage
   const [cart, setCart] = useState(() => {
@@ -205,7 +215,7 @@ export default function App() {
         }}
       />
 
-      {/* CONDITIONAL: Product Detail Page OR Home Catalog View */}
+      {/* Chi tiet san pham > Trang danh sach san pham > Trang chu */}
       {viewingProduct ? (
         <Suspense fallback={null}>
         <ProductDetailPage
@@ -216,6 +226,15 @@ export default function App() {
           onBuyNow={handleBuyNow}
           onSelectProduct={handleSelectProduct}
         />
+        </Suspense>
+      ) : productsPageCat !== null ? (
+        <Suspense fallback={null}>
+          <ProductsPage
+            initialCategory={productsPageCat}
+            onViewDetails={handleSelectProduct}
+            onAddToCart={handleAddToCart}
+            onGoHome={() => setProductsPageCat(null)}
+          />
         </Suspense>
       ) : (
         <>
@@ -237,6 +256,7 @@ export default function App() {
                 setSelectedCategory(cat);
                 scrollToProducts();
               }}
+              onViewAll={openProductsPage}
             />
 
             {/* Section Heading: SẢN PHẨM NỔI BẬT */}
@@ -256,10 +276,7 @@ export default function App() {
               </div>
 
               <button
-                onClick={() => {
-                  setSelectedCategory('Tất cả');
-                  setSearchTerm('');
-                }}
+                onClick={() => openProductsPage('Tất cả')}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -335,17 +352,21 @@ export default function App() {
       {/* Mobile Fixed Bottom Navigation Bar (Hidden on desktop) */}
       <div className="mobile-only">
         <MobileBottomNav
-          activeTab={!viewingProduct && selectedCategory === 'Tất cả' ? 'home' : ''}
+          activeTab={
+            productsPageCat !== null ? 'products'
+              : !viewingProduct && selectedCategory === 'Tất cả' ? 'home'
+              : ''
+          }
           onGoHome={() => {
             setViewingProduct(null);
+            setProductsPageCat(null);
             setSelectedCategory('Tất cả');
             setSearchTerm('');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          onOpenCart={() => setIsCartOpen(true)}
+          onOpenProducts={() => openProductsPage('Tất cả')}
           onOpenTracker={() => setIsTrackerOpen(true)}
           onToggleAdmin={() => setIsAdmin(!isAdmin)}
-          cartCount={totalCartCount}
         />
       </div>
 

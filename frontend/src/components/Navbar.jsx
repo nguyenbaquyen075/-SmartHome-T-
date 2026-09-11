@@ -201,10 +201,39 @@ export default function Navbar({
           </div>
 
           {/* Mobile hamburger icon */}
-          <div className="mobile-only">
+          {/* Dien thoai: gio hang phai o day, vi thanh duoi da doi thanh muc San pham */}
+          <div className="mobile-flex" style={{ alignItems: 'center', gap: '14px' }}>
+            <button
+              onClick={() => setIsCartOpen(true)}
+              aria-label="Mở giỏ hàng"
+              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', position: 'relative', padding: 0 }}
+            >
+              <ShoppingCart size={23} />
+              {totalCartCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-5px',
+                  right: '-7px',
+                  backgroundColor: '#ef4444',
+                  color: '#fff',
+                  fontSize: '0.62rem',
+                  fontWeight: 800,
+                  minWidth: '16px',
+                  height: '16px',
+                  padding: '0 3px',
+                  borderRadius: '9px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {totalCartCount}
+                </span>
+              )}
+            </button>
             <button
               onClick={() => setMobileDrawerOpen(true)}
-              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex' }}
+              aria-label="Mở menu"
+              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', padding: 0 }}
             >
               <Menu size={24} />
             </button>

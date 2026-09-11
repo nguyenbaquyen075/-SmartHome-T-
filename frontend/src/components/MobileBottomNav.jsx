@@ -1,13 +1,12 @@
 import React from 'react';
-import { Home, ShoppingCart, PackageCheck, User } from 'lucide-react';
+import { Home, LayoutGrid, PackageCheck, User } from 'lucide-react';
 
 export default function MobileBottomNav({
   activeTab = 'home',
   onGoHome,
-  onOpenCart,
+  onOpenProducts,
   onOpenTracker,
-  onToggleAdmin,
-  cartCount = 0
+  onToggleAdmin
 }) {
   return (
     <nav style={{
@@ -45,9 +44,9 @@ export default function MobileBottomNav({
         </span>
       </button>
 
-      {/* 2. Giỏ hàng */}
+      {/* 2. Sản phẩm */}
       <button
-        onClick={onOpenCart}
+        onClick={onOpenProducts}
         style={{
           background: 'none',
           border: 'none',
@@ -55,36 +54,14 @@ export default function MobileBottomNav({
           flexDirection: 'column',
           alignItems: 'center',
           gap: '3px',
-          color: '#64748b',
+          color: activeTab === 'products' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          position: 'relative',
           padding: '4px 12px'
         }}
       >
-        <div style={{ position: 'relative' }}>
-          <ShoppingCart size={22} />
-          {cartCount > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: '-6px',
-              right: '-8px',
-              backgroundColor: '#ef4444',
-              color: '#fff',
-              fontSize: '0.65rem',
-              fontWeight: 800,
-              width: '16px',
-              height: '16px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {cartCount}
-            </span>
-          )}
-        </div>
-        <span style={{ fontSize: '0.72rem', fontWeight: 500 }}>
-          Giỏ hàng
+        <LayoutGrid size={22} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
+        <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
+          Sản phẩm
         </span>
       </button>
 

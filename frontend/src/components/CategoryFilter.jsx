@@ -3,7 +3,8 @@ import { LayoutGrid, ArrowRight, Zap, Droplets, Camera } from 'lucide-react';
 
 export default function CategoryFilter({
   selectedCategory,
-  setSelectedCategory
+  setSelectedCategory,
+  onViewAll
 }) {
   const [hoveredCat, setHoveredCat] = useState(null);
 
@@ -77,7 +78,7 @@ export default function CategoryFilter({
 
         {/* Right: "Xem tất cả →" button */}
         <button
-          onClick={() => setSelectedCategory('Tất cả')}
+          onClick={() => (onViewAll ? onViewAll('Tất cả') : setSelectedCategory('Tất cả'))}
           style={{
             background: 'none',
             border: 'none',
