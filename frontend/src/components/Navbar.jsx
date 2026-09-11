@@ -97,10 +97,6 @@ export default function Navbar({
               </div>
             </div>
 
-            <div className="navbar-name">
-              <div className="navbar-name-main">ĐIỆN NƯỚC CAMERA</div>
-              <div className="navbar-name-sub">Chất lượng tạo nên niềm tin</div>
-            </div>
           </div>
 
           {/* Search Bar in Header */}
