@@ -1198,6 +1198,40 @@ body {
   cursor: pointer;
 }
 
+/* --- Nút X đóng trang, dùng chung cho trang sản phẩm & chi tiết sản phẩm --- */
+.nut-dong-hang {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nut-dong-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.nut-tro-ve {
+  /* Chỉ là chữ, không khung */
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  /* padding phai de chu khong sat mep man hinh */
+  padding: 4px 8px 4px 0;
+  margin-right: 2px;
+  border: none;
+  background: none;
+  color: #0066cc;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.nut-tro-ve:hover { color: #004c99; text-decoration: underline; }
+
 /* ================= CHI TIẾT CÔNG TRÌNH ================= */
 .ct-chitiet {
   /* Mở toàn màn hình, thoát khỏi khung .modal-overlay có padding */
