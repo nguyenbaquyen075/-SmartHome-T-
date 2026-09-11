@@ -3,7 +3,6 @@ import {
   Home, 
   ChevronRight, 
   ChevronLeft, 
-  Star, 
   Zap, 
   ShieldCheck, 
   Truck, 
@@ -21,7 +20,6 @@ import {
   Compass,
   CheckCircle2
 } from 'lucide-react';
-import { formatPrice } from '../utils/api';
 
 export default function ProductDetailPage({
   product,
@@ -101,11 +99,6 @@ export default function ProductDetailPage({
     ? relatedProducts 
     : allProducts.filter((p) => p.id !== product.id).slice(0, 5);
 
-  const discountPercent = product.discountPercent || (
-    product.originalPrice && product.originalPrice > product.price
-      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-      : 23
-  );
 
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '60px' }}>
@@ -149,21 +142,6 @@ export default function ProductDetailPage({
               backgroundColor: '#fff',
               marginBottom: '16px'
             }}>
-              {/* Discount Badge on Top Left */}
-              <div style={{
-                position: 'absolute',
-                top: '14px',
-                left: '14px',
-                backgroundColor: '#dc2626',
-                color: '#fff',
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                padding: '3px 10px',
-                borderRadius: '6px'
-              }}>
-                -{discountPercent}%
-              </div>
-
               {/* Brand Logo on Top Right */}
               <div style={{
                 position: 'absolute',
@@ -297,44 +275,6 @@ export default function ProductDetailPage({
             }}>
               {product.name}
             </h1>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', color: '#f59e0b', gap: '2px' }}>
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={15} fill="#f59e0b" color="#f59e0b" />
-                ))}
-              </div>
-              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                ({product.reviewsCount || 43} đánh giá)
-              </span>
-              <span style={{ color: '#cbd5e1' }}>|</span>
-              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                Đã bán <strong>1.245</strong> sản phẩm
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '18px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '1.85rem', fontWeight: 800, color: '#e11d48' }}>
-                {formatPrice(product.price)}{product.unit === 'mét' ? '/m' : ''}
-              </span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <span style={{ fontSize: '1.05rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-                  {formatPrice(product.originalPrice)}{product.unit === 'mét' ? '/m' : ''}
-                </span>
-              )}
-              {discountPercent > 0 && (
-                <span style={{
-                  backgroundColor: '#fee2e2',
-                  color: '#dc2626',
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                  borderRadius: '4px'
-                }}>
-                  -{discountPercent}%
-                </span>
-              )}
-            </div>
 
             {/* 4 Feature Badges Strip (Matching Screenshot) */}
             <div style={{
@@ -736,11 +676,6 @@ export default function ProductDetailPage({
             gap: '16px'
           }}>
             {displayRelated.map((rel) => {
-              const relDiscount = rel.discountPercent || (
-                rel.originalPrice && rel.originalPrice > rel.price
-                  ? Math.round(((rel.originalPrice - rel.price) / rel.originalPrice) * 100)
-                  : 0
-              );
               return (
                 <div
                   key={rel.id}
@@ -760,22 +695,6 @@ export default function ProductDetailPage({
                   onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 102, 204, 0.12)'}
                   onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)'}
                 >
-                  {relDiscount > 0 && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      backgroundColor: '#0066cc',
-                      color: '#fff',
-                      fontSize: '0.68rem',
-                      fontWeight: 700,
-                      padding: '2px 6px',
-                      borderRadius: '4px'
-                    }}>
-                      Giảm {relDiscount}%
-                    </span>
-                  )}
-
                   <div style={{ width: '100%', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', marginBottom: '8px' }}>
                     <img src={rel.image} alt={rel.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                   </div>
@@ -795,26 +714,6 @@ export default function ProductDetailPage({
                     {rel.name}
                   </h4>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#e11d48' }}>
-                      {formatPrice(rel.price)}
-                    </span>
-                    {rel.originalPrice && rel.originalPrice > rel.price && (
-                      <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-                        {formatPrice(rel.originalPrice)}
-                      </span>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '4px' }}>
-                    <div style={{ display: 'flex', color: '#f59e0b', gap: '1px' }}>
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={11} fill="#f59e0b" color="#f59e0b" />
-                      ))}
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', marginLeft: '3px' }}>({rel.reviewsCount || 40})</span>
-                    </div>
-
-                  </div>
                 </div>
               );
             })}
