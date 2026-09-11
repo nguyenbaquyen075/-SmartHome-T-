@@ -1,12 +1,11 @@
 import React from 'react';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { formatPrice } from '../utils/api';
 
 export default function ProductCard({
   product,
   index = 0,
-  onViewDetails,
-  onAddToCart
+  onViewDetails
 }) {
   // 4 anh dau nam ngay trong man hinh dau tien -> tai ngay, dung lazy.
   // loading="lazy" tren anh trong viewport lam trinh duyet hoan tai => LCP cham.
@@ -117,10 +116,10 @@ export default function ProductCard({
         </span>
       </div>
 
-      {/* Add To Cart Button */}
+      {/* Xem chi tiet */}
       <div style={{ marginTop: 'auto' }}>
         <button
-          onClick={() => onAddToCart(product)}
+          onClick={() => onViewDetails(product)}
           className="btn-primary"
           style={{
             width: '100%',
@@ -130,8 +129,7 @@ export default function ProductCard({
             borderRadius: '6px'
           }}
         >
-          <ShoppingCart size={14} />
-          <span>Thêm vào giỏ</span>
+          <span>Xem chi tiết</span>
         </button>
       </div>
     </div>

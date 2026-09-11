@@ -23,7 +23,6 @@ const SORTS = [
 export default function ProductsPage({
   initialCategory = 'Tất cả',
   onViewDetails,
-  onAddToCart,
   onGoHome
 }) {
   const [products, setProducts] = useState([]);
@@ -194,7 +193,6 @@ export default function ProductsPage({
                   product={p}
                   index={i}
                   onViewDetails={onViewDetails}
-                  onAddToCart={onAddToCart}
                 />
               ))}
             </div>

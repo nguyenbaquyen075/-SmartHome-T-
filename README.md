@@ -1,6 +1,10 @@
 # ĐIỆN NƯỚC CAMERA
 
-Website thương mại điện tử bán camera an ninh, thiết bị điện dân dụng, thiết bị nước và đèn chiếu sáng.
+Website giới thiệu camera an ninh, thiết bị điện dân dụng, thiết bị nước và đèn chiếu sáng.
+
+> Đây là web **trưng bày sản phẩm cho khách xem**, không bán hàng trực tuyến.
+> Không có giỏ hàng, đặt hàng hay thanh toán. Khách xem sản phẩm rồi liên hệ qua
+> hotline / Zalo ở đầu trang và chân trang.
 
 ---
 
@@ -24,8 +28,7 @@ cameraTD/
 │   ├── index.js             Toàn bộ API + phục vụ bản build của frontend
 │   ├── data/
 │   │   ├── products.json    Danh sách sản phẩm
-│   │   ├── projects.json    Nhật ký thi công (các công trình đã làm)
-│   │   └── orders.json      Đơn hàng khách đặt
+│   │   └── projects.json    Nhật ký thi công (các công trình đã làm)
 │   └── package.json         Thư viện riêng của backend
 │
 ├── server/index.js      ⚠️ File cầu nối tạm (xem mục Deploy) — không chứa code
@@ -42,7 +45,7 @@ cameraTD/
 | Ngôn ngữ | React (JSX) | Node.js (CommonJS) |
 | Cổng khi dev | `5174` | `5001` |
 | Sửa giao diện, màu sắc, layout | ✅ sửa ở đây | ❌ |
-| Thêm/sửa sản phẩm, đơn hàng | ❌ | ✅ sửa ở đây |
+| Thêm/sửa sản phẩm, công trình | ❌ | ✅ sửa ở đây |
 
 Frontend **không bao giờ** gọi thẳng đến database. Mọi dữ liệu đi qua [frontend/src/utils/api.js](frontend/src/utils/api.js) → gọi `/api/...` → [backend/index.js](backend/index.js).
 
@@ -118,7 +121,7 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 
 ### ⚠️ Lưu ý gói Free
 
-- **Đơn hàng sẽ mất khi deploy lại.** Đơn được lưu vào `backend/data/orders.json`, mà ổ đĩa Render là tạm thời — mỗi lần deploy hoặc restart, file quay về trạng thái trong Git. Muốn giữ đơn thật thì phải chuyển sang database (Render có Postgres miễn phí).
+- **Sửa sản phẩm trong trang quản trị sẽ mất khi deploy lại.** Dữ liệu lưu vào file JSON, mà ổ đĩa Render là tạm thời — mỗi lần deploy hoặc restart, file quay về trạng thái trong Git. Sửa lâu dài thì sửa thẳng file `backend/data/*.json` rồi push lên.
 - **Service ngủ sau 15 phút** không có ai truy cập. Lần mở tiếp theo mất ~50 giây khởi động lại.
 
 ---
@@ -135,11 +138,10 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 | DELETE | `/api/products/:id` | Xóa sản phẩm |
 | GET | `/api/categories` | Danh sách danh mục |
 | GET | `/api/brands` | Danh sách thương hiệu |
-| GET | `/api/orders` | Danh sách đơn hàng |
-| POST | `/api/orders` | Tạo đơn hàng mới |
-| PUT | `/api/orders/:id` | Cập nhật trạng thái đơn |
 | GET | `/api/projects` | Nhật ký thi công (tự sắp xếp mới nhất trước) |
 | GET | `/api/stats` | Số liệu tổng quan cho trang quản trị |
+
+Đường dẫn `/api/...` không khớp route nào sẽ trả về lỗi 404 dạng JSON.
 
 ---
 

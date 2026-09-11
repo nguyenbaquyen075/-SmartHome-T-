@@ -14,7 +14,6 @@ app.use(express.json());
 
 // Paths
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
-const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
 const PROJECTS_FILE = path.join(__dirname, 'data', 'projects.json');
 
 // Helper to read/write JSON safely
@@ -252,107 +251,30 @@ app.delete('/api/products/:id', (req, res) => {
   res.json({ success: true, message: 'Đã xóa sản phẩm' });
 });
 
-// ================= ORDERS =================
-
-// GET /api/orders
-app.get('/api/orders', (req, res) => {
-  const orders = readJson(ORDERS_FILE);
-  res.json(orders);
-});
-
-// GET /api/orders/:id
-app.get('/api/orders/:id', (req, res) => {
-  const orders = readJson(ORDERS_FILE);
-  const order = orders.find(
-    (o) => o.id.toLowerCase() === req.params.id.toLowerCase() || (o.customer?.phone && o.customer.phone === req.params.id)
-  );
-  if (!order) {
-    return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
-  }
-  res.json(order);
-});
-
-// POST /api/orders (Create order)
-app.post('/api/orders', (req, res) => {
-  const { customer, items, paymentMethod, discount = 0 } = req.body;
-  if (!items || !items.length || !customer || !customer.name || !customer.phone) {
-    return res.status(400).json({ error: 'Thiếu thông tin đơn hàng hoặc thông tin khách hàng' });
-  }
-
-  const products = readJson(PRODUCTS_FILE);
-  let totalAmount = 0;
-
-  // Verify stock & calculate total
-  for (const item of items) {
-    const prod = products.find((p) => p.id === item.id);
-    if (prod) {
-      totalAmount += prod.price * (item.quantity || 1);
-      // Reduce stock
-      prod.inStock = Math.max(0, prod.inStock - (item.quantity || 1));
-    }
-  }
-  writeJson(PRODUCTS_FILE, products);
-
-  const finalAmount = Math.max(0, totalAmount - (Number(discount) || 0));
-  const newOrder = {
-    id: `CAM-${Math.floor(100000 + Math.random() * 900000)}`,
-    customer,
-    items,
-    totalAmount,
-    discount: Number(discount) || 0,
-    finalAmount,
-    paymentMethod: paymentMethod || 'cod',
-    paymentStatus: paymentMethod === 'vietqr' ? 'waiting_payment' : 'pending',
-    orderStatus: 'processing',
-    createdAt: new Date().toISOString()
-  };
-
-  const orders = readJson(ORDERS_FILE);
-  orders.unshift(newOrder);
-  writeJson(ORDERS_FILE, orders);
-
-  res.status(201).json(newOrder);
-});
-
-// PATCH /api/orders/:id/status
-app.patch('/api/orders/:id/status', (req, res) => {
-  const { orderStatus, paymentStatus } = req.body;
-  const orders = readJson(ORDERS_FILE);
-  const order = orders.find((o) => o.id === req.params.id);
-  if (!order) {
-    return res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
-  }
-
-  if (orderStatus) order.orderStatus = orderStatus;
-  if (paymentStatus) order.paymentStatus = paymentStatus;
-
-  writeJson(ORDERS_FILE, orders);
-  res.json(order);
-});
-
 // GET /api/stats (Admin stats)
 app.get('/api/stats', (req, res) => {
   const products = readJson(PRODUCTS_FILE);
-  const orders = readJson(ORDERS_FILE);
 
   const totalProducts = products.length;
   const totalStock = products.reduce((acc, p) => acc + (p.inStock || 0), 0);
   const lowStockProducts = products.filter((p) => p.inStock <= 5);
-  const totalOrders = orders.length;
-  const totalRevenue = orders.reduce((acc, o) => acc + (o.finalAmount || 0), 0);
 
   res.json({
     totalProducts,
     totalStock,
-    lowStockCount: lowStockProducts.length,
-    totalOrders,
-    totalRevenue
+    lowStockCount: lowStockProducts.length
   });
 });
 
 // ================= SERVE REACT BUILD =================
 // ponytail: don gian nhat - 1 service, Express serve luon frontend/dist.
 // Tach frontend/backend rieng chi khi can CDN hoac scale doc lap.
+// API khong khop route nao -> tra 404 JSON, khong roi vao SPA fallback ben duoi
+// (neu khong, goi API sai se nhan ve index.html kem status 200)
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Không tìm thấy API: ' + req.originalUrl });
+});
+
 const CLIENT_DIST = path.join(__dirname, '..', 'frontend', 'dist');
 // Asset co hash trong ten -> cache 1 nam; index.html luon lay moi
 app.use(express.static(CLIENT_DIST, { maxAge: '1y', index: false }));

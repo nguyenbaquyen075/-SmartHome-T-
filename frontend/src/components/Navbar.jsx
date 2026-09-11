@@ -4,7 +4,6 @@ import {
   ShieldCheck, 
   Headphones, 
   User, 
-  ShoppingCart, 
   Search, 
   Home, 
   Zap, 
@@ -22,16 +21,12 @@ import {
 export default function Navbar({
   searchTerm,
   setSearchTerm,
-  cart,
-  setIsCartOpen,
-  setIsTrackerOpen,
   isAdmin,
   setIsAdmin,
   setSelectedCategory
 }) {
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const navCategories = [
     { name: 'Điện nước', icon: Droplet },
@@ -172,64 +167,10 @@ export default function Navbar({
               <span>{isAdmin ? 'Quản trị (Bật)' : 'Tài khoản'}</span>
             </div>
 
-            {/* Gio hang */}
-            <div 
-              onClick={() => setIsCartOpen(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.82rem', position: 'relative' }}
-            >
-              <ShoppingCart size={18} />
-              {totalCartCount > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-6px',
-                  right: '-8px',
-                  backgroundColor: '#ef4444',
-                  color: '#fff',
-                  fontSize: '0.65rem',
-                  fontWeight: 800,
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {totalCartCount}
-                </span>
-              )}
-            </div>
           </div>
 
           {/* Mobile hamburger icon */}
-          {/* Dien thoai: gio hang phai o day, vi thanh duoi da doi thanh muc San pham */}
-          <div className="mobile-flex" style={{ alignItems: 'center', gap: '14px' }}>
-            <button
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Mở giỏ hàng"
-              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', position: 'relative', padding: 0 }}
-            >
-              <ShoppingCart size={23} />
-              {totalCartCount > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-7px',
-                  backgroundColor: '#ef4444',
-                  color: '#fff',
-                  fontSize: '0.62rem',
-                  fontWeight: 800,
-                  minWidth: '16px',
-                  height: '16px',
-                  padding: '0 3px',
-                  borderRadius: '9px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {totalCartCount}
-                </span>
-              )}
-            </button>
+          <div className="mobile-flex" style={{ alignItems: 'center' }}>
             <button
               onClick={() => setMobileDrawerOpen(true)}
               aria-label="Mở menu"
