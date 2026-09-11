@@ -359,14 +359,6 @@ export default function ProductDetailPage({
               </div>
             </div>
 
-            {/* In Stock Notice */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#15803d', marginBottom: '20px' }}>
-              <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Check size={12} strokeWidth={3} />
-              </div>
-              <span><strong>Còn hàng</strong> - Giao hàng nhanh 1 - 3 ngày trên toàn quốc</span>
-            </div>
-
             {/* Extra Utilities */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '0.85rem', color: '#64748b' }}>
               <button
