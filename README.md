@@ -183,6 +183,20 @@ công trình mới nhất lên đầu theo `startDate`.
 
 ---
 
+## 🏷️ Thay logo trên header
+
+Đặt file logo vào đúng đường dẫn sau, trang tự nhận, **không cần sửa code**:
+
+```
+frontend/public/images/logo.png
+```
+
+- Nên dùng ảnh **vuông** (VD 512×512), nền trong suốt hoặc nền trắng
+- Chưa có file thì header tự hiện biểu tượng dự phòng, trang không bị vỡ
+- Nhớ nén ảnh trước khi bỏ vào (xem mục *Lưu ý về ảnh* ở dưới)
+
+---
+
 ## 📢 Sửa nội dung thanh chạy trên banner
 
 Mở [frontend/src/components/PromoTicker.jsx](frontend/src/components/PromoTicker.jsx),

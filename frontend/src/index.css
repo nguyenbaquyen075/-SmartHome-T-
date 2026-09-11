@@ -324,6 +324,35 @@ body {
   display: none;
 }
 
+/* ================= LOGO & TÊN TRÊN HEADER ================= */
+.navbar-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.navbar-name {
+  min-width: 0;
+}
+.navbar-name-main {
+  font-size: 1.42rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.navbar-name-sub {
+  font-size: 0.74rem;
+  color: #bae6fd;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
 /* ================= THANH CHẠY TRÊN BANNER ================= */
 .ticker {
   background: linear-gradient(90deg, #003d7a 0%, #0066cc 50%, #003d7a 100%);
@@ -852,37 +881,34 @@ body {
     padding-bottom: calc(65px + env(safe-area-inset-bottom));
   }
 
+  /* Header gọn lại: bớt khoảng đệm, logo và tên vẫn đủ to để đọc */
   .navbar-main-row {
     gap: 8px !important;
-    padding-top: 9px;
-    padding-bottom: 9px;
+    padding-top: 7px;
+    padding-bottom: 7px;
   }
 
   .navbar-brand {
-    gap: 7px !important;
+    gap: 8px !important;
     min-width: 0;
   }
 
-  .navbar-brand > div:first-child {
-    width: 36px !important;
-    height: 36px !important;
-    flex-shrink: 0;
+  .navbar-logo,
+  .navbar-logo-fallback {
+    width: 40px !important;
+    height: 40px !important;
   }
-
-  .navbar-brand > div:first-child svg {
+  .navbar-logo-fallback svg {
     width: 19px;
     height: 19px;
   }
 
-  .navbar-brand > div:last-child > div:first-child {
-    font-size: clamp(0.7rem, 3.5vw, 0.9rem) !important;
-    letter-spacing: 0 !important;
-    white-space: nowrap;
+  .navbar-name-main {
+    font-size: clamp(0.86rem, 4.3vw, 1.08rem);
+    letter-spacing: -0.2px;
   }
-
-  .navbar-brand > div:last-child > div:last-child {
-    font-size: 0.58rem !important;
-    white-space: nowrap;
+  .navbar-name-sub {
+    font-size: 0.6rem;
   }
 
   .navbar-search {
@@ -906,7 +932,10 @@ body {
   }
 
   .navbar-search > div {
-    min-height: 38px;
+    min-height: 36px;
+  }
+  .navbar-search {
+    margin-top: 2px;
   }
 
   /* Thanh chạy: chữ nhỏ lại, khoảng cách hẹp hơn cho vừa màn điện thoại */
@@ -1064,11 +1093,11 @@ body {
     padding-inline: 8px;
   }
 
-  .navbar-brand > div:last-child > div:first-child {
-    font-size: 0.66rem !important;
+  /* Máy rất nhỏ: giấu dòng phụ, giữ tên chính đủ to */
+  .navbar-name-main {
+    font-size: 0.84rem;
   }
-
-  .navbar-brand > div:last-child > div:last-child {
+  .navbar-name-sub {
     display: none;
   }
 
