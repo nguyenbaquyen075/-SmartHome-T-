@@ -24,6 +24,29 @@ import {
 } from 'lucide-react';
 import ProductCard from './ProductCard';
 
+// Nhan tieng Viet cho tung khoa thong so. Khoa la se tu tach camelCase.
+const NHAN_THONG_SO = {
+  doPhanGiai: 'Độ phân giải', ongKinh: 'Ống kính', hongNgoai: 'Hồng ngoại',
+  chongNuoc: 'Chống nước', ketNoi: 'Kết nối', tinhNang: 'Tính năng',
+  luuTru: 'Lưu trữ', xuatXu: 'Xuất xứ', congSuat: 'Công suất',
+  chatLieu: 'Chất liệu', nguon: 'Nguồn điện', quayQuet: 'Quay quét',
+  amThanh: 'Âm thanh', soCuc: 'Số cực', dongDinhMuc: 'Dòng định mức',
+  dongCatNganMach: 'Dòng cắt ngắn mạch', dienAp: 'Điện áp',
+  quangThong: 'Quang thông', nhietDoMau: 'Nhiệt độ màu', duoiDen: 'Đuôi đèn',
+  tuoiTho: 'Tuổi thọ', tietDien: 'Tiết diện', loiDong: 'Lõi đồng',
+  lopVo: 'Lớp vỏ', dienApSuDung: 'Điện áp sử dụng', quyCach: 'Quy cách',
+  loaiLapDat: 'Loại lắp đặt', apLucNuoc: 'Áp lực nước', baoHanh: 'Bảo hành',
+  dayCao: 'Đẩy cao', luuLuongNuoc: 'Lưu lượng nước', duongKinhOng: 'Đường kính ống',
+  kichCo: 'Kích cỡ', doDay: 'Độ dày', chieuDaiCay: 'Chiều dài cây',
+  tieuChuan: 'Tiêu chuẩn', kichThuoc: 'Kích thước', phuKien: 'Phụ kiện',
+  dauVao: 'Đầu vào', dauRa: 'Đầu ra', chanCam: 'Chân cắm',
+  soKenh: 'Số kênh', chuanNen: 'Chuẩn nén', xuatHinh: 'Xuất hình', oCung: 'Ổ cứng'
+};
+
+const doiNhan = (khoa) =>
+  NHAN_THONG_SO[khoa] ||
+  khoa.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+
 export default function ProductDetailPage({
   product,
   allProducts = [],
@@ -522,44 +545,18 @@ export default function ProductDetailPage({
                 </h2>
               </div>
 
-              <div style={{ border: '1px solid #e2e8f0', borderRadius: '10px', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-                  <tbody>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b', width: '35%' }}>Độ phân giải</td>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#1e293b' }}>2.0 Megapixel (1920 × 1080) Full HD</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#fff', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Cảm biến hình ảnh</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>1/2.8" Progressive Scan CMOS thế hệ mới</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Tiêu cự ống kính</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>2.8mm (góc rộng 103°) hoặc 4mm (góc nhìn 86°)</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#fff', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Tầm xa hồng ngoại</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>30 mét quan sát rõ nét ban đêm</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Tiêu chuẩn chống nước</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>IP67 lắp đặt ngoài trời</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#fff', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Chuẩn nén video</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>H.265+ / H.265 / H.264+ / H.264</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Nguồn điện</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>12V DC ± 25% hoặc Cấp nguồn PoE (802.3af)</td>
-                    </tr>
-                    <tr style={{ backgroundColor: '#fff' }}>
-                      <td style={{ padding: '11px 16px', fontWeight: 600, color: '#64748b' }}>Trọng lượng</td>
-                      <td style={{ padding: '11px 16px', color: '#1e293b' }}>Khoảng 480g</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              {Object.keys(product.specs || {}).length > 0 ? (
+                <dl className="pd-ts">
+                  {Object.entries(product.specs).map(([khoa, giaTri]) => (
+                    <div key={khoa} className="pd-ts-o">
+                      <dt>{doiNhan(khoa)}</dt>
+                      <dd>{giaTri}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : (
+                <p className="pd-ts-trong">Sản phẩm này chưa có thông số chi tiết.</p>
+              )}
             </section>
 
             <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
