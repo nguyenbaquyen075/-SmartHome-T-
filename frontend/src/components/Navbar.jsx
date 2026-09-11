@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Truck, 
   ShieldCheck, 
@@ -27,6 +27,19 @@ export default function Navbar({
 }) {
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  // Dien thoai: o tim kiem an di, bam kinh lup moi truot ra
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
+
+  const toggleSearch = () => {
+    const mo = !searchOpen;
+    setSearchOpen(mo);
+    if (mo) {
+      setTimeout(() => searchInputRef.current?.focus(), 260);
+    } else {
+      setSearchTerm('');
+    }
+  };
 
   const navCategories = [
     { name: 'Điện nước', icon: Droplet },
@@ -56,7 +69,10 @@ export default function Navbar({
         color: '#fff',
         padding: '12px 0'
       }}>
-        <div className="container navbar-main-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+        <div
+          className={`container navbar-main-row ${searchOpen ? 'searching' : ''}`}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', position: 'relative' }}
+        >
           {/* Logo */}
           <div 
             onClick={() => {
@@ -97,6 +113,10 @@ export default function Navbar({
               </div>
             </div>
 
+            <div className="navbar-name">
+              <div className="navbar-name-main">ĐIỆN NƯỚC CAMERA</div>
+              <div className="navbar-name-sub">Chất lượng tạo nên niềm tin</div>
+            </div>
           </div>
 
           {/* Search Bar in Header */}
@@ -110,6 +130,7 @@ export default function Navbar({
               boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
             }}>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Tìm kiếm sản phẩm, thương hiệu..."
                 value={searchTerm}
@@ -175,7 +196,16 @@ export default function Navbar({
           </div>
 
           {/* Mobile hamburger icon */}
-          <div className="mobile-flex" style={{ alignItems: 'center' }}>
+          <div className="mobile-flex" style={{ alignItems: 'center', gap: '14px' }}>
+            <button
+              onClick={toggleSearch}
+              aria-label={searchOpen ? 'Đóng tìm kiếm' : 'Mở tìm kiếm'}
+              aria-expanded={searchOpen}
+              className="navbar-search-toggle"
+              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', padding: 0 }}
+            >
+              {searchOpen ? <X size={24} /> : <Search size={23} strokeWidth={2.4} />}
+            </button>
             <button
               onClick={() => setMobileDrawerOpen(true)}
               aria-label="Mở menu"
