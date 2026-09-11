@@ -12,13 +12,27 @@ import {
   RefreshCw,
   Eye
 } from 'lucide-react';
-import { formatPrice } from '../utils/api';
+import { formatPrice, api } from '../utils/api';
+import AdminProjects from './AdminProjects';
+import AdminSettings from './AdminSettings';
 
 export default function AdminDashboard({ onClose, onProductChange }) {
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [bao, setBao] = useState(null);
+
+  const hienBao = (message, type = 'success') => {
+    setBao({ message, type });
+    setTimeout(() => setBao(null), 3000);
+  };
+
+  const dangXuat = async () => {
+    await api.logout();
+    onClose();
+  };
 
   // New Product Form State
   const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -47,12 +61,14 @@ export default function AdminDashboard({ onClose, onProductChange }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prodsRes, statsRes] = await Promise.all([
+      const [prodsRes, statsRes, projRes] = await Promise.all([
         fetch('/api/products').then((r) => r.json()),
-        fetch('/api/stats').then((r) => r.json())
+        fetch('/api/stats').then((r) => r.json()),
+        fetch('/api/projects').then((r) => r.json())
       ]);
       setProducts(prodsRes);
       setStats(statsRes);
+      setProjects(projRes);
     } catch (err) {
       console.error(err);
     } finally {
@@ -156,7 +172,7 @@ export default function AdminDashboard({ onClose, onProductChange }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
-        className="modal-content"
+        className="modal-content adm-modal"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
@@ -168,27 +184,19 @@ export default function AdminDashboard({ onClose, onProductChange }) {
         }}
       >
         {/* Top bar */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingBottom: '16px'
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="adm-topbar">
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span className="badge badge-amber">Admin Portal</span>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Quản Trị Hệ Thống CameraTD</h2>
+              <h2 className="adm-tieude">Quản trị website</h2>
             </div>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-              Quản lý kho hàng và cập nhật giá bán
-            </p>
+            <p className="adm-phude">Quản lý sản phẩm, công trình và giao diện trang chủ</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="adm-topbar-nut">
             <button onClick={loadData} className="btn-secondary" style={{ padding: '8px 12px' }} title="Làm mới">
               <RefreshCw size={15} />
             </button>
+            <button onClick={dangXuat} className="adm-dangxuat">Đăng xuất</button>
             <button onClick={onClose} className="btn-icon" style={{ width: '36px', height: '36px' }}>
               <X size={20} />
             </button>
@@ -251,21 +259,20 @@ export default function AdminDashboard({ onClose, onProductChange }) {
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           marginBottom: '16px'
         }}>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <button
-              onClick={() => setActiveTab('products')}
-              style={{
-                padding: '8px 16px',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === 'products' ? '2px solid #f59e0b' : '2px solid transparent',
-                color: activeTab === 'products' ? '#f59e0b' : '#94a3b8',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              Danh Mục Sản Phẩm ({products.length})
-            </button>
+          <div className="adm-tabs">
+            {[
+              { key: 'products', nhan: `Sản phẩm (${products.length})` },
+              { key: 'projects', nhan: `Nhật ký thi công (${projects.length})` },
+              { key: 'settings', nhan: 'Banner & thanh chạy' }
+            ].map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={activeTab === t.key ? 'on' : ''}
+              >
+                {t.nhan}
+              </button>
+            ))}
           </div>
 
           {activeTab === 'products' && (
@@ -518,7 +525,18 @@ export default function AdminDashboard({ onClose, onProductChange }) {
             </div>
           )}
 
+          {activeTab === 'projects' && (
+            <AdminProjects projects={projects} onReload={loadData} onBao={hienBao} />
+          )}
+
+          {activeTab === 'settings' && <AdminSettings onBao={hienBao} />}
+
         </div>
+
+        {/* Thong bao ngan sau moi thao tac */}
+        {bao && (
+          <div className={`adm-bao ${bao.type}`}>{bao.message}</div>
+        )}
       </div>
     </div>
   );

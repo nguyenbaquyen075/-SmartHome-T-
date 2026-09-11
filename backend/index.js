@@ -10,11 +10,12 @@ const PORT = process.env.PORT || 5001;
 // Middleware
 app.use(compression());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '12mb' }));
 
 // Paths
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
 const PROJECTS_FILE = path.join(__dirname, 'data', 'projects.json');
+const SETTINGS_FILE = path.join(__dirname, 'data', 'settings.json');
 
 // Helper to read/write JSON safely
 const readJson = (filePath) => {
@@ -40,6 +41,42 @@ const writeJson = (filePath, data) => {
   }
 };
 
+// ================= XAC THUC QUAN TRI =================
+// Mat khau dat qua bien moi truong ADMIN_PASSWORD (tren Render: Environment).
+// Khong dat thi dung mat khau tam - chi hop khi chay o may minh.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'diennuoc@2026';
+if (!process.env.ADMIN_PASSWORD) {
+  console.warn('[CANH BAO] Chua dat ADMIN_PASSWORD, dang dung mat khau tam.');
+}
+
+// Token giu trong bo nho. Server khoi dong lai la phai dang nhap lai -
+// du dung cho 1 nguoi quan tri, khong can them thu vien phien dang nhap.
+const phienDangNhap = new Set();
+
+const laToken = (req) => (req.headers.authorization || '').replace('Bearer ', '');
+
+const canQuyen = (req, res, next) => {
+  if (phienDangNhap.has(laToken(req))) return next();
+  res.status(401).json({ error: 'Cần đăng nhập quản trị' });
+};
+
+app.post('/api/admin/login', (req, res) => {
+  if (req.body?.password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Mật khẩu không đúng' });
+  }
+  const token = require('crypto').randomBytes(24).toString('hex');
+  phienDangNhap.add(token);
+  res.json({ token });
+});
+
+app.post('/api/admin/logout', canQuyen, (req, res) => {
+  phienDangNhap.delete(laToken(req));
+  res.json({ success: true });
+});
+
+// Kiem tra token con hieu luc (dung khi tai lai trang)
+app.get('/api/admin/check', canQuyen, (req, res) => res.json({ ok: true }));
+
 // ================= API ROUTES =================
 
 // Health check
@@ -52,6 +89,87 @@ app.get('/api/projects', (req, res) => {
   const projects = readJson(PROJECTS_FILE);
   projects.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   res.json(projects);
+});
+
+// POST /api/projects (them cong trinh)
+app.post('/api/projects', canQuyen, (req, res) => {
+  const projects = readJson(PROJECTS_FILE);
+  const moi = {
+    id: req.body.id || 'ct-' + Date.now(),
+    title: req.body.title || '',
+    address: req.body.address || '',
+    customerType: req.body.customerType || '',
+    startDate: req.body.startDate || new Date().toISOString().slice(0, 10),
+    durationDays: Number(req.body.durationDays) || 0,
+    status: req.body.status || 'Hoàn thành',
+    image: req.body.image || '/images/cat_tools.jpg'
+  };
+  projects.push(moi);
+  writeJson(PROJECTS_FILE, projects);
+  res.status(201).json(moi);
+});
+
+// PUT /api/projects/:id (sua cong trinh)
+app.put('/api/projects/:id', canQuyen, (req, res) => {
+  const projects = readJson(PROJECTS_FILE);
+  const i = projects.findIndex((p) => p.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy công trình' });
+  projects[i] = { ...projects[i], ...req.body, id: projects[i].id };
+  writeJson(PROJECTS_FILE, projects);
+  res.json(projects[i]);
+});
+
+// DELETE /api/projects/:id
+app.delete('/api/projects/:id', canQuyen, (req, res) => {
+  const projects = readJson(PROJECTS_FILE);
+  const con = projects.filter((p) => p.id !== req.params.id);
+  if (con.length === projects.length) return res.status(404).json({ error: 'Không tìm thấy công trình' });
+  writeJson(PROJECTS_FILE, con);
+  res.json({ success: true });
+});
+
+// GET /api/settings (thanh chay + anh banner) - ai cung doc duoc
+app.get('/api/settings', (req, res) => {
+  const s = readJson(SETTINGS_FILE);
+  res.json(Array.isArray(s) ? { ticker: [], banner: null } : s);
+});
+
+// PUT /api/settings
+app.put('/api/settings', canQuyen, (req, res) => {
+  const hienTai = readJson(SETTINGS_FILE);
+  const moi = {
+    ticker: Array.isArray(req.body.ticker) ? req.body.ticker.filter((t) => t.trim()) : hienTai.ticker,
+    banner: 'banner' in req.body ? req.body.banner : hienTai.banner
+  };
+  writeJson(SETTINGS_FILE, moi);
+  res.json(moi);
+});
+
+// POST /api/upload - nhan anh dang base64 roi ghi ra file.
+// Dung base64 thay vi multipart de khoi them thu vien multer.
+app.post('/api/upload', canQuyen, (req, res) => {
+  const { data, name } = req.body || {};
+  const khop = /^data:image\/(png|jpe?g|webp);base64,(.+)$/.exec(data || '');
+  if (!khop) return res.status(400).json({ error: 'Chỉ nhận ảnh PNG, JPG hoặc WEBP' });
+
+  const duoi = khop[1] === 'jpeg' ? 'jpg' : khop[1];
+  const buf = Buffer.from(khop[2], 'base64');
+  if (buf.length > 6 * 1024 * 1024) {
+    return res.status(413).json({ error: 'Ảnh quá nặng, tối đa 6MB. Nén bớt rồi tải lại.' });
+  }
+
+  const anToan = String(name || 'anh').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
+  const tenFile = `${anToan}-${Date.now()}.${duoi}`;
+  const thuMuc = path.join(__dirname, '..', 'frontend', 'public', 'images', 'tai-len');
+
+  try {
+    fs.mkdirSync(thuMuc, { recursive: true });
+    fs.writeFileSync(path.join(thuMuc, tenFile), buf);
+    res.json({ url: `/images/tai-len/${tenFile}` });
+  } catch (err) {
+    console.error('Lỗi lưu ảnh:', err);
+    res.status(500).json({ error: 'Không lưu được ảnh' });
+  }
 });
 
 // GET /api/categories
@@ -189,7 +307,7 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // POST /api/products (Add product)
-app.post('/api/products', (req, res) => {
+app.post('/api/products', canQuyen, (req, res) => {
   const products = readJson(PRODUCTS_FILE);
   const newProduct = {
     id: `cam-${Date.now().toString().slice(-6)}`,
@@ -220,7 +338,7 @@ app.post('/api/products', (req, res) => {
 });
 
 // PUT /api/products/:id (Update product)
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', canQuyen, (req, res) => {
   const products = readJson(PRODUCTS_FILE);
   const index = products.findIndex((p) => p.id === req.params.id);
   if (index === -1) {
@@ -239,7 +357,7 @@ app.put('/api/products/:id', (req, res) => {
 });
 
 // DELETE /api/products/:id (Delete product)
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', canQuyen, (req, res) => {
   let products = readJson(PRODUCTS_FILE);
   const exists = products.some((p) => p.id === req.params.id);
   if (!exists) {
