@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Xem thử trên điện thoại — ĐIỆN NƯỚC CAMERA</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 16px;
+  }
+  header {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  h1 { font-size: 1rem; font-weight: 700; color: #fff; }
+  .hint { color: #64748b; font-size: 0.78rem; }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  button, select {
+    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
+    padding: 7px 12px; border-radius: 7px; font-size: 0.8rem; cursor: pointer;
+    font-family: inherit;
+  }
+  button:hover, select:hover { background: #334155; }
+  button.on { background: #0066cc; border-color: #0066cc; color: #fff; }
+
+  .stage { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+
+  .device { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .label { font-size: 0.74rem; color: #94a3b8; font-variant-numeric: tabular-nums; }
+  .label b { color: #e2e8f0; font-weight: 600; }
+
+  /* Khung máy */
+  .frame {
+    position: relative;
+    background: #1e293b;
+    border: 10px solid #1e293b;
+    border-radius: 34px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 42%; height: 20px; background: #1e293b;
+    border-radius: 0 0 12px 12px; z-index: 2;
+  }
+  iframe { display: block; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📱 Xem thử trên điện thoại</h1>
+  <span class="hint">Sửa code xong lưu lại là khung tự cập nhật (Vite HMR)</span>
+  <div class="controls">
+    <button id="rotate">🔄 Xoay ngang</button>
+    <button id="reload">↻ Tải lại</button>
+    <button id="multi" class="on">Xem 3 máy</button>
+  </div>
+</header>
+
+<div class="stage" id="stage"></div>
+
+<script>
+  // Kich thuoc CSS that cua tung may
+  const DEVICES = [
+    { name: 'iPhone SE',      w: 320, h: 568 },
+    { name: 'iPhone 12 / 13', w: 390, h: 844 },
+    { name: 'iPhone 14 Pro Max', w: 430, h: 932 }
+  ];
+
+  const stage = document.getElementById('stage');
+  let landscape = false;
+  let multi = true;
+
+  function render() {
+    const list = multi ? DEVICES : [DEVICES[1]];
+    const src = '/';
+    stage.innerHTML = '';
+    for (const d of list) {
+      const w = landscape ? d.h : d.w;
+      const h = landscape ? d.w : d.h;
+      const box = document.createElement('div');
+      box.className = 'device';
+      box.innerHTML =
+        '<div class="frame" style="width:' + (w + 20) + 'px">' +
+          (landscape ? '' : '<div class="notch"></div>') +
+          '<iframe src="' + src + '" width="' + w + '" height="' + h + '" loading="eager"></iframe>' +
+        '</div>' +
+        '<div class="label"><b>' + d.name + '</b> · ' + w + ' × ' + h + '</div>';
+      stage.appendChild(box);
+    }
+  }
+
+  document.getElementById('rotate').onclick = (e) => {
+    landscape = !landscape;
+    e.target.textContent = landscape ? '🔄 Xoay dọc' : '🔄 Xoay ngang';
+    e.target.classList.toggle('on', landscape);
+    render();
+  };
+  document.getElementById('multi').onclick = (e) => {
+    multi = !multi;
+    e.target.textContent = multi ? 'Xem 3 máy' : 'Xem 1 máy';
+    e.target.classList.toggle('on', multi);
+    render();
+  };
+  document.getElementById('reload').onclick = () => {
+    document.querySelectorAll('iframe').forEach(f => f.contentWindow.location.reload());
+  };
+
+  render();
+</script>
+
+</body>
+</html>
