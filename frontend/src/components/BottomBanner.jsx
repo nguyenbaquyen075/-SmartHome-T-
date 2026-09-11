@@ -22,7 +22,7 @@ export default function BottomBanner() {
           {/* Left Decorative Image */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <img 
-              src="https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=120&q=80" 
+              src="/images/products/1557597774-9d273605dfa9.jpg" 
               alt="Camera" 
               style={{ width: '65px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.3)' }}
             />
@@ -55,7 +55,7 @@ export default function BottomBanner() {
           {/* Right Pipe Illustration */}
           <div>
             <img 
-              src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=120&q=80" 
+              src="/images/products/1584622650111-993a426fbf0a.jpg" 
               alt="Equipment" 
               style={{ width: '65px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.3)' }}
             />
