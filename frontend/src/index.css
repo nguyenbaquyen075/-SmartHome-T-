@@ -275,14 +275,15 @@ body {
 }
 
 .diary-card {
-  flex: 0 0 320px;
+  flex: 0 0 460px;
   scroll-snap-align: start;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;     /* ảnh bên trái, mô tả bên phải */
+  min-height: 180px;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 .diary-card:hover {
@@ -292,7 +293,7 @@ body {
 
 .diary-thumb {
   position: relative;
-  height: 168px;
+  flex: 0 0 40%;           /* ảnh chiếm 40% bề ngang thẻ, tự cao bằng thẻ */
   background: #f1f5f9;
 }
 .diary-thumb img {
@@ -303,8 +304,9 @@ body {
 }
 .diary-status {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -322,14 +324,19 @@ body {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;            /* không có dòng này, chữ dài sẽ đẩy thẻ tràn ra ngoài */
 }
 .diary-date {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 5px;
   color: #0066cc;
   font-size: 0.76rem;
   font-weight: 700;
+}
+.diary-date > span:first-of-type {
+  white-space: nowrap;
 }
 .diary-dur {
   color: #94a3b8;
@@ -471,10 +478,36 @@ body {
 
   /* Nhật ký thi công: 1 thẻ gần kín màn, hở mép phải để biết còn thẻ bên cạnh */
   .diary-card {
-    flex-basis: 82%;
+    flex-basis: 90%;
+    min-height: 150px;
   }
   .diary-thumb {
-    height: 150px;
+    flex-basis: 34%;
+  }
+  .diary-body {
+    padding: 10px;
+    gap: 4px;
+  }
+  .diary-status {
+    font-size: 0.62rem;
+    padding: 3px 6px;
+  }
+  .diary-date {
+    font-size: 0.7rem;
+  }
+  .diary-title {
+    font-size: 0.85rem;
+  }
+  .diary-addr {
+    font-size: 0.72rem;
+  }
+  .diary-chip {
+    font-size: 0.62rem;
+    padding: 2px 5px;
+  }
+  /* Cot phai hep, hien het hang muc se lam the cao gap doi man hinh */
+  .diary-chip:nth-child(n + 4) {
+    display: none;
   }
 
   /* Lưới sản phẩm điện thoại: đúng chuẩn 2 cột không bị tràn vỡ */
