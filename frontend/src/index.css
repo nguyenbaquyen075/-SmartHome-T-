@@ -247,6 +247,10 @@ body {
   display: none !important;
 }
 
+.mobile-flex {
+  display: none;
+}
+
 /* Product grid container responsive */
 .products-grid {
   display: grid;
@@ -257,6 +261,224 @@ body {
 /* Grid item mac dinh min-width:auto -> con co white-space:nowrap lam vo luoi */
 .products-grid > * {
   min-width: 0;
+}
+
+/* ================= TRANG SẢN PHẨM ================= */
+.pp-wrap {
+  padding-top: 14px;
+  padding-bottom: 30px;
+}
+
+.pp-crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+.pp-crumb button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #0066cc;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.pp-crumb button:hover { text-decoration: underline; }
+.pp-crumb-cur { color: #1e293b; font-weight: 600; }
+
+.pp-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 18px;
+}
+.pp-head h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+}
+.pp-head p {
+  color: #64748b;
+  font-size: 0.84rem;
+  margin-top: 3px;
+}
+.pp-head p strong { color: #0066cc; }
+
+.pp-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.pp-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0 10px;
+  height: 38px;
+  color: #94a3b8;
+}
+.pp-search:focus-within { border-color: #0066cc; }
+.pp-search input {
+  border: none;
+  outline: none;
+  font: inherit;
+  font-size: 0.84rem;
+  color: #1e293b;
+  width: 190px;
+  min-width: 0;
+  background: none;
+}
+.pp-search button {
+  background: none; border: none; cursor: pointer; color: #94a3b8;
+  display: flex; padding: 0;
+}
+
+.pp-sort, .pp-filter-btn {
+  height: 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e293b;
+  font: inherit;
+  font-size: 0.84rem;
+  padding: 0 12px;
+  cursor: pointer;
+}
+.pp-filter-btn {
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.pp-body { display: flex; gap: 22px; align-items: flex-start; }
+
+.pp-side {
+  flex: 0 0 228px;
+  position: sticky;
+  top: 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  max-height: calc(100vh - 28px);
+  overflow-y: auto;
+}
+.pp-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.04em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 12px;
+}
+.pp-side-head button {
+  background: none; border: none; cursor: pointer;
+  color: #e11d48; font: inherit; font-size: 0.74rem; font-weight: 600;
+  letter-spacing: 0;
+}
+
+.pp-filter-group { margin-bottom: 16px; }
+.pp-filter-group:last-child { margin-bottom: 0; }
+.pp-filter-group h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 7px;
+}
+
+.pp-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.pp-radio:hover { background: #f8fafc; }
+.pp-radio.on { background: #eff6ff; color: #0066cc; font-weight: 600; }
+.pp-radio input { accent-color: #0066cc; cursor: pointer; margin: 0; }
+
+.pp-results { flex: 1; min-width: 0; }
+
+.pp-empty {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 50px 20px;
+  text-align: center;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.pp-empty-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
+.pp-empty .btn-primary { margin-top: 10px; padding: 9px 18px; }
+
+/* Bảng lọc trượt lên - chỉ dùng trên điện thoại */
+.pp-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+.pp-sheet {
+  background: #fff;
+  width: 100%;
+  max-height: 86vh;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+.pp-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 1rem;
+  color: #1e293b;
+}
+.pp-sheet-head button {
+  background: none; border: none; cursor: pointer; color: #64748b; display: flex;
+}
+.pp-sheet-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
+.pp-sheet-foot {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid #f1f5f9;
+}
+.pp-sheet-foot .btn-primary { flex: 1; }
+.pp-clear {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #e11d48;
+  font: inherit;
+  font-weight: 600;
+  padding: 0 16px;
+  cursor: pointer;
 }
 
 /* ================= NHẬT KÝ THI CÔNG ================= */
@@ -439,7 +661,8 @@ body {
 
   .navbar-search {
     order: 3;
-    flex-basis: 100%;
+    /* !important vi inline style flex:1 (flex-basis:0) se thang class thuong */
+    flex: 1 0 100% !important;
     max-width: none !important;
   }
 
@@ -447,7 +670,7 @@ body {
     flex-wrap: wrap;
   }
 
-  .navbar-main-row > .mobile-only {
+  .navbar-main-row > .mobile-flex {
     margin-left: auto;
   }
 
@@ -458,6 +681,32 @@ body {
 
   .navbar-search > div {
     min-height: 38px;
+  }
+
+  /* Trang sản phẩm trên điện thoại: bỏ cột lọc, dùng bảng lọc trượt lên */
+  .pp-head {
+    display: block;
+  }
+  .pp-head h1 {
+    font-size: 1.12rem;
+  }
+  .pp-tools {
+    margin-top: 12px;
+    gap: 7px;
+  }
+  .pp-search {
+    flex: 1 1 100%;
+    order: -1;
+  }
+  .pp-search input {
+    width: 100%;
+  }
+  .pp-sort {
+    flex: 1;
+    min-width: 0;
+  }
+  .pp-filter-btn {
+    flex: 0 0 auto;
   }
 
   /* Nhật ký thi công: 1 thẻ gần kín màn, hở mép phải để biết còn thẻ bên cạnh */

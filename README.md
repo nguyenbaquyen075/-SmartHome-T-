@@ -14,6 +14,7 @@ cameraTD/
 │   ├── public/images/       Ảnh sản phẩm, banner
 │   ├── src/
 │   │   ├── components/      Các khối giao diện (Navbar, ProductCard, Footer...)
+│   │   │                     ProductsPage.jsx = trang danh sách sản phẩm có bộ lọc
 │   │   ├── utils/api.js     Nơi duy nhất gọi API xuống backend
 │   │   ├── App.jsx          Khung trang chính
 │   │   └── index.css        CSS chung + responsive cho điện thoại
