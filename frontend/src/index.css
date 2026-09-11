@@ -324,6 +324,76 @@ body {
   display: none;
 }
 
+/* ================= THANH CHẠY TRÊN BANNER ================= */
+.ticker {
+  background: linear-gradient(90deg, #003d7a 0%, #0066cc 50%, #003d7a 100%);
+  overflow: hidden;
+  position: relative;
+}
+/* Mờ dần 2 mép cho chữ trôi ra/vào mềm mắt, không bị cắt cụt */
+.ticker::before,
+.ticker::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker::before {
+  left: 0;
+  background: linear-gradient(90deg, #003d7a, transparent);
+}
+.ticker::after {
+  right: 0;
+  background: linear-gradient(270deg, #003d7a, transparent);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 38s linear infinite;
+}
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-row {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ticker-item {
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 9px 0;
+}
+.ticker-dot {
+  color: #7dd3fc;
+  margin: 0 26px;
+  font-size: 0.7rem;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Tôn trọng cài đặt giảm chuyển động của máy người dùng */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  .ticker {
+    overflow-x: auto;
+  }
+}
+
 /* ================= SẢN PHẨM LIÊN QUAN (chạy ngang) ================= */
 .rel-track {
   display: flex;
@@ -837,6 +907,19 @@ body {
 
   .navbar-search > div {
     min-height: 38px;
+  }
+
+  /* Thanh chạy: chữ nhỏ lại, khoảng cách hẹp hơn cho vừa màn điện thoại */
+  .ticker-item {
+    font-size: 0.72rem;
+    padding: 7px 0;
+  }
+  .ticker-dot {
+    margin: 0 16px;
+  }
+  .ticker::before,
+  .ticker::after {
+    width: 24px;
   }
 
   /* Sản phẩm liên quan: thẻ hẹp lại, hở mép phải để biết còn thẻ bên cạnh */

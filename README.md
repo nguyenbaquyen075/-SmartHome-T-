@@ -19,6 +19,7 @@ cameraTD/
 │   ├── src/
 │   │   ├── components/      Các khối giao diện (Navbar, ProductCard, Footer...)
 │   │   │                     ProductsPage.jsx = trang danh sách sản phẩm có bộ lọc
+│   │   │                     PromoTicker.jsx  = thanh chữ chạy trên banner
 │   │   ├── utils/api.js     Nơi duy nhất gọi API xuống backend
 │   │   ├── App.jsx          Khung trang chính
 │   │   └── index.css        CSS chung + responsive cho điện thoại
@@ -179,6 +180,25 @@ công trình mới nhất lên đầu theo `startDate`.
 > ⚠️ Ảnh 6 công trình hiện tại là **ảnh minh hoạ lấy tạm** từ kho ảnh có sẵn của dự án.
 > Anh thay bằng ảnh chụp thực tế: bỏ ảnh vào `frontend/public/images/cong-trinh/`,
 > nén trước theo hướng dẫn mục dưới, rồi sửa `image` trong `projects.json`.
+
+---
+
+## 📢 Sửa nội dung thanh chạy trên banner
+
+Mở [frontend/src/components/PromoTicker.jsx](frontend/src/components/PromoTicker.jsx),
+sửa danh sách `MESSAGES` ở đầu file:
+
+```js
+const MESSAGES = [
+  '🔧 LẮP ĐẶT TẬN NƠI - MIỄN PHÍ KHẢO SÁT & TƯ VẤN',
+  '📞 HOTLINE 24/7: 0987 654 321 - ZALO: 0368.338.988',
+  // thêm dòng mới ở đây
+];
+```
+
+Thêm bớt bao nhiêu dòng cũng được, thanh tự chạy vòng cho khớp. Muốn chạy nhanh/chậm
+hơn thì sửa `38s` trong `.ticker-track` ở [index.css](frontend/src/index.css)
+(số càng lớn càng chậm). Rê chuột vào thanh là nó dừng để đọc.
 
 ---
 
