@@ -63,6 +63,20 @@ npm run dev
 
 Mở trình duyệt: **http://localhost:5174**
 
+### 📱 Xem thử trên điện thoại khi đang code
+
+Sau khi `npm run dev`, mở:
+
+**http://localhost:5174/mobile.html**
+
+Trang này dựng sẵn 3 khung máy cạnh nhau (iPhone SE 320px, iPhone 12 390px,
+iPhone 14 Pro Max 430px) để vừa sửa code vừa thấy ngay kết quả — lưu file là
+khung tự cập nhật. Có nút xoay ngang và tải lại.
+
+> Chrome DevTools (`Cmd+Shift+M`) cũng giả lập điện thoại, lại chính xác hơn về
+> cảm ứng và user agent. Trang này hơn ở chỗ xem được nhiều kích thước cùng lúc
+> và để mở thường trực cạnh editor.
+
 ### Chạy riêng từng phần
 
 Khi chỉ muốn sửa giao diện, hoặc chỉ muốn test API:
