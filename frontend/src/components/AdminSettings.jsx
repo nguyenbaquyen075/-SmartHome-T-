@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, RotateCcw } from 'lucide-react';
 import { api } from '../utils/api';
+import { nenAnh, coFile, coDataUrl } from '../utils/anh';
 
 // phan = 'ticker' | 'banner': mỗi mục trong menu quản trị chỉ hiện đúng phần của nó.
 // Lưu vẫn gửi cả 2 giá trị để không làm mất phần kia.
@@ -33,21 +34,24 @@ export default function AdminSettings({ onBao, phan }) {
 
   const chonBanner = async (e) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
-    if (file.size > 6 * 1024 * 1024) {
-      onBao('Ảnh quá nặng (tối đa 6MB). Nén bớt rồi tải lại.', 'error');
+    if (file.size > 40 * 1024 * 1024) {
+      onBao(`Ảnh quá lớn (${coFile(file.size)}). Chọn ảnh nhỏ hơn 40MB.`, 'error');
       return;
     }
-    const doc = new FileReader();
-    doc.onload = async () => {
-      try {
-        const { url } = await api.uploadImage(doc.result, 'banner');
-        await luu({ ticker, banner: url });
-      } catch (err) {
-        onBao(err.message, 'error');
+    try {
+      // Nén ngay trên máy trước khi gửi lên
+      const goi = await nenAnh(file);
+      if (coDataUrl(goi) > 6 * 1024 * 1024) {
+        onBao('Ảnh nén rồi vẫn quá nặng, thử ảnh khác.', 'error');
+        return;
       }
-    };
-    doc.readAsDataURL(file);
+      const { url } = await api.uploadImage(goi, 'banner');
+      await luu({ ticker, banner: url });
+    } catch (err) {
+      onBao(err.message, 'error');
+    }
   };
 
   if (dangTai) return <p className="adm-trong">Đang tải…</p>;
