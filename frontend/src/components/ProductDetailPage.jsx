@@ -1,52 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Home, 
-  ChevronRight, 
-  ChevronLeft, 
+import {
+  Home,
+  ChevronRight,
+  ChevronLeft,
   ArrowLeft,
-  Zap, 
-  ShieldCheck, 
+  ShieldCheck,
   RotateCcw,
   Headphones,
-  Truck, 
-  Wrench, 
-  Heart, 
-  Share2, 
+  Heart,
+  Share2,
   SlidersHorizontal,
   Check,
-  Droplets,
-  Moon,
-  Tv,
   FileText,
   Cog,
-  BookOpen,
-  Compass,
-  CheckCircle2
+  BookOpen
 } from 'lucide-react';
 import ProductCard from './ProductCard';
-
-// Nhan tieng Viet cho tung khoa thong so. Khoa la se tu tach camelCase.
-const NHAN_THONG_SO = {
-  doPhanGiai: 'Độ phân giải', ongKinh: 'Ống kính', hongNgoai: 'Hồng ngoại',
-  chongNuoc: 'Chống nước', ketNoi: 'Kết nối', tinhNang: 'Tính năng',
-  luuTru: 'Lưu trữ', xuatXu: 'Xuất xứ', congSuat: 'Công suất',
-  chatLieu: 'Chất liệu', nguon: 'Nguồn điện', quayQuet: 'Quay quét',
-  amThanh: 'Âm thanh', soCuc: 'Số cực', dongDinhMuc: 'Dòng định mức',
-  dongCatNganMach: 'Dòng cắt ngắn mạch', dienAp: 'Điện áp',
-  quangThong: 'Quang thông', nhietDoMau: 'Nhiệt độ màu', duoiDen: 'Đuôi đèn',
-  tuoiTho: 'Tuổi thọ', tietDien: 'Tiết diện', loiDong: 'Lõi đồng',
-  lopVo: 'Lớp vỏ', dienApSuDung: 'Điện áp sử dụng', quyCach: 'Quy cách',
-  loaiLapDat: 'Loại lắp đặt', apLucNuoc: 'Áp lực nước', baoHanh: 'Bảo hành',
-  dayCao: 'Đẩy cao', luuLuongNuoc: 'Lưu lượng nước', duongKinhOng: 'Đường kính ống',
-  kichCo: 'Kích cỡ', doDay: 'Độ dày', chieuDaiCay: 'Chiều dài cây',
-  tieuChuan: 'Tiêu chuẩn', kichThuoc: 'Kích thước', phuKien: 'Phụ kiện',
-  dauVao: 'Đầu vào', dauRa: 'Đầu ra', chanCam: 'Chân cắm',
-  soKenh: 'Số kênh', chuanNen: 'Chuẩn nén', xuatHinh: 'Xuất hình', oCung: 'Ổ cứng'
-};
-
-const doiNhan = (khoa) =>
-  NHAN_THONG_SO[khoa] ||
-  khoa.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+import { doiNhan, DaiNoiBat, MAU_HUONG_DAN, BAO_HANH_MAC_DINH } from '../utils/sanPham';
 
 export default function ProductDetailPage({
   product,
@@ -108,14 +78,17 @@ export default function ProductDetailPage({
 
   if (!product) return null;
 
-  // Multiple gallery images
-  const images = product.images && product.images.length > 1 ? product.images : [
-    product.image,
-    '/images/products/1558002038-1055907df827.jpg',
-    '/images/products/1557597774-9d273605dfa9.jpg',
-    '/images/products/1584622650111-993a426fbf0a.jpg',
-    '/images/products/1581092160607-ee22621dd758.jpg'
-  ];
+  // Chi hien anh that cua san pham, khong chen anh minh hoa khong lien quan
+  const images = product.images?.length ? product.images : [product.image].filter(Boolean);
+
+  // Huong dan va bao hanh: lay tu du lieu, chua nhap thi dung mau theo danh muc
+  const huongDan = product.huongDan?.length
+    ? product.huongDan
+    : MAU_HUONG_DAN[product.category] || MAU_HUONG_DAN['Phụ kiện'];
+  const baoHanh = {
+    thoiGian: product.baoHanh?.thoiGian || BAO_HANH_MAC_DINH.thoiGian,
+    doiTra: product.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
+  };
 
   // Related products
   const relatedProducts = allProducts
@@ -198,7 +171,8 @@ export default function ProductDetailPage({
                 }}
               />
 
-              {/* Navigation Arrows */}
+              {/* Nut chuyen anh: chi hien khi co tu 2 anh */}
+              {images.length > 1 && (<>
               <button
                 onClick={() => setSelectedImgIdx((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
                 style={{
@@ -241,9 +215,11 @@ export default function ProductDetailPage({
               >
                 <ChevronRight size={18} />
               </button>
+              </>)}
             </div>
 
             {/* Thumbnails Row */}
+            {images.length > 1 && (
             <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
               {images.map((img, idx) => (
                 <div
@@ -265,22 +241,8 @@ export default function ProductDetailPage({
                   <img src={img} alt="" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
                 </div>
               ))}
-              <div style={{
-                width: '68px',
-                height: '68px',
-                borderRadius: '8px',
-                border: '1px dashed #cbd5e1',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.85rem',
-                color: '#64748b',
-                fontWeight: 600,
-                flexShrink: 0
-              }}>
-                +3
-              </div>
             </div>
+            )}
           </div>
 
           {/* Column 2: Buy Box */}
@@ -308,87 +270,8 @@ export default function ProductDetailPage({
               {product.name}
             </h1>
 
-            {/* 4 Feature Badges Strip (Matching Screenshot) */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              borderRadius: '10px',
-              padding: '12px 6px',
-              marginBottom: '20px',
-              gap: '8px'
-            }}>
-              {/* Feature 1: Resolution */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 8px',
-                borderRight: '1px solid #e2e8f0'
-              }}>
-                <div style={{
-                  border: '1.5px solid #0066cc',
-                  borderRadius: '4px',
-                  padding: '2px 4px',
-                  fontSize: '0.65rem',
-                  fontWeight: 900,
-                  color: '#0066cc',
-                  lineHeight: 1,
-                  flexShrink: 0
-                }}>
-                  HD
-                </div>
-                <div style={{ fontSize: '0.73rem', color: '#334155', lineHeight: 1.3 }}>
-                  <span style={{ color: '#64748b' }}>Độ phân giải</span><br />
-                  <strong>2MP</strong> <span style={{ color: '#64748b', fontSize: '0.68rem' }}>(1920 x 1080)</span>
-                </div>
-              </div>
-
-              {/* Feature 2: Night vision */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 8px',
-                borderRight: '1px solid #e2e8f0'
-              }}>
-                <Moon size={18} color="#0066cc" style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: '0.73rem', color: '#334155', lineHeight: 1.3 }}>
-                  <span style={{ color: '#64748b' }}>Hồng ngoại</span><br />
-                  <strong>30m</strong> <span style={{ color: '#64748b', fontSize: '0.68rem' }}>quan sát ban đêm</span>
-                </div>
-              </div>
-
-              {/* Feature 3: Waterproof */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 8px',
-                borderRight: '1px solid #e2e8f0'
-              }}>
-                <Droplets size={18} color="#0066cc" style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: '0.73rem', color: '#334155', lineHeight: 1.3 }}>
-                  <span style={{ color: '#64748b' }}>Chuẩn chống nước</span><br />
-                  <strong>IP67</strong> <span style={{ color: '#64748b', fontSize: '0.68rem' }}>ngoài trời</span>
-                </div>
-              </div>
-
-              {/* Feature 4: Warranty */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 8px'
-              }}>
-                <Wrench size={18} color="#0066cc" style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: '0.73rem', color: '#334155', lineHeight: 1.3 }}>
-                  <span style={{ color: '#64748b' }}>Bảo hành chính hãng</span><br />
-                  <strong>24 tháng</strong>
-                </div>
-              </div>
-            </div>
+            {/* 4 ô nổi bật: nhập trong quản trị, chưa nhập thì ẩn cho khỏi hiện sai */}
+            <DaiNoiBat ds={product.noiBat} />
 
             {/* Extra Utilities */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '0.85rem', color: '#64748b' }}>
@@ -484,7 +367,7 @@ export default function ProductDetailPage({
                       borderRadius: '2px',
                       display: 'inline-block'
                     }}></span>
-                    <strong>{product.name}</strong> là dòng sản phẩm camera giám sát an ninh thế hệ mới được tối ưu hóa cho công trình nhà ở, biệt thự, văn phòng, nhà xưởng và chuỗi cửa hàng bán lẻ. Sản phẩm sở hữu thiết kế thân trụ gọn gàng, lớp vỏ đúc hợp kim nguyên khối kết hợp nắp che chống nắng mưa giúp máy vận hành ổn định liên tục 24/7/365 trong môi trường nhiệt đới gió mùa tại Việt Nam.
+                    {product.description || <><strong>{product.name}</strong> — thông tin chi tiết đang được cập nhật.</>}
                   </p>
                 </div>
 
@@ -550,12 +433,7 @@ export default function ProductDetailPage({
               </div>
 
               <ol className="pd-buoc">
-                {[
-                  'Cố định camera lên tường và cắm nguồn điện 12V hoặc dây mạng PoE.',
-                  'Tải ứng dụng trên điện thoại qua App Store hoặc Google Play.',
-                  'Quét mã QR code in trên tem thân máy để kết nối.',
-                  'Đặt mật khẩu và bắt đầu xem video trực tiếp từ xa 24/7.'
-                ].map((noiDung, i) => (
+                {huongDan.map((noiDung, i) => (
                   <li key={i}>
                     <span className="pd-buoc-so">{i + 1}</span>
                     <div>
@@ -582,14 +460,14 @@ export default function ProductDetailPage({
                 <div className="pd-camket-o">
                   <div className="pd-camket-icon"><ShieldCheck size={20} /></div>
                   <div className="pd-camket-tt">
-                    <strong>Bảo hành 24 tháng</strong>
+                    <strong>Bảo hành {baoHanh.thoiGian}</strong>
                     <p>Chính hãng tại tất cả trung tâm bảo hành trên toàn quốc</p>
                   </div>
                 </div>
                 <div className="pd-camket-o">
                   <div className="pd-camket-icon"><RotateCcw size={20} /></div>
                   <div className="pd-camket-tt">
-                    <strong>1 đổi 1 trong 7 ngày</strong>
+                    <strong>{baoHanh.doiTra}</strong>
                     <p>Áp dụng khi lỗi phần cứng từ nhà sản xuất</p>
                   </div>
                 </div>

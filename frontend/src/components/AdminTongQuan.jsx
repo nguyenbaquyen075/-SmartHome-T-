@@ -1,0 +1,109 @@
+import React, { useState, useEffect } from 'react';
+import { Package, HardHat, Clapperboard, Plus, Upload, AlertCircle } from 'lucide-react';
+import { api } from '../utils/api';
+import { DANH_MUC, thieuThongTin } from '../utils/sanPham';
+
+export default function AdminTongQuan({ onBao, diToi }) {
+  const [duLieu, setDuLieu] = useState(null);
+
+  useEffect(() => {
+    Promise.all([api.getProducts(), api.getProjects(), api.getGiaiTriQuanTri()])
+      .then(([sanPham, congTrinh, giaiTri]) => setDuLieu({ sanPham, congTrinh, giaiTri }))
+      .catch((err) => onBao(err.message, 'error'));
+  }, [onBao]);
+
+  if (!duLieu) return <p className="adm-trong">Đang tải…</p>;
+
+  const { sanPham, congTrinh, giaiTri } = duLieu;
+  // Mỗi danh mục: số sản phẩm + ảnh của sản phẩm đầu tiên làm ảnh đại diện
+  const theoDanhMuc = DANH_MUC.map((dm) => {
+    const cungLoai = sanPham.filter((p) => p.category === dm);
+    return { dm, so: cungLoai.length, anh: cungLoai.find((p) => p.image)?.image };
+  });
+  const chuaDu = sanPham.filter((p) => thieuThongTin(p).length > 0);
+
+  return (
+    <>
+      <div className="qt-tieude">
+        <div>
+          <h1>Tổng quan</h1>
+          <p>Chào anh 👋 Hôm nay có gì mới để cập nhật?</p>
+        </div>
+      </div>
+
+      <div className="qt-so">
+        {[
+          [Package, 'Sản phẩm', sanPham.length, 'san-pham'],
+          [HardHat, 'Công trình', congTrinh.length, 'cong-trinh'],
+          [Clapperboard, 'Bài giải trí', giaiTri.length, 'giai-tri']
+        ].map(([Icon, nhan, so, d]) => (
+          <a key={d} href={`#/${d}`} className="qt-so-o">
+            <span className="qt-so-icon"><Icon size={22} /></span>
+            <div>
+              <strong>{so}</strong>
+              <span>{nhan}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <section className="qt-khung">
+          <h2>Thêm nhanh</h2>
+          <div className="qt-nhanh">
+            <button onClick={() => diToi('san-pham', 'moi')}>
+              <span className="qt-nhanh-icon"><Plus size={22} /></span>
+              <span>Thêm sản phẩm</span>
+            </button>
+            <button onClick={() => diToi('cong-trinh', 'moi')}>
+              <span className="qt-nhanh-icon"><HardHat size={21} /></span>
+              <span>Thêm công trình</span>
+            </button>
+            <button onClick={() => diToi('giai-tri')}>
+              <span className="qt-nhanh-icon"><Upload size={21} /></span>
+              <span>Đăng ảnh, video</span>
+            </button>
+          </div>
+      </section>
+
+      <section className="qt-khung">
+        <h2>Sản phẩm theo danh mục</h2>
+        <ul className="qt-dmo">
+          {theoDanhMuc.map(({ dm, so, anh }) => (
+            <li key={dm}>
+              <a
+                href={`#/san-pham/loc/${encodeURIComponent(dm)}`}
+                className={`qt-dmo-o${so ? '' : ' trong'}`}
+                title={`Xem ${so} sản phẩm ${dm}`}
+              >
+                <span className="qt-dmo-anh">
+                  {anh ? <img src={anh} alt="" loading="lazy" /> : <Package size={30} />}
+                </span>
+                <span className="qt-dmo-so">{so}</span>
+                <span className="qt-dmo-ten">{dm}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {chuaDu.length > 0 && (
+        <section className="qt-khung">
+          <h2><AlertCircle size={18} /> Sản phẩm chưa đủ thông tin ({chuaDu.length})</h2>
+          <p className="qt-phu">Bổ sung để trang chi tiết hiện đầy đủ cho khách xem.</p>
+          <ul className="qt-thieu">
+            {chuaDu.map((p) => (
+              <li key={p.id}>
+                <img src={p.image} alt="" />
+                <div>
+                  <strong>{p.name}</strong>
+                  <span>Thiếu: {thieuThongTin(p).join(', ')}</span>
+                </div>
+                <button className="qt-nut" onClick={() => diToi('san-pham', p.id)}>Bổ sung</button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </>
+  );
+}
