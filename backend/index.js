@@ -6,6 +6,8 @@ const path = require('path');
 const kho = require('./kho');
 
 const app = express();
+// Render dung proxy o truoc: bat cai nay moi doc duoc dia chi that cua khach
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5001;
 
 // Middleware
@@ -38,30 +40,74 @@ if (!process.env.ADMIN_PASSWORD || !process.env.ADMIN_TAI_KHOAN) {
 // So sanh tai khoan: bo khoang trang, dau cham/gach cua so dien thoai, khong phan biet hoa thuong
 const chuanTaiKhoan = (v) => String(v || '').trim().toLowerCase().replace(/[\s.()-]/g, '');
 
-// Token giu trong bo nho. Server khoi dong lai la phai dang nhap lai -
-// du dung cho 1 nguoi quan tri, khong can them thu vien phien dang nhap.
-const phienDangNhap = new Set();
+// Phien dang nhap dang "<han dung>.<chu ky>", chu ky = HMAC bang bi mat cua server.
+// Khong giu trong bo nho nen server ngu day / deploy lai van dang nhap duoc tiep.
+// Doi mat khau la moi phien cu het hieu luc (vi bi mat doi theo).
+const crypto = require('crypto');
+const BI_MAT = process.env.ADMIN_SECRET || `${ADMIN_TAI_KHOAN}|${ADMIN_PASSWORD}`;
+const HAN_PHIEN = 7 * 24 * 60 * 60 * 1000;   // 7 ngay
+const daThoat = new Set();                   // token bam "Dang xuat" (chi trong lan chay nay)
+
+const kyPhien = (han) => crypto.createHmac('sha256', BI_MAT).update(String(han)).digest('hex');
+const taoPhien = () => {
+  const han = Date.now() + HAN_PHIEN;
+  return `${han}.${kyPhien(han)}`;
+};
+const phienHopLe = (token) => {
+  const [han, chuKy] = String(token || '').split('.');
+  if (!han || !chuKy || !(Number(han) > Date.now()) || daThoat.has(token)) return false;
+  const dung = kyPhien(han);
+  return chuKy.length === dung.length
+    && crypto.timingSafeEqual(Buffer.from(chuKy), Buffer.from(dung));
+};
 
 const laToken = (req) => (req.headers.authorization || '').replace('Bearer ', '');
 
 const canQuyen = (req, res, next) => {
-  if (phienDangNhap.has(laToken(req))) return next();
+  if (phienHopLe(laToken(req))) return next();
   res.status(401).json({ error: 'Cần đăng nhập quản trị' });
 };
 
+// Chan do mat khau: sai nhieu lan tu cung mot noi thi phai doi.
+// Dem trong bo nho, du cho 1 trang nho; server khoi dong lai thi dem lai tu dau.
+const CHO_PHEP_SAI = 8;
+const KHOA_TRONG = 15 * 60 * 1000;
+const demSai = new Map();   // dia chi -> { so, den }
+
+const conKhoa = (noi) => {
+  const d = demSai.get(noi);
+  if (!d) return 0;
+  if (d.den < Date.now()) { demSai.delete(noi); return 0; }
+  return d.so >= CHO_PHEP_SAI ? Math.ceil((d.den - Date.now()) / 60000) : 0;
+};
+
+const demThemMotLanSai = (noi) => {
+  const d = demSai.get(noi);
+  const con = d && d.den > Date.now() ? d.so : 0;
+  demSai.set(noi, { so: con + 1, den: Date.now() + KHOA_TRONG });
+  // Don cho khoi phinh bo nho
+  if (demSai.size > 500) for (const [k, v] of demSai) if (v.den < Date.now()) demSai.delete(k);
+};
+
 app.post('/api/admin/login', (req, res) => {
+  const noi = req.ip || 'khong-ro';
+  const phutConLai = conKhoa(noi);
+  if (phutConLai) {
+    return res.status(429).json({ error: `Sai quá nhiều lần, thử lại sau ${phutConLai} phút` });
+  }
+
   const dungTaiKhoan = ADMIN_TAI_KHOAN.split(',').some((tk) => tk.trim() && chuanTaiKhoan(tk) === chuanTaiKhoan(req.body?.taiKhoan));
   // Bao chung 1 cau de nguoi la khong biet sai o o nao
   if (!dungTaiKhoan || req.body?.password !== ADMIN_PASSWORD) {
+    demThemMotLanSai(noi);
     return res.status(401).json({ error: 'Email / số điện thoại hoặc mật khẩu không đúng' });
   }
-  const token = require('crypto').randomBytes(24).toString('hex');
-  phienDangNhap.add(token);
-  res.json({ token });
+  demSai.delete(noi);
+  res.json({ token: taoPhien() });
 });
 
 app.post('/api/admin/logout', canQuyen, (req, res) => {
-  phienDangNhap.delete(laToken(req));
+  daThoat.add(laToken(req));
   res.json({ success: true });
 });
 
@@ -153,7 +199,7 @@ const cld = (() => {
 })();
 
 // Chu ky Cloudinary = sha1(cac tham so xep theo ABC, noi bang & + api_secret), theo tai lieu
-const kyCloudinary = (thamSo) => require('crypto').createHash('sha1')
+const kyCloudinary = (thamSo) => crypto.createHash('sha1')
   .update(Object.keys(thamSo).sort().map((k) => `${k}=${thamSo[k]}`).join('&') + cld.secret)
   .digest('hex');
 
@@ -470,6 +516,7 @@ const GIAI_TRI_THU_MUC = path.join(__dirname, 'data', 'giai-tri-file');
 const URL_FILE_MAY = '/api/giai-tri/file/';
 // Duoi file nhan khi luu tren may - khong nhan svg/html de khoi bi chen ma doc
 const DUOI_HOP_LE = { image: ['.jpg', '.jpeg', '.png', '.webp', '.gif'], video: ['.mp4', '.mov', '.webm', '.m4v'] };
+const KIEU_ANH = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif' };
 
 // Lam sach thong tin bai admin gui len
 const chuanHoaBai = (b = {}) => ({
@@ -506,7 +553,7 @@ let cacheGiaiTri = null;
 
 app.get('/api/giai-tri', async (req, res) => {
   if (!cld) return res.json(sapXep(kho.doc(KHO_GIAI_TRI)));
-  const laQuanTri = phienDangNhap.has(laToken(req));
+  const laQuanTri = phienHopLe(laToken(req));
   if (!laQuanTri && cacheGiaiTri && Date.now() - cacheGiaiTri.luc < 60000) {
     return res.json(cacheGiaiTri.ds);
   }
@@ -566,15 +613,27 @@ app.post('/api/giai-tri/tai-len', canQuyen, express.raw({ type: () => true, limi
   let bai = {};
   try { bai = JSON.parse(giaiMa(req.headers['x-bai']) || '{}'); } catch { /* dung gia tri mac dinh */ }
 
-  const tenFile = `${Date.now()}-${require('crypto').randomBytes(4).toString('hex')}${duoi}`;
-  try {
-    fs.mkdirSync(GIAI_TRI_THU_MUC, { recursive: true });
-    fs.writeFileSync(path.join(GIAI_TRI_THU_MUC, tenFile), req.body);
-  } catch (err) {
-    console.error('Lỗi lưu file giải trí:', err);
-    return res.status(500).json({ error: 'Không lưu được file' });
+  const tenFile = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}${duoi}`;
+  let url = URL_FILE_MAY + tenFile;
+
+  // Anh thi cat vao kho du lieu cho khoi mat khi deploy lai.
+  // Video van phai nam tren dia (nang ca tram MB) -> muon giu lau thi can Cloudinary.
+  if (loai === 'image' && kho.dangDungDB()) {
+    if (!(await kho.ghiAnh(tenFile, KIEU_ANH[duoi] || 'image/jpeg', req.body))) {
+      return res.status(500).json(LOI_LUU);
+    }
+    url = `/api/anh/${tenFile}`;
+  } else {
+    try {
+      fs.mkdirSync(GIAI_TRI_THU_MUC, { recursive: true });
+      fs.writeFileSync(path.join(GIAI_TRI_THU_MUC, tenFile), req.body);
+    } catch (err) {
+      console.error('Lỗi lưu file giải trí:', err);
+      return res.status(500).json({ error: 'Không lưu được file' });
+    }
   }
-  const moi = { id: `${THU_MUC_GIAI_TRI}/${tenFile}`, loai, url: URL_FILE_MAY + tenFile, ...chuanHoaBai(bai) };
+
+  const moi = { id: `${THU_MUC_GIAI_TRI}/${tenFile}`, loai, url, ...chuanHoaBai(bai) };
   if (!(await kho.ghi(KHO_GIAI_TRI, [...kho.doc(KHO_GIAI_TRI), moi]))) return res.status(500).json(LOI_LUU);
   res.status(201).json(moi);
 });
@@ -618,7 +677,8 @@ app.delete('/api/giai-tri', canQuyen, async (req, res) => {
     const bai = ds.find((b) => b.id === id);
     if (!bai) return res.status(404).json({ error: 'Không tìm thấy bài' });
     if (!(await kho.ghi(KHO_GIAI_TRI, ds.filter((b) => b.id !== id)))) return res.status(500).json(LOI_LUU);
-    if (bai.url.startsWith(URL_FILE_MAY)) {
+    if (bai.url.startsWith('/api/anh/')) await kho.xoaAnh(path.basename(bai.url));
+    else if (bai.url.startsWith(URL_FILE_MAY)) {
       fs.rmSync(path.join(GIAI_TRI_THU_MUC, path.basename(bai.url)), { force: true });
     }
     return res.json({ success: true });

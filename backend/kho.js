@@ -129,6 +129,16 @@ const docAnh = async (id) => {
   return rows[0] || null;
 };
 
+const xoaAnh = async (id) => {
+  try {
+    await pool.query('DELETE FROM anh WHERE id = $1', [id]);
+    return true;
+  } catch (err) {
+    console.error('[KHO] Khong xoa duoc anh:', err.message);
+    return false;
+  }
+};
+
 const dangDungDB = () => Boolean(pool);
 
-module.exports = { moKho, doc, ghi, ghiAnh, docAnh, dangDungDB };
+module.exports = { moKho, doc, ghi, ghiAnh, docAnh, xoaAnh, dangDungDB };

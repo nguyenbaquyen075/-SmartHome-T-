@@ -216,6 +216,10 @@ Code nằm trong `frontend/src/components/Admin*.jsx` + `frontend/src/admin.css`
 | `ADMIN_TAI_KHOAN` | Email hoặc số điện thoại để đăng nhập (mặc định tạm `0987654321`). Muốn vào được bằng **cả email lẫn số**, viết cả hai cách nhau dấu phẩy: `email@cuaanh.vn, 0987654321` |
 | `ADMIN_PASSWORD` | Mật khẩu (mặc định tạm `diennuoc@2026`) |
 
+Đổi mật khẩu xong thì mọi phiên đăng nhập cũ hết hiệu lực ngay. Phiên đăng nhập sống 7 ngày
+và **không mất khi server ngủ dậy hay deploy lại**. Sai mật khẩu 8 lần từ cùng một nơi thì
+phải đợi 15 phút mới thử tiếp được.
+
 | Nơi chạy | Cách đặt |
 |---|---|
 | Máy của anh | `ADMIN_TAI_KHOAN=email@cuaanh.vn ADMIN_PASSWORD=matkhaucuaanh npm run dev` |
