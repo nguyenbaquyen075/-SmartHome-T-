@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Wand2, Link } from 'lucide-react';
 import { api } from '../utils/api';
+import { nenAnh, coFile, coDataUrl } from '../utils/anh';
 import {
   DANH_MUC, DON_VI, MAU_THONG_SO, MAU_NOI_BAT, MAU_HUONG_DAN, BAO_HANH_MAC_DINH,
   BIEU_TUONG, BieuTuong, DaiNoiBat, doiNhan
 } from '../utils/sanPham';
 import { Truong, Khoi, ThanhLuu, DanhSachDong } from './AdminForm';
 
-const TOI_DA_ANH = 6 * 1024 * 1024;   // giới hạn của /api/upload
+const TOI_DA_ANH = 6 * 1024 * 1024;    // giới hạn của /api/upload (tính sau khi nén)
+const TOI_DA_CHON = 40 * 1024 * 1024;  // ảnh to hơn mức này thì máy nén cũng ì
 
 // Đổi dữ liệu sản phẩm sang dạng để sửa trên form
 const tuSanPham = (sp) => ({
@@ -29,13 +31,6 @@ const tuSanPham = (sp) => ({
 
 const khungThongSo = (dm) => (MAU_THONG_SO[dm] || []).map(([nhan]) => ({ nhan, giaTri: '' }));
 const khungNoiBat = (dm) => (MAU_NOI_BAT[dm] || []).map(([bieuTuong, nhan]) => ({ bieuTuong, nhan, giaTri: '', ghiChu: '' }));
-
-const docFile = (file) => new Promise((xong, hong) => {
-  const doc = new FileReader();
-  doc.onload = () => xong(doc.result);
-  doc.onerror = hong;
-  doc.readAsDataURL(file);
-});
 
 export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
   const [f, setF] = useState(() => tuSanPham(sp));
@@ -72,14 +67,21 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
     for (const [i, file] of files.entries()) {
-      if (file.size > TOI_DA_ANH) {
-        onBao(`"${file.name}" quá nặng, tối đa 6MB. Nén bớt rồi tải lại.`, 'error');
+      if (file.size > TOI_DA_CHON) {
+        onBao(`"${file.name}" quá lớn (${coFile(file.size)}). Chọn ảnh nhỏ hơn 40MB.`, 'error');
         continue;
       }
       setDangTaiAnh(`${i + 1}/${files.length}`);
       try {
-        const { url } = await api.uploadImage(await docFile(file), f.name || file.name.replace(/\.[^.]+$/, ''));
+        // Nén ngay trên máy: ảnh điện thoại vài MB còn vài trăm KB
+        const goi = await nenAnh(file);
+        if (coDataUrl(goi) > TOI_DA_ANH) {
+          onBao(`"${file.name}" nén rồi vẫn quá nặng, thử ảnh khác.`, 'error');
+          continue;
+        }
+        const { url } = await api.uploadImage(goi, f.name || file.name.replace(/\.[^.]+$/, ''));
         setF((cu) => ({ ...cu, images: [...cu.images, url] }));
+        if (file.size > coDataUrl(goi) * 1.3) onBao(`Đã nén "${file.name}": ${coFile(file.size)} → ${coFile(coDataUrl(goi))}`);
       } catch (err) {
         onBao(err.message, 'error');
       }
@@ -218,7 +220,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       </Khoi>
 
       {/* 2. Hình ảnh */}
-      <Khoi so={2} tieuDe="Hình ảnh" moTa="Ảnh đầu tiên là ảnh đại diện. Nên dùng ảnh vuông nền trắng, dưới 400KB">
+      <Khoi so={2} tieuDe="Hình ảnh" moTa="Ảnh đầu tiên là ảnh đại diện. Cứ chọn ảnh chụp từ điện thoại, hệ thống tự nén lại">
         <div className={`qt-anh${loi.images && !f.images.length ? ' loi' : ''}`}>
           <div className="qt-anh-luoi">
             {f.images.map((url, i) => (
@@ -242,7 +244,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             <label className="qt-anh-them">
               <Upload size={22} />
               <span>{dangTaiAnh ? `Đang tải ${dangTaiAnh}…` : 'Tải ảnh lên'}</span>
-              <small>JPG, PNG, WEBP · chọn nhiều ảnh</small>
+              <small>JPG, PNG, WEBP · chọn nhiều ảnh · tự nén</small>
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
