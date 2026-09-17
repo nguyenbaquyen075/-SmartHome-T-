@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Trash2, Pencil, Pin, PinOff, X, Play, Camera, HardDrive, Cloud } from 'lucide-react';
 import { api, anhNho, ngayVN } from '../utils/api';
+import { nenAnhFile } from '../utils/anh';
 
 // Giới hạn của gói Cloudinary miễn phí (lưu trên máy cũng dùng luôn cho đơn giản)
 const TOI_DA = { image: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
@@ -79,7 +80,9 @@ export default function AdminGiaiTri({ onBao }) {
     for (const x of cho) {
       suaCho(x.key, { tienDo: 0, loi: '' });
       try {
-        await api.taiLenGiaiTri(x.file, { chuThich: x.chuThich, ngay: x.ngay }, (p) => suaCho(x.key, { tienDo: p }));
+        // Ảnh thì nén trước cho nhẹ; video giữ nguyên
+        const guiDi = x.loai === 'image' ? await nenAnhFile(x.file) : x.file;
+        await api.taiLenGiaiTri(guiDi, { chuThich: x.chuThich, ngay: x.ngay }, (p) => suaCho(x.key, { tienDo: p }));
         boCho(x);
         xong++;
       } catch (err) {

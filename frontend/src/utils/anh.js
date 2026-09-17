@@ -51,6 +51,15 @@ export const nenAnh = async (file) => {
   return nho.length < goc.length ? nho : goc;
 };
 
+// Nén rồi trả về dạng File để gửi nguyên file (mục Hậu trường gửi thẳng, không qua base64)
+export const nenAnhFile = async (file) => {
+  const nho = await nenAnh(file);
+  const khoi = await (await fetch(nho)).blob();
+  if (khoi.size >= file.size) return file;
+  const ten = file.name.replace(/\.\w+$/, '') + (khoi.type === 'image/png' ? '.png' : '.jpg');
+  return new File([khoi], ten, { type: khoi.type });
+};
+
 // Cho lời nhắn kiểu "4,2MB → 260KB"
 export const coFile = (soByte) =>
   soByte >= 1024 * 1024 ? `${(soByte / 1024 / 1024).toFixed(1)}MB` : `${Math.round(soByte / 1024)}KB`;
