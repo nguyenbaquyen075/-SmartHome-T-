@@ -1,4 +1,4 @@
-# ĐIỆN NƯỚC CAMERA
+| `ADMIN_TAI_KHOAN` | Email hoặc số điện thoại để đăng nhập (mặc định tạm `0987654321`). Muốn dùng được **cả email lẫn số**, viết cả hai cách nhau dấu phẩy: `email@cuaanh.vn, 0987654321` |# ĐIỆN NƯỚC CAMERA
 
 Website giới thiệu camera an ninh, thiết bị điện dân dụng, thiết bị nước và đèn chiếu sáng.
 
@@ -122,8 +122,49 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 
 ### ⚠️ Lưu ý gói Free
 
-- **Sửa sản phẩm trong trang quản trị sẽ mất khi deploy lại.** Dữ liệu lưu vào file JSON, mà ổ đĩa Render là tạm thời — mỗi lần deploy hoặc restart, file quay về trạng thái trong Git. Sửa lâu dài thì sửa thẳng file `backend/data/*.json` rồi push lên.
 - **Service ngủ sau 15 phút** không có ai truy cập. Lần mở tiếp theo mất ~50 giây khởi động lại.
+- Ổ đĩa của Render là tạm — xem mục **Dữ liệu không bị mất** ngay dưới đây để dữ liệu còn mãi.
+
+---
+
+## 💾 Dữ liệu không bị mất
+
+Ổ đĩa của Render (gói Free) **bị xóa sạch mỗi lần deploy hoặc restart**. Vì vậy dữ liệu
+được để ở hai nơi bên ngoài, cả hai đều miễn phí:
+
+| Thứ | Để ở đâu | Biến môi trường |
+|---|---|---|
+| Sản phẩm, công trình, cài đặt | Kho dữ liệu Postgres (Neon) | `DATABASE_URL` |
+| Ảnh sản phẩm, ảnh banner, ảnh/video hậu trường | Cloudinary | `CLOUDINARY_URL` |
+
+**Chưa đặt 2 biến này thì web vẫn chạy**, nhưng dữ liệu chỉ nằm trong máy chủ và sẽ mất khi
+deploy lại. Trong log sẽ có dòng `[CANH BAO] Chua dat DATABASE_URL`.
+
+### Lấy `DATABASE_URL` (kho dữ liệu Neon — miễn phí)
+
+1. Vào [neon.com](https://neon.com) → **Sign up** bằng tài khoản Google/GitHub
+2. Đặt tên dự án (ví dụ `cameratd`) → **Create project**
+3. Trang hiện ra có ô **Connection string**, dạng
+   `postgresql://...@....neon.tech/neondb?sslmode=require` → bấm **Copy**
+4. Vào Render → dịch vụ của anh → **Settings → Environment → Add Environment Variable**
+   - Key: `DATABASE_URL` — Value: dán chuỗi vừa copy → **Save**
+5. Render tự deploy lại. Lần chạy đầu tiên, dữ liệu đang có trong `backend/data/*.json`
+   được **tự chuyển lên kho** (log ghi `[KHO] Da chuyen "products" tu file len co so du lieu`).
+   Từ đó về sau anh thêm sửa gì trong trang quản trị cũng còn nguyên.
+
+> 🔒 Chuỗi `DATABASE_URL` có mật khẩu — chỉ dán vào ô Environment của Render, đừng để vào code
+> hay gửi cho ai.
+
+### Lấy `CLOUDINARY_URL` (kho ảnh — miễn phí)
+
+Xem mục [Hậu trường thi công](#-hậu-trường-thi-công-ảnhvideo-giải-trí) bên dưới. Cùng một biến
+đó lo luôn ảnh sản phẩm và ảnh banner.
+
+### Muốn xem dữ liệu đang nằm ở đâu
+
+Vào Neon → **Tables** → bảng `du_lieu`. Mỗi dòng là một mục: `products`, `projects`,
+`settings`, `giai-tri`. Neon giữ lịch sử 24 giờ, lỡ tay xóa nhầm vẫn quay lại được
+(**Restore** trong Neon).
 
 ---
 
@@ -141,6 +182,11 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 | GET | `/api/brands` | Danh sách thương hiệu |
 | GET | `/api/projects` | Nhật ký thi công (tự sắp xếp mới nhất trước) |
 | GET | `/api/stats` | Số liệu tổng quan cho trang quản trị |
+| GET | `/api/giai-tri` | Ảnh/video Hậu trường thi công (lấy từ Cloudinary, cache 60 giây) |
+| POST | `/api/giai-tri/chu-ky` | Cấp chữ ký để trình duyệt tải thẳng file lên Cloudinary (cần đăng nhập) |
+| PUT | `/api/giai-tri` | Sửa chú thích, ngày, ghim (cần đăng nhập) |
+| DELETE | `/api/giai-tri` | Xóa 1 ảnh/video (cần đăng nhập) |
+| POST | `/api/giai-tri/tai-len` | Nhận file khi chạy chế độ lưu trên máy (cần đăng nhập) |
 
 Đường dẫn `/api/...` không khớp route nào sẽ trả về lỗi 404 dạng JSON.
 
@@ -148,27 +194,43 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 
 ## 🔐 Trang quản trị
 
-Bấm **Tài khoản** (thanh dưới trên điện thoại, góc phải trên máy tính) → nhập mật khẩu.
+Trang quản trị nằm riêng ở **`/admin`** (ví dụ `http://localhost:5174/admin`). Bấm **Tài khoản**
+trên web cũng dẫn tới đó. Chưa đăng nhập thì hiện trang đăng nhập, xong vào trang quản trị nền sáng
+— bấm nút **☰ góc trái** để mở menu các mục của trang chủ (xếp đúng thứ tự từ trên xuống,
+mục nào thêm được có nút **+**). Mỗi trang con có địa chỉ riêng sau dấu `#` (vd `/admin#/san-pham/moi`) nên bấm Back
+hay tải lại trang vẫn đúng chỗ.
 
-### Đặt mật khẩu
+Code nằm trong `frontend/src/components/Admin*.jsx` + `frontend/src/admin.css`, chỉ tải khi vào `/admin`.
 
-Mật khẩu đọc từ biến môi trường `ADMIN_PASSWORD`, **không nằm trong code** nên
-không ai xem được qua GitHub.
+### Đặt tài khoản & mật khẩu
+
+Đăng nhập cần **email hoặc số điện thoại** + **mật khẩu**. Cả hai đọc từ biến môi trường,
+**không nằm trong code** nên không ai xem được qua GitHub.
+
+| Biến | Nội dung |
+|---|---|
+| `ADMIN_TAI_KHOAN` | Email hoặc số điện thoại để đăng nhập (mặc định tạm `0987654321`). Muốn vào được bằng **cả email lẫn số**, viết cả hai cách nhau dấu phẩy: `email@cuaanh.vn, 0987654321` |
+| `ADMIN_PASSWORD` | Mật khẩu (mặc định tạm `diennuoc@2026`) |
 
 | Nơi chạy | Cách đặt |
 |---|---|
-| Máy của anh | `ADMIN_PASSWORD=matkhaucuaanh npm run dev` |
-| Render | **Settings → Environment → Add Environment Variable**: key `ADMIN_PASSWORD` |
+| Máy của anh | `ADMIN_TAI_KHOAN=email@cuaanh.vn ADMIN_PASSWORD=matkhaucuaanh npm run dev` |
+| Render | **Settings → Environment → Add Environment Variable**: thêm cả 2 key |
+
+Khi nhập, dấu cách và dấu chấm trong số điện thoại được bỏ qua, chữ hoa thường không tính,
+nên gõ `0987 654 321` hay `0987.654.321` đều vào được.
 
 > ⚠️ Chưa đặt thì hệ thống dùng mật khẩu tạm `diennuoc@2026` và in cảnh báo ra log.
 > **Nhớ đặt biến này trên Render trước khi đưa web cho khách.**
 
 ### Làm được gì
 
-| Tab | Nội dung |
+| Menu | Nội dung |
 |---|---|
-| **Sản phẩm** | Thêm / sửa / xóa sản phẩm, xem tồn kho |
+| **Tổng quan** | Số sản phẩm theo danh mục, nút thêm nhanh, danh sách sản phẩm còn thiếu thông tin |
+| **Sản phẩm** | Tìm, lọc theo danh mục; trang thêm/sửa 8 phần giống hệt trang chi tiết (ảnh, 4 ô nổi bật, giới thiệu, đặc điểm, thông số, hướng dẫn, bảo hành). Chọn danh mục là tự hiện khung thông số của loại đó |
 | **Nhật ký thi công** | Thêm / sửa / xóa công trình, tải ảnh lên trực tiếp |
+| **Giải trí** | Đăng nhiều ảnh/video một lượt, sửa, ghim, xóa (xem mục *Hậu trường thi công*) |
 | **Banner & thanh chạy** | Sửa các dòng chữ chạy, thay ảnh banner trang chủ |
 
 Ảnh tải lên lưu vào `frontend/public/images/tai-len/`. Nén ảnh dưới 400KB trước
@@ -176,6 +238,46 @@ khi tải để trang không bị chậm (tối đa 6MB).
 
 Phiên đăng nhập lưu trong tab trình duyệt — đóng tab là phải đăng nhập lại.
 Server khởi động lại cũng vậy.
+
+---
+
+## 🎬 Hậu trường thi công (ảnh/video giải trí)
+
+Đi công trình thấy vui thì quay/chụp lại, vào **quản trị → tab Giải trí** để đăng.
+Đăng lên là khách thấy ngay ở mục **Hậu trường thi công** trên trang chủ (chậm tối đa 1 phút).
+Chưa có bài nào thì mục này tự ẩn.
+
+Tab Giải trí làm được: kéo thả nhiều ảnh/video một lượt, ghi chú thích + ngày cho từng file,
+xem trước rồi mới đăng; sửa chú thích/ngày, **ghim** bài lên đầu, lọc ảnh/video, xóa bài.
+
+Có 2 chế độ lưu, server tự chọn theo biến môi trường (góc phải tab Giải trí có ghi đang dùng chế độ nào):
+
+| Chế độ | Khi nào | File nằm ở đâu |
+|---|---|---|
+| **Cloudinary** | Có đặt `CLOUDINARY_URL` — **bắt buộc trên Render** | Tải thẳng từ điện thoại lên Cloudinary, deploy lại không mất |
+| **Lưu trên máy** | Chưa đặt `CLOUDINARY_URL` | `backend/data/giai-tri.json` + `backend/data/giai-tri-file/` — chỉ để chạy thử, không đưa lên Git |
+
+> ⚠️ Không đặt `CLOUDINARY_URL` trên Render thì web vẫn đăng được, nhưng **mỗi lần deploy là mất sạch bài**.
+
+### Cài đặt 1 lần
+
+1. Đăng ký miễn phí ở [cloudinary.com](https://cloudinary.com)
+2. Vào **Dashboard** (hoặc *Settings → API Keys*), copy dòng **API environment variable**, dạng
+   `cloudinary://123456789:abcXYZ@ten-cloud`
+3. Đặt biến môi trường `CLOUDINARY_URL` bằng dòng đó:
+
+| Nơi chạy | Cách đặt |
+|---|---|
+| Máy của anh | `CLOUDINARY_URL=cloudinary://... npm run dev` |
+| Render | **Settings → Environment → Add Environment Variable**: key `CLOUDINARY_URL` |
+
+> ⚠️ Dòng này chứa mã bí mật, **không dán vào code hay gửi qua chat**.
+
+Giới hạn gói miễn phí: ảnh tối đa 10MB, video tối đa 100MB mỗi file.
+Mỗi loại (ảnh, video) hiện tối đa 100 bài mới nhất.
+
+> Đặt xong biến này thì **ảnh sản phẩm và ảnh banner** anh tải lên trong trang quản trị
+> cũng tự lưu trên Cloudinary, deploy lại không mất.
 
 ---
 
