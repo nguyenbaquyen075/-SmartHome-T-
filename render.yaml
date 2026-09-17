@@ -8,3 +8,12 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
+      # Dan gia tri trong Render: Settings -> Environment (khong de trong code)
+      - key: DATABASE_URL        # Postgres (Neon) - noi luu san pham, cong trinh, cai dat
+        sync: false
+      - key: CLOUDINARY_URL      # Kho anh/video
+        sync: false
+      - key: ADMIN_TAI_KHOAN     # Email hoac so dien thoai de dang nhap quan tri
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
