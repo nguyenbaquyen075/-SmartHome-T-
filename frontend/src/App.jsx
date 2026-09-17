@@ -7,6 +7,7 @@ import BottomBanner from './components/BottomBanner';
 import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
 import ProjectDiary from './components/ProjectDiary';
+import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
 import { api } from './utils/api';
 
@@ -14,9 +15,7 @@ import { api } from './utils/api';
 // nho vay trang chu khong phai tai ~70KB code khong dung toi.
 const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const ProductsPage = lazy(() => import('./components/ProductsPage'));
-const AdminLogin = lazy(() => import('./components/AdminLogin'));
 import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
 
 // 3 nhom hien o trang chu, ten khop voi 4 o DANH MUC SAN PHAM
@@ -49,15 +48,9 @@ export default function App() {
 
   // Modals state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  // Bam "Tài khoản" -> hien man dang nhap truoc, dung mat khau moi vao quan tri
-  const [dangDangNhap, setDangDangNhap] = useState(false);
 
-  const moQuanTri = async () => {
-    if (isAdmin) { setIsAdmin(false); return; }
-    if (await api.checkLogin()) setIsAdmin(true);   // con phien thi vao thang
-    else setDangDangNhap(true);
-  };
+  // Bam "Tài khoản" -> sang trang quan tri rieng (chua dang nhap thi hien trang dang nhap)
+  const moQuanTri = () => window.location.assign('/admin');
 
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
   const [homeGroups, setHomeGroups] = useState([]);
@@ -182,7 +175,6 @@ export default function App() {
         }}
         compareList={compareList}
         setIsCompareOpen={setIsCompareOpen}
-        isAdmin={isAdmin}
         setIsAdmin={moQuanTri}
         setSelectedCategory={(cat) => {
           setSelectedCategory(cat);
@@ -339,6 +331,9 @@ export default function App() {
             {/* Nhật ký thi công */}
             <ProjectDiary />
 
+            {/* Hậu trường thi công (ảnh/video giải trí) */}
+            <GiaiTri />
+
             {/* Bottom Banner on Desktop */}
             <div className="desktop-only">
               <BottomBanner />
@@ -382,24 +377,6 @@ export default function App() {
         </Suspense>
       )}
 
-      {dangDangNhap && (
-        <Suspense fallback={null}>
-          <AdminLogin
-            onSuccess={() => { setDangDangNhap(false); setIsAdmin(true); }}
-            onClose={() => setDangDangNhap(false)}
-          />
-        </Suspense>
-      )}
-
-      {/* Admin Dashboard */}
-      {isAdmin && (
-        <Suspense fallback={null}>
-        <AdminDashboard
-          onClose={() => setIsAdmin(false)}
-          onProductChange={fetchProductsList}
-        />
-        </Suspense>
-      )}
     </div>
   );
 }

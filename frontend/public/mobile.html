@@ -81,17 +81,24 @@
     const list = multi ? DEVICES : [DEVICES[1]];
     const src = '/';
     stage.innerHTML = '';
+    // Thu nho khung cho vua chieu cao cua so. Dung transform nen trang ben trong
+    // van dung chieu rong that cua may, chi hinh anh nho lai.
+    const cao = Math.max(...list.map(d => (landscape ? d.w : d.h) + 20));
+    const conLai = window.innerHeight - stage.getBoundingClientRect().top - 16 - 30;
+    const s = Math.min(1, conLai / cao);
     for (const d of list) {
       const w = landscape ? d.h : d.w;
       const h = landscape ? d.w : d.h;
       const box = document.createElement('div');
       box.className = 'device';
       box.innerHTML =
-        '<div class="frame" style="width:' + (w + 20) + 'px">' +
-          (landscape ? '' : '<div class="notch"></div>') +
-          '<iframe src="' + src + '" width="' + w + '" height="' + h + '" loading="eager"></iframe>' +
+        '<div style="width:' + (w + 20) * s + 'px;height:' + (h + 20) * s + 'px">' +
+          '<div class="frame" style="width:' + (w + 20) + 'px;transform:scale(' + s + ');transform-origin:top left">' +
+            (landscape ? '' : '<div class="notch"></div>') +
+            '<iframe src="' + src + '" width="' + w + '" height="' + h + '" loading="eager"></iframe>' +
+          '</div>' +
         '</div>' +
-        '<div class="label"><b>' + d.name + '</b> · ' + w + ' × ' + h + '</div>';
+        '<div class="label"><b>' + d.name + '</b> · ' + w + ' × ' + h + (s < 1 ? ' · ' + Math.round(s * 100) + '%' : '') + '</div>';
       stage.appendChild(box);
     }
   }
@@ -111,6 +118,10 @@
   document.getElementById('reload').onclick = () => {
     document.querySelectorAll('iframe').forEach(f => f.contentWindow.location.reload());
   };
+
+  // Keo to/nho cua so thi tinh lai (cho ngung keo moi ve lai, khoi tai iframe lien tuc)
+  let hen;
+  window.addEventListener('resize', () => { clearTimeout(hen); hen = setTimeout(render, 300); });
 
   render();
 </script>

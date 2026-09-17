@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, RotateCcw } from 'lucide-react';
 import { api } from '../utils/api';
 
-export default function AdminSettings({ onBao }) {
+// phan = 'ticker' | 'banner': mỗi mục trong menu quản trị chỉ hiện đúng phần của nó.
+// Lưu vẫn gửi cả 2 giá trị để không làm mất phần kia.
+export default function AdminSettings({ onBao, phan }) {
   const [ticker, setTicker] = useState([]);
   const [banner, setBanner] = useState(null);
   const [dangTai, setDangTai] = useState(true);
@@ -53,8 +55,8 @@ export default function AdminSettings({ onBao }) {
   return (
     <div className="adm-caidat">
       {/* ===== Thanh chạy ===== */}
+      {phan !== 'banner' && (
       <section>
-        <h3>Thanh chữ chạy trên banner</h3>
         <p className="adm-ghichu">Mỗi dòng là một thông điệp, chạy vòng liên tục ở trang chủ.</p>
 
         {ticker.map((dong, i) => (
@@ -83,10 +85,11 @@ export default function AdminSettings({ onBao }) {
           </button>
         </div>
       </section>
+      )}
 
       {/* ===== Ảnh banner ===== */}
+      {phan !== 'ticker' && (
       <section>
-        <h3>Ảnh banner trang chủ</h3>
         <p className="adm-ghichu">
           Nên dùng ảnh ngang tỉ lệ khoảng 1024×317. Ảnh càng nặng trang càng chậm —
           nén xuống dưới 400KB trước khi tải lên.
@@ -109,6 +112,7 @@ export default function AdminSettings({ onBao }) {
           )}
         </div>
       </section>
+      )}
     </div>
   );
 }
