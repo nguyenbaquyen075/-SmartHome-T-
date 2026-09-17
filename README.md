@@ -135,7 +135,11 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 | Thứ | Để ở đâu | Biến môi trường |
 |---|---|---|
 | Sản phẩm, công trình, cài đặt | Kho dữ liệu Postgres (Neon) | `DATABASE_URL` |
-| Ảnh sản phẩm, ảnh banner, ảnh/video hậu trường | Cloudinary | `CLOUDINARY_URL` |
+| Ảnh sản phẩm, ảnh banner | Cloudinary; **chưa có Cloudinary thì nằm luôn trong kho Neon** | `CLOUDINARY_URL` (không bắt buộc) |
+| Ảnh, video hậu trường thi công | Cloudinary (video nặng nên bắt buộc) | `CLOUDINARY_URL` |
+
+Ảnh tải lên khi chưa có Cloudinary được cất trong bảng `anh` của kho Neon và phục vụ qua
+đường dẫn `/api/anh/<tên ảnh>` — deploy lại vẫn còn.
 
 **Chưa đặt 2 biến này thì web vẫn chạy**, nhưng dữ liệu chỉ nằm trong máy chủ và sẽ mất khi
 deploy lại. Trong log sẽ có dòng `[CANH BAO] Chua dat DATABASE_URL`.
