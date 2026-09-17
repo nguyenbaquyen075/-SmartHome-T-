@@ -55,6 +55,14 @@ const moKho = async (macDinhs) => {
     sua_luc timestamptz NOT NULL DEFAULT now()
   )`);
 
+  // Bang rieng cho anh quan tri tai len (file nhi phan, khong nhet chung vao jsonb)
+  await pool.query(`CREATE TABLE IF NOT EXISTS anh (
+    id      text PRIMARY KEY,
+    kieu    text NOT NULL,
+    du_lieu bytea NOT NULL,
+    tao_luc timestamptz NOT NULL DEFAULT now()
+  )`);
+
   const { rows } = await pool.query('SELECT ten, noi_dung FROM du_lieu');
   rows.forEach((r) => boNho.set(r.ten, r.noi_dung));
 
@@ -103,6 +111,24 @@ const ghi = async (ten, duLieu) => {
   return false;
 };
 
+// ponytail: anh nam luon trong kho, khong xoa theo khi go anh khoi san pham.
+// Kho mien phi 0.5GB ~ vai nghin anh nen chua can don; khi nao chat thi them viec don rac.
+const ghiAnh = async (id, kieu, buf) => {
+  try {
+    await pool.query('INSERT INTO anh (id, kieu, du_lieu) VALUES ($1, $2, $3)', [id, kieu, buf]);
+    return true;
+  } catch (err) {
+    console.error('[KHO] Khong luu duoc anh:', err.message);
+    return false;
+  }
+};
+
+// Tra { kieu, du_lieu } hoac null neu khong co
+const docAnh = async (id) => {
+  const { rows } = await pool.query('SELECT kieu, du_lieu FROM anh WHERE id = $1', [id]);
+  return rows[0] || null;
+};
+
 const dangDungDB = () => Boolean(pool);
 
-module.exports = { moKho, doc, ghi, dangDungDB };
+module.exports = { moKho, doc, ghi, ghiAnh, docAnh, dangDungDB };

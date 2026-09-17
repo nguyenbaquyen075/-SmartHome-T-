@@ -200,7 +200,13 @@ app.post('/api/upload', canQuyen, async (req, res) => {
     }
   }
 
-  // Chua co Cloudinary: ghi ra file trong may (chay thu)
+  // Khong co Cloudinary nhung co kho du lieu: cat anh luon vao kho, khong mat khi deploy
+  if (kho.dangDungDB()) {
+    if (!(await kho.ghiAnh(tenFile, `image/${khop[1]}`, buf))) return res.status(500).json(LOI_LUU);
+    return res.json({ url: `/api/anh/${tenFile}` });
+  }
+
+  // Chay o may minh, chua co kho: ghi ra file
   const thuMuc = path.join(__dirname, '..', 'frontend', 'public', 'images', 'tai-len');
 
   try {
@@ -210,6 +216,21 @@ app.post('/api/upload', canQuyen, async (req, res) => {
   } catch (err) {
     console.error('Lỗi lưu ảnh:', err);
     res.status(500).json({ error: 'Không lưu được ảnh' });
+  }
+});
+
+// Anh nam trong kho: ten co san ky tu thoi gian nen khong bao gio doi -> cho cache 1 nam
+app.get('/api/anh/:id', async (req, res) => {
+  if (!kho.dangDungDB()) return res.status(404).json({ error: 'Không có ảnh' });
+  try {
+    const anh = await kho.docAnh(req.params.id);
+    if (!anh) return res.status(404).json({ error: 'Không tìm thấy ảnh' });
+    res.setHeader('Content-Type', anh.kieu);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.send(anh.du_lieu);
+  } catch (err) {
+    console.error('Loi doc anh:', err.message);
+    res.status(500).json({ error: 'Không đọc được ảnh' });
   }
 });
 
