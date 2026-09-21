@@ -22,6 +22,7 @@ const KHO_SAN_PHAM = 'products';
 const KHO_CONG_TRINH = 'projects';
 const KHO_CAI_DAT = 'settings';
 const KHO_GIAI_TRI = 'giai-tri';
+const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
 const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
 
 // Kho hong (mat mang, DB day...) thi bao that cho admin, khong bao "da luu" gia
@@ -49,7 +50,41 @@ const BI_MAT = process.env.ADMIN_SECRET || `${ADMIN_TAI_KHOAN}|${ADMIN_PASSWORD}
 const HAN_PHIEN = 7 * 24 * 60 * 60 * 1000;   // 7 ngay
 const daThoat = new Set();                   // token bam "Dang xuat" (chi trong lan chay nay)
 
-const kyPhien = (han) => crypto.createHmac('sha256', BI_MAT).update(String(han)).digest('hex');
+// Mat khau khong bao gio cat nguyen chu: bam bang scrypt kem muoi ngau nhien
+const bamMatKhau = (mk) => {
+  const muoi = crypto.randomBytes(16).toString('hex');
+  return `scrypt$${muoi}$${crypto.scryptSync(String(mk), muoi, 32).toString('hex')}`;
+};
+const khopMatKhau = (mk, bam) => {
+  const [kieu, muoi, dung] = String(bam || '').split('$');
+  if (kieu !== 'scrypt' || !muoi || !dung) return false;
+  const thu = crypto.scryptSync(String(mk), muoi, 32).toString('hex');
+  return thu.length === dung.length && crypto.timingSafeEqual(Buffer.from(thu), Buffer.from(dung));
+};
+
+// Tai khoan dang dung: uu tien cai da doi trong trang Cai dat, chua doi thi lay bien moi truong
+const taiKhoanTrongKho = () => {
+  const t = kho.doc(KHO_QUAN_TRI, {});
+  return t && typeof t === 'object' && !Array.isArray(t) ? t : {};
+};
+const dungTaiKhoanKhong = (nhap) => {
+  const luu = taiKhoanTrongKho();
+  const ds = luu.taiKhoan ? [luu.taiKhoan] : ADMIN_TAI_KHOAN.split(',');
+  return ds.some((tk) => tk.trim() && chuanTaiKhoan(tk) === chuanTaiKhoan(nhap));
+};
+const dungMatKhauKhong = (nhap) => {
+  const luu = taiKhoanTrongKho();
+  return luu.matKhauBam ? khopMatKhau(nhap, luu.matKhauBam) : String(nhap) === ADMIN_PASSWORD;
+};
+
+// Bi mat ky phien co ca mat khau va moc "dang xuat moi noi": doi mat khau hay bam
+// dang xuat moi noi la moi phien cu het hieu luc ngay.
+const biMatPhien = () => {
+  const luu = taiKhoanTrongKho();
+  return `${BI_MAT}|${luu.matKhauBam || ''}|${luu.phienTu || 0}`;
+};
+
+const kyPhien = (han) => crypto.createHmac('sha256', biMatPhien()).update(String(han)).digest('hex');
 const taoPhien = () => {
   const han = Date.now() + HAN_PHIEN;
   return `${han}.${kyPhien(han)}`;
@@ -97,9 +132,8 @@ app.post('/api/admin/login', (req, res) => {
     return res.status(429).json({ error: `Sai quá nhiều lần, thử lại sau ${phutConLai} phút` });
   }
 
-  const dungTaiKhoan = ADMIN_TAI_KHOAN.split(',').some((tk) => tk.trim() && chuanTaiKhoan(tk) === chuanTaiKhoan(req.body?.taiKhoan));
   // Bao chung 1 cau de nguoi la khong biet sai o o nao
-  if (!dungTaiKhoan || req.body?.password !== ADMIN_PASSWORD) {
+  if (!dungTaiKhoanKhong(req.body?.taiKhoan) || !dungMatKhauKhong(req.body?.password)) {
     demThemMotLanSai(noi);
     return res.status(401).json({ error: 'Email / số điện thoại hoặc mật khẩu không đúng' });
   }
@@ -110,6 +144,61 @@ app.post('/api/admin/login', (req, res) => {
 app.post('/api/admin/logout', canQuyen, (req, res) => {
   daThoat.add(laToken(req));
   res.json({ success: true });
+});
+
+// ---- Cai dat & bao mat tai khoan ----
+app.get('/api/admin/tai-khoan', canQuyen, (req, res) => {
+  const luu = taiKhoanTrongKho();
+  res.json({
+    taiKhoan: luu.taiKhoan || ADMIN_TAI_KHOAN,
+    nguon: luu.matKhauBam ? 'kho' : 'bien-moi-truong',
+    doiLuc: luu.doiLuc || null,
+    kho: {
+      duLieu: kho.dangDungDB() ? 'neon' : 'file',
+      file: khoFile.dangBat() ? 'kho-neon' : cld ? 'cloudinary' : kho.dangDungDB() ? 'kho-du-lieu' : 'may'
+    }
+  });
+});
+
+// Doi tai khoan va/hoac mat khau. Bat buoc nhap dung mat khau hien tai.
+app.put('/api/admin/tai-khoan', canQuyen, async (req, res) => {
+  const { matKhauHienTai, taiKhoanMoi, matKhauMoi } = req.body || {};
+  if (!dungMatKhauKhong(matKhauHienTai)) {
+    return res.status(401).json({ error: 'Mật khẩu hiện tại không đúng' });
+  }
+
+  const moi = { ...taiKhoanTrongKho() };
+
+  if (taiKhoanMoi !== undefined) {
+    const tk = String(taiKhoanMoi).trim();
+    const laEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tk);
+    const laSo = /^[\d\s.()+-]{9,15}$/.test(tk);
+    if (!laEmail && !laSo) return res.status(400).json({ error: 'Cần nhập email hợp lệ hoặc số điện thoại' });
+    moi.taiKhoan = tk;
+  }
+
+  if (matKhauMoi !== undefined) {
+    if (String(matKhauMoi).length < 8) return res.status(400).json({ error: 'Mật khẩu mới cần ít nhất 8 ký tự' });
+    moi.matKhauBam = bamMatKhau(matKhauMoi);
+  }
+
+  // Chua tung doi thi ghi luon cai dang dung vao kho, de sau nay doi bien tren Render
+  // cung khong lam anh mat tai khoan
+  if (!moi.matKhauBam) moi.matKhauBam = bamMatKhau(ADMIN_PASSWORD);
+  if (!moi.taiKhoan) moi.taiKhoan = ADMIN_TAI_KHOAN.split(',')[0].trim();
+  moi.doiLuc = new Date().toISOString();
+
+  if (!(await kho.ghi(KHO_QUAN_TRI, moi))) return res.status(500).json(LOI_LUU);
+  // Doi mat khau lam bi mat ky phien doi theo -> phien cu het han, cap phien moi ngay
+  res.json({ taiKhoan: moi.taiKhoan, token: matKhauMoi !== undefined ? taoPhien() : undefined });
+});
+
+// Dang xuat khoi moi thiet bi: doi moc phien -> moi token da phat deu vo hieu
+app.post('/api/admin/dang-xuat-moi-noi', canQuyen, async (req, res) => {
+  const moi = { ...taiKhoanTrongKho(), phienTu: Date.now() };
+  if (!moi.matKhauBam) moi.matKhauBam = bamMatKhau(ADMIN_PASSWORD);
+  if (!(await kho.ghi(KHO_QUAN_TRI, moi))) return res.status(500).json(LOI_LUU);
+  res.json({ success: true, token: taoPhien() });   // may dang dung thi cap phien moi
 });
 
 // Kiem tra token con hieu luc (dung khi tai lai trang)
@@ -770,7 +859,8 @@ kho.moKho({
   [KHO_SAN_PHAM]: [],
   [KHO_CONG_TRINH]: [],
   [KHO_CAI_DAT]: CAI_DAT_MAC_DINH,
-  [KHO_GIAI_TRI]: []
+  [KHO_GIAI_TRI]: [],
+  [KHO_QUAN_TRI]: {}
 }).then(() => {
   if (khoFile.dangBat()) khoFile.datPhepTrinhDuyet();
   app.listen(PORT, '0.0.0.0', () => {

@@ -247,6 +247,11 @@ Code nằm trong `frontend/src/components/Admin*.jsx` + `frontend/src/admin.css`
 | `ADMIN_TAI_KHOAN` | Email hoặc số điện thoại để đăng nhập (mặc định tạm `0987654321`). Muốn vào được bằng **cả email lẫn số**, viết cả hai cách nhau dấu phẩy: `email@cuaanh.vn, 0987654321` |
 | `ADMIN_PASSWORD` | Mật khẩu (mặc định tạm `diennuoc@2026`) |
 
+> 💡 Từ trong trang quản trị: **☰ → Cài đặt & bảo mật** đổi được tài khoản và mật khẩu ngay,
+> không cần vào Render. Đổi ở đó là lưu vào kho dữ liệu (mật khẩu băm bằng scrypt, không lưu
+> nguyên chữ) và **ghi đè** hai biến môi trường trên. Trang đó còn có nút *Đăng xuất mọi nơi*
+> và bảng cho biết dữ liệu đang cất ở đâu.
+
 Đổi mật khẩu xong thì mọi phiên đăng nhập cũ hết hiệu lực ngay. Phiên đăng nhập sống 7 ngày
 và **không mất khi server ngủ dậy hay deploy lại**. Sai mật khẩu 8 lần từ cùng một nơi thì
 phải đợi 15 phút mới thử tiếp được.

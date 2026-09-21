@@ -35,3 +35,6 @@ Thumbs.db
 # Giai tri luu tren may (che do chay thu khi chua co Cloudinary) - khong dua len Git
 backend/data/giai-tri.json
 backend/data/giai-tri-file/
+
+# Tai khoan quan tri luu tren may (che do chay thu) - co ma bam mat khau
+backend/data/quan-tri.json

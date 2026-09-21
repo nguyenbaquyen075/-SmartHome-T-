@@ -114,6 +114,21 @@ export const api = {
     return data;
   },
 
+  // Cai dat & bao mat tai khoan
+  taiKhoan: () => apiAdmin('/admin/tai-khoan'),
+
+  async doiTaiKhoan(duLieu) {
+    const kq = await apiAdmin('/admin/tai-khoan', { method: 'PUT', body: JSON.stringify(duLieu) });
+    if (kq.token) adminToken.set(kq.token);   // doi mat khau -> nhan phien moi, khoi bi day ra
+    return kq;
+  },
+
+  async dangXuatMoiNoi() {
+    const kq = await apiAdmin('/admin/dang-xuat-moi-noi', { method: 'POST' });
+    if (kq.token) adminToken.set(kq.token);
+    return kq;
+  },
+
   async checkLogin() {
     if (!adminToken.get()) return false;
     try { await apiAdmin('/admin/check'); return true; } catch { return false; }

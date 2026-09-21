@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft
+  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import AdminLogin from './AdminLogin';
@@ -9,6 +9,7 @@ import AdminSanPham from './AdminSanPham';
 import AdminProjects from './AdminProjects';
 import AdminGiaiTri from './AdminGiaiTri';
 import AdminSettings from './AdminSettings';
+import AdminCaiDat from './AdminCaiDat';
 import '../admin.css';
 
 // Menu ☰: các mục của trang chủ xếp đúng thứ tự từ trên xuống như khách thấy.
@@ -16,7 +17,10 @@ import '../admin.css';
 const MENU = [
   {
     nhom: 'Chung',
-    muc: [{ duong: 'tong-quan', nhan: 'Tổng quan', moTa: 'Số liệu và việc cần bổ sung', Icon: LayoutDashboard }]
+    muc: [
+      { duong: 'tong-quan', nhan: 'Tổng quan', moTa: 'Số liệu và việc cần bổ sung', Icon: LayoutDashboard },
+      { duong: 'cai-dat', nhan: 'Cài đặt & bảo mật', moTa: 'Tài khoản, mật khẩu, nơi cất dữ liệu', Icon: ShieldCheck }
+    ]
   },
   {
     nhom: 'Trang chủ · từ trên xuống',
@@ -171,6 +175,7 @@ export default function AdminApp() {
         {trang === 'san-pham' && <AdminSanPham {...chung} con={con} />}
         {trang === 'cong-trinh' && <AdminProjects {...chung} con={con} />}
         {trang === 'giai-tri' && <AdminGiaiTri onBao={hienBao} />}
+        {trang === 'cai-dat' && <AdminCaiDat onBao={hienBao} />}
         {(trang === 'thanh-chay' || trang === 'banner') && (
           <>
             <div className="qt-tieude">
