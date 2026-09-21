@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, Upload, ArrowLeft, MapPin, CalendarDays } from 'lucide-react';
 import { api, ngayVN } from '../utils/api';
 import { Truong, Khoi, ThanhLuu } from './AdminForm';
+import { useBanNhap, gioPhut } from '../utils/banNhap';
 
 const RONG = {
   title: '', address: '', customerType: '', description: '',
@@ -94,7 +95,11 @@ export default function AdminProjects({ onBao, diToi, con }) {
 }
 
 function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
-  const [f, setF] = useState(() => ({ ...RONG, ...(ct || {}), durationDays: ct?.durationDays || '' }));
+  const { f, setF, daKhoiPhuc, luc, boBanNhap, xongBanNhap, huyBanNhap } = useBanNhap(
+    `cameratd_dang_nhap_ct_${ct?.id || 'moi'}`,
+    () => ({ ...RONG, ...(ct || {}), durationDays: ct?.durationDays || '' })
+  );
+  const huy = huyBanNhap(onHuy);
   const [loi, setLoi] = useState({});
   const [dangLuu, setDangLuu] = useState(false);
   const [dangTaiAnh, setDangTaiAnh] = useState(false);
@@ -138,6 +143,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
       if (ct) await api.updateProject(ct.id, duLieu);
       else await api.createProject(duLieu);
       onBao(ct ? 'Đã lưu thay đổi' : 'Đã thêm công trình');
+      xongBanNhap();
       onXong();
     } catch (err) {
       onBao(err.message, 'error');
@@ -150,11 +156,21 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
     <form onSubmit={luu} noValidate>
       <div className="qt-tieude">
         <div>
-          <button type="button" className="qt-quaylai" onClick={onHuy}><ArrowLeft size={15} /> Quay lại danh sách công trình</button>
+          <button type="button" className="qt-quaylai" onClick={huy}><ArrowLeft size={15} /> Quay lại danh sách công trình</button>
           <h1>{ct ? 'Sửa công trình' : 'Thêm công trình'}</h1>
           <p>Hiện ở mục Nhật ký thi công trên trang chủ</p>
         </div>
       </div>
+
+      {daKhoiPhuc && (
+        <div className="qt-ban-nhap" role="status">
+          <span>
+            <strong>Đã lấy lại phần anh nhập dở</strong>
+            {luc ? ' lúc ' + gioPhut(luc) : ''} — kiểm tra lại rồi bấm Lưu.
+          </span>
+          <button type="button" className="qt-nut" onClick={boBanNhap}>Bỏ, nhập lại từ đầu</button>
+        </div>
+      )}
 
       <Khoi so={1} tieuDe="Thông tin công trình" moTa="Hiện trên thẻ công trình">
         <div className="qt-hang">
@@ -207,7 +223,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
         />
       </Khoi>
 
-      <ThanhLuu dangLuu={dangLuu} onHuy={onHuy} nhan={ct ? 'Lưu thay đổi' : 'Thêm công trình'} ghiChu={f.title || 'Công trình mới'} />
+      <ThanhLuu dangLuu={dangLuu} onHuy={huy} nhan={ct ? 'Lưu thay đổi' : 'Thêm công trình'} ghiChu={f.title || 'Công trình mới'} />
     </form>
   );
 }

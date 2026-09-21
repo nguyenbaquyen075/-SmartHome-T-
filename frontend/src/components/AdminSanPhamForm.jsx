@@ -7,6 +7,7 @@ import {
   BIEU_TUONG, BieuTuong, DaiNoiBat, doiNhan
 } from '../utils/sanPham';
 import { Truong, Khoi, ThanhLuu, DanhSachDong } from './AdminForm';
+import { useBanNhap, gioPhut } from '../utils/banNhap';
 
 const TOI_DA_ANH = 6 * 1024 * 1024;    // giới hạn của /api/upload (tính sau khi nén)
 const TOI_DA_CHON = 40 * 1024 * 1024;  // ảnh to hơn mức này thì máy nén cũng ì
@@ -29,17 +30,20 @@ const tuSanPham = (sp) => ({
   doiTra: sp?.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
 });
 
+
 const khungThongSo = (dm) => (MAU_THONG_SO[dm] || []).map(([nhan]) => ({ nhan, giaTri: '' }));
 const khungNoiBat = (dm) => (MAU_NOI_BAT[dm] || []).map(([bieuTuong, nhan]) => ({ bieuTuong, nhan, giaTri: '', ghiChu: '' }));
 
 export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
-  const [f, setF] = useState(() => tuSanPham(sp));
+  const { f, setF, daKhoiPhuc, luc, boBanNhap, xongBanNhap, huyBanNhap } =
+    useBanNhap(`cameratd_dang_nhap_sp_${sp?.id || 'moi'}`, () => tuSanPham(sp));
+  const huy = huyBanNhap(onHuy);
   const [loi, setLoi] = useState({});
   const [dangLuu, setDangLuu] = useState(false);
   const [dangTaiAnh, setDangTaiAnh] = useState('');   // "2/5" khi đang tải nhiều ảnh
   const [duongDanAnh, setDuongDanAnh] = useState('');
 
-  const doi = (khoa, giaTri) => setF((cu) => ({ ...cu, [khoa]: giaTri }));
+  const doi = (ten, giaTri) => setF((cu) => ({ ...cu, [ten]: giaTri }));
   const cacHang = [...new Set(ds.map((p) => p.brand).filter(Boolean))];
   const mauThongSo = MAU_THONG_SO[f.category] || [];
   const viDuThongSo = Object.fromEntries(Object.values(MAU_THONG_SO).flat());
@@ -138,6 +142,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       if (sp) await api.updateProduct(sp.id, duLieu);
       else await api.createProduct(duLieu);
       onBao(sp ? 'Đã lưu thay đổi' : 'Đã thêm sản phẩm');
+      xongBanNhap();
       onXong();
     } catch (err) {
       onBao(err.message, 'error');
@@ -152,7 +157,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
     <form onSubmit={luu} noValidate>
       <div className="qt-tieude">
         <div>
-          <button type="button" className="qt-quaylai" onClick={onHuy}><ArrowLeft size={15} /> Quay lại danh sách sản phẩm</button>
+          <button type="button" className="qt-quaylai" onClick={huy}><ArrowLeft size={15} /> Quay lại danh sách sản phẩm</button>
           <h1>{sp ? 'Sửa sản phẩm' : 'Thêm sản phẩm'}</h1>
           <p>Các phần xếp đúng thứ tự khách thấy ở trang chi tiết. Ô có dấu <b className="qt-sao">*</b> là bắt buộc.</p>
         </div>
@@ -160,6 +165,16 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
           <a className="qt-nut" href={`/#product=${sp.id}`} target="_blank" rel="noreferrer">Xem trên web ↗</a>
         )}
       </div>
+
+      {daKhoiPhuc && (
+        <div className="qt-ban-nhap" role="status">
+          <span>
+            <strong>Đã lấy lại phần anh nhập dở</strong>
+            {luc ? ' lúc ' + gioPhut(luc) : ''} — kiểm tra lại rồi bấm Lưu.
+          </span>
+          <button type="button" className="qt-nut" onClick={boBanNhap}>Bỏ, nhập lại từ đầu</button>
+        </div>
+      )}
 
       {/* 1. Thông tin cơ bản */}
       <Khoi so={1} tieuDe="Thông tin cơ bản" moTa="Tên, danh mục và dòng mô tả ngắn hiện trên thẻ sản phẩm">
@@ -425,7 +440,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
 
       <ThanhLuu
         dangLuu={dangLuu}
-        onHuy={onHuy}
+        onHuy={huy}
         nhan={sp ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
         ghiChu={f.name || 'Sản phẩm mới'}
       />
