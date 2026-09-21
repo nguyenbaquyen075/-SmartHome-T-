@@ -221,18 +221,18 @@ export default function App() {
           {/* Main Catalog Section */}
           <main ref={productsRef} className="container" style={{ flex: 1, paddingTop: '10px' }}>
             {/* Category Section (Matching user design: DANH MỤC SẢN PHẨM + 4 cards) */}
-            {!chuaCoHang && <CategoryFilter
+            <CategoryFilter
               selectedCategory={selectedCategory}
               setSelectedCategory={(cat) => {
                 setSelectedCategory(cat);
                 scrollToProducts();
               }}
               onViewAll={openProductsPage}
-            />}
+            />
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
             <div style={{
-              display: homeGroups.length > 0 || chuaCoHang ? 'none' : 'flex',
+              display: homeGroups.length > 0 ? 'none' : 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: '14px'
@@ -270,9 +270,6 @@ export default function App() {
               <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
                 <p>Đang tải dữ liệu thiết bị...</p>
               </div>
-            ) : chuaCoHang ? (
-              /* Cửa hàng chưa nhập sản phẩm: một dòng nhẹ nhàng, không bày khung trống */
-              <p className="trang-trong">Đang cập nhật sản phẩm…</p>
             ) : products.length === 0 ? (
               <div style={{
                 textAlign: 'center',
@@ -281,19 +278,24 @@ export default function App() {
                 borderRadius: '10px',
                 border: '1px solid #e2e8f0'
               }}>
+                {/* Chưa nhập hàng thì nói thẳng "chưa có", còn do lọc/tìm mới là "không tìm thấy" */}
                 <p style={{ fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
-                  Không tìm thấy sản phẩm phù hợp
+                  {chuaCoHang ? 'Chưa có sản phẩm nào' : 'Không tìm thấy sản phẩm phù hợp'}
                 </p>
-                <button
-                  onClick={() => {
-                    setSelectedCategory('Tất cả');
-                    setSearchTerm('');
-                  }}
-                  className="btn-primary"
-                  style={{ padding: '6px 16px', fontSize: '0.85rem' }}
-                >
-                  Xem toàn bộ danh mục
-                </button>
+                {chuaCoHang ? (
+                  <p style={{ color: '#64748b', fontSize: '0.88rem' }}>Cửa hàng đang cập nhật, anh/chị quay lại sau nhé</p>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('Tất cả');
+                      setSearchTerm('');
+                    }}
+                    className="btn-primary"
+                    style={{ padding: '6px 16px', fontSize: '0.85rem' }}
+                  >
+                    Xem toàn bộ danh mục
+                  </button>
+                )}
               </div>
             ) : homeGroups.length > 0 ? (
               /* Mục "Tất cả": 3 nhóm, mỗi nhóm 2 sản phẩm + nút sang trang sản phẩm của nhóm đó */
