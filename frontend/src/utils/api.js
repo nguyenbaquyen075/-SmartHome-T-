@@ -138,7 +138,7 @@ export const api = {
   async taiAnhLen(file, ten, onTienDo) {
     const phep = await xinPhep(file, 'san-pham', ten);
     if (phep.cach === 's3') {
-      await guiFile('PUT', phep.uploadUrl, file, { 'Content-Type': file.type }, onTienDo);
+      await guiFile('PUT', phep.uploadUrl, file, phep.dauMuc, onTienDo);
       return { url: phep.url };
     }
     const dataUrl = await new Promise((xong, hong) => {
@@ -182,7 +182,7 @@ export const api = {
     //    Video nang khong di qua server minh nen khong bi nghen.
     const phep = await xinPhep(file, 'giai-tri');
     if (phep.cach === 's3') {
-      await guiFile('PUT', phep.uploadUrl, file, { 'Content-Type': file.type }, onTienDo);
+      await guiFile('PUT', phep.uploadUrl, file, phep.dauMuc, onTienDo);
       return apiAdmin('/giai-tri/xong', { method: 'POST', body: JSON.stringify({ url: phep.url, ...bai }) });
     }
 

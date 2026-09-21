@@ -242,7 +242,13 @@ app.post('/api/tai-len/chu-ky', canQuyen, async (req, res) => {
   const ten = `${thuMuc}/${goc || 'file'}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}${duoi}`;
 
   try {
-    res.json({ cach: 's3', ten, uploadUrl: await khoFile.kyTaiLen(ten, kieu), url: khoFile.diaChi(ten) });
+    res.json({
+      cach: 's3',
+      ten,
+      uploadUrl: await khoFile.kyTaiLen(ten, kieu),
+      url: khoFile.diaChi(ten),
+      dauMuc: khoFile.dauMucTaiLen(kieu)   // trinh duyet phai gui dung may dau muc nay
+    });
   } catch (err) {
     console.error('Loi ky tai len:', err.message);
     res.status(502).json({ error: 'Không xin được phép tải lên, thử lại sau' });

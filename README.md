@@ -162,6 +162,13 @@ File **không đi qua server mình**, nhờ vậy web không nặng và không c
 
 Server tự bật CORS cho bucket lúc khởi động, log ghi `[KHO FILE] Da bat kho file Neon`.
 
+Mỗi file tải lên được gắn lệnh **nhớ 1 năm** (`Cache-Control: immutable`) — tên file có dấu thời gian
+nên nội dung không bao giờ đổi. Khách xem lần hai không tải lại, đỡ được phần lớn lưu lượng.
+
+> ⚠️ Gói Neon miễn phí cho **5GB lưu lượng/tháng** dùng chung cho cả kho dữ liệu và kho file.
+> Ảnh nén ~300KB thì thoải mái, nhưng **video 50MB chỉ khoảng 100 lượt xem là hết**. Nên quay
+> clip ngắn 10–20 giây, clip dài thì đưa lên YouTube (chế độ không công khai) rồi nhúng.
+
 **Chưa đặt 4 biến này thì web vẫn chạy**, chỉ là lùi về cách cũ: ảnh cất trong bảng `anh` của
 kho dữ liệu (phục vụ qua `/api/anh/<tên>`), còn **video nằm trên đĩa máy chủ và mất khi deploy**.
 

@@ -40,9 +40,20 @@ const tenTuDiaChi = (url) => {
   return String(url || '').startsWith(dau) ? String(url).slice(dau.length) : null;
 };
 
+// Ten file co dau thoi gian nen khong bao gio doi noi dung -> cho trinh duyet nho 1 nam.
+// Khach xem lan hai khong phai tai lai, do la phan tiet kiem luu luong lon nhat.
+const NHO_LAU = 'public, max-age=31536000, immutable';
+
+// Cac dau muc trinh duyet phai gui kem khi tai len; thieu 1 cai la chu ky khong khop
+const dauMucTaiLen = (kieu) => ({ 'Content-Type': kieu, 'Cache-Control': NHO_LAU });
+
 // Giay phep cho trinh duyet tu tai file len
 const kyTaiLen = (ten, kieu) =>
-  getSignedUrl(noiKho(), new PutObjectCommand({ Bucket: BUCKET, Key: ten, ContentType: kieu }), { expiresIn: HAN_KY });
+  getSignedUrl(
+    noiKho(),
+    new PutObjectCommand({ Bucket: BUCKET, Key: ten, ContentType: kieu, CacheControl: NHO_LAU }),
+    { expiresIn: HAN_KY }
+  );
 
 // Trinh duyet chi gui thang file len kho khi kho cho phep (CORS). Dat 1 lan luc khoi dong.
 // De '*' van an toan: muon ghi duoc phai co giay phep da ky, xem thi bucket von da cong khai.
@@ -77,4 +88,4 @@ const xoa = async (ten) => {
   }
 };
 
-module.exports = { dangBat, diaChi, tenTuDiaChi, kyTaiLen, xoa, datPhepTrinhDuyet };
+module.exports = { dangBat, diaChi, tenTuDiaChi, kyTaiLen, dauMucTaiLen, xoa, datPhepTrinhDuyet };
