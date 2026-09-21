@@ -47,6 +47,8 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
   const cacHang = [...new Set(ds.map((p) => p.brand).filter(Boolean))];
   const mauThongSo = MAU_THONG_SO[f.category] || [];
   const viDuThongSo = Object.fromEntries(Object.values(MAU_THONG_SO).flat());
+  // Gợi ý tiêu đề cho 4 ô nổi bật: gom hết mẫu của mọi danh mục, anh vẫn gõ chữ khác được
+  const goiYNhanNoiBat = [...new Set(Object.values(MAU_NOI_BAT).flat().map((m) => m[1]))];
 
   // Chọn danh mục: tự điền khung thông số, 4 ô nổi bật, hướng dẫn của loại đó.
   // Phần nào anh đã nhập giá trị thì giữ nguyên, không ghi đè.
@@ -291,13 +293,17 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       <Khoi
         so={3}
         tieuDe="4 ô nổi bật"
-        moTa="Dải thông tin ngay dưới tên sản phẩm. Để trống thì trang chi tiết ẩn phần này"
+        moTa="Dải thông tin ngay dưới tên sản phẩm. Tiêu đề gõ tự do, bấm vào ô là hiện gợi ý"
         nut={f.category && (
           <button type="button" className="qt-nut-mau" onClick={() => doi('noiBat', khungNoiBat(f.category))}>
             <Wand2 size={14} /> Dùng khung mẫu
           </button>
         )}
       >
+        <datalist id="qt-nhan-nb">
+          {goiYNhanNoiBat.map((n) => <option key={n} value={n} />)}
+        </datalist>
+
         {f.noiBat.map((o, i) => {
           const viDu = (MAU_NOI_BAT[f.category] || []).find((m) => m[1] === o.nhan);
           const doiO = (khoa, giaTri) => doi('noiBat', f.noiBat.map((x, j) => (j === i ? { ...x, [khoa]: giaTri } : x)));
@@ -309,7 +315,14 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
                   {Object.entries(BIEU_TUONG).map(([k, b]) => <option key={k} value={k}>{b.ten}</option>)}
                 </select>
               </div>
-              <input className="qt-input" value={o.nhan} onChange={(e) => doiO('nhan', e.target.value)} placeholder="Nhãn, VD: Hồng ngoại" aria-label="Nhãn" />
+              <input
+                className="qt-input"
+                list="qt-nhan-nb"
+                value={o.nhan}
+                onChange={(e) => doiO('nhan', e.target.value)}
+                placeholder="Tiêu đề, VD: Hồng ngoại"
+                aria-label="Tiêu đề ô nổi bật"
+              />
               <input className="qt-input" value={o.giaTri} onChange={(e) => doiO('giaTri', e.target.value)} placeholder={`Giá trị, VD: ${viDu?.[2] || '30m'}`} aria-label="Giá trị" />
               <input className="qt-input" value={o.ghiChu} onChange={(e) => doiO('ghiChu', e.target.value)} placeholder={viDu?.[3] ? `Ghi chú, VD: ${viDu[3]}` : 'Ghi chú (không bắt buộc)'} aria-label="Ghi chú" />
               <button type="button" className="qt-xoa-o" onClick={() => doi('noiBat', f.noiBat.filter((_, j) => j !== i))} aria-label="Xóa ô">
