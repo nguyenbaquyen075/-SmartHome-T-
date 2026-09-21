@@ -1,8 +1,17 @@
 // Du lieu dung chung cho trang chi tiet san pham va form quan tri
 import React from 'react';
-import { Moon, Droplets, ShieldCheck, Zap, Gauge, Sun, Clock, Ruler, Wifi, Wrench } from 'lucide-react';
+import { Moon, Droplets, ShieldCheck, Zap, Gauge, Sun, Clock, Ruler, Wifi, Wrench, LayoutGrid, Cctv } from 'lucide-react';
 
-export const DANH_MUC = ['Camera an ninh', 'Thiết bị điện', 'Đèn chiếu sáng', 'Thiết bị nước', 'Vật tư phụ', 'Phụ kiện'];
+// 3 danh muc hang + "Tất cả" = 4 o ngoai trang chu. Dung chung cho menu, trang chu,
+// trang san pham va form quan tri - sua o day la doi ca web.
+export const DANH_MUC = ['Thiết bị mạng', 'Thiết bị điện', 'Thiết bị nước'];
+
+export const MUC_DANH_MUC = [
+  { ten: 'Tất cả', Icon: LayoutGrid, anh: '/images/cat_style_new/prod_all.jpg', moTa: 'Toàn bộ sản phẩm' },
+  { ten: 'Thiết bị mạng', Icon: Cctv, anh: '/images/cat_style_new/prod_3.png', moTa: 'Camera, wifi, đầu ghi' },
+  { ten: 'Thiết bị điện', Icon: Zap, anh: '/images/cat_style_new/prod_1.png', moTa: 'Aptomat, dây điện, đèn' },
+  { ten: 'Thiết bị nước', Icon: Droplets, anh: '/images/cat_style_new/prod_2.png', moTa: 'Máy bơm, ống, vòi sen' }
+];
 export const DON_VI = ['chiếc', 'cái', 'bộ', 'mét', 'cuộn', 'bóng', 'hộp'];
 
 // Nhan tieng Viet cho khoa thong so cu (camelCase).
@@ -31,7 +40,7 @@ export const doiNhan = (khoa) =>
 // Khung thong so theo danh muc: [nhan, vi du]. Vi du chi dung lam goi y trong o nhap,
 // khong dien san vao gia tri de khoi dang so lieu sai len web.
 export const MAU_THONG_SO = {
-  'Camera an ninh': [
+  'Thiết bị mạng': [
     ['Độ phân giải', '2MP Full HD (1920 × 1080)'], ['Ống kính', '2.8mm, góc nhìn 103°'],
     ['Hồng ngoại', 'Smart IR 30m'], ['Chống nước', 'IP67'], ['Kết nối', 'RJ45 10/100M, hỗ trợ PoE'],
     ['Lưu trữ', 'Thẻ nhớ microSD tối đa 256GB'], ['Nguồn điện', '12V DC / PoE'],
@@ -100,7 +109,7 @@ export function DaiNoiBat({ ds }) {
 
 // Khung 4 o noi bat theo danh muc: [bieu tuong, nhan, vi du gia tri, vi du ghi chu]
 export const MAU_NOI_BAT = {
-  'Camera an ninh': [
+  'Thiết bị mạng': [
     ['hd', 'Độ phân giải', '2MP', '(1920 x 1080)'], ['moon', 'Hồng ngoại', '30m', 'quan sát ban đêm'],
     ['droplets', 'Chuẩn chống nước', 'IP67', 'ngoài trời'], ['wrench', 'Bảo hành chính hãng', '24 tháng', '']
   ],

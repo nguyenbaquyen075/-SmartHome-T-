@@ -17,6 +17,7 @@ import {
   Package,
   Sparkles
 } from 'lucide-react';
+import { MUC_DANH_MUC, DANH_MUC } from '../utils/sanPham';
 
 export default function Navbar({
   searchTerm,
@@ -41,25 +42,9 @@ export default function Navbar({
     }
   };
 
-  const navCategories = [
-    { name: 'Điện nước', icon: Droplet },
-    { name: 'Camera', icon: Camera, isHot: true },
-    { name: 'Thiết bị điện', icon: Zap },
-    { name: 'Thiết bị vệ sinh', icon: Droplet },
-    { name: 'Dụng cụ cầm tay', icon: Wrench },
-    { name: 'Vật tư khác', icon: Cog }
-  ];
-
-  const allCategories = [
-    'Camera an ninh',
-    'Thiết bị điện',
-    'Thiết bị nước',
-    'Đèn chiếu sáng',
-    'Dây & Cáp điện',
-    'Ống nhựa & Phụ kiện',
-    'Dụng cụ cầm tay',
-    'Vật tư khác'
-  ];
+  // Lay tu danh sach dung chung (utils/sanPham.jsx) de menu khong lech voi trang chu
+  const navCategories = MUC_DANH_MUC.map((m) => ({ name: m.ten, icon: m.Icon }));
+  const allCategories = DANH_MUC;
 
   return (
     <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>

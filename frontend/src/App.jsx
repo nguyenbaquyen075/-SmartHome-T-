@@ -10,6 +10,7 @@ import ProjectDiary from './components/ProjectDiary';
 import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
 import { api } from './utils/api';
+import { MUC_DANH_MUC } from './utils/sanPham';
 
 // Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
 // nho vay trang chu khong phai tai ~70KB code khong dung toi.
@@ -19,11 +20,8 @@ const ProductsPage = lazy(() => import('./components/ProductsPage'));
 import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
 
 // 3 nhom hien o trang chu, ten khop voi 4 o DANH MUC SAN PHAM
-const HOME_GROUPS = [
-  { name: 'Thiết bị mạng', icon: Camera },
-  { name: 'Thiết bị điện', icon: Zap },
-  { name: 'Thiết bị nước', icon: Droplets }
-];
+// 3 nhom hang o trang chu, lay tu danh sach dung chung (bo "Tất cả" o dau)
+const HOME_GROUPS = MUC_DANH_MUC.slice(1).map((m) => ({ name: m.ten, icon: m.Icon }));
 
 export default function App() {
   const [products, setProducts] = useState([]);
@@ -54,6 +52,18 @@ export default function App() {
 
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
   const [homeGroups, setHomeGroups] = useState([]);
+
+  // Đếm số sản phẩm mỗi danh mục để hiện trên ô (lấy 1 lần lúc mở trang)
+  const [demDanhMuc, setDemDanhMuc] = useState({});
+  useEffect(() => {
+    api.getProducts()
+      .then((ds) => {
+        const d = { 'Tất cả': ds.length };
+        ds.forEach((p) => { d[p.category] = (d[p.category] || 0) + 1; });
+        setDemDanhMuc(d);
+      })
+      .catch(() => {});
+  }, []);
 
   // Toast Notification
   const [toast, setToast] = useState(null);
@@ -102,7 +112,7 @@ export default function App() {
     Promise.all(
       HOME_GROUPS.map((g) =>
         api.getProducts({ category: g.name })
-          .then((list) => ({ ...g, items: list.slice(0, 2) }))
+          .then((list) => ({ ...g, items: list.slice(0, 4) }))
           .catch(() => ({ ...g, items: [] }))
       )
     ).then((res) => {
@@ -228,6 +238,7 @@ export default function App() {
                 scrollToProducts();
               }}
               onViewAll={openProductsPage}
+              dem={demDanhMuc}
             />
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
@@ -317,7 +328,7 @@ export default function App() {
                       <ProductCard
                         key={product.id}
                         product={product}
-                        index={gi * 2 + i}
+                        index={gi * 4 + i}
                         onViewDetails={handleSelectProduct}
                       />
                     ))}

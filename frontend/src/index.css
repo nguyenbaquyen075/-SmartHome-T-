@@ -670,9 +670,12 @@ body {
 }
 
 /* Mỗi nhóm chỉ 2 sản phẩm nên giữ đúng 2 cột, không để lưới tự dàn ra thưa thớt */
+/* 4 cot cho khop voi 4 o danh muc phia tren; hep thi tu xuong 2 cot */
 .home-group-grid {
-  grid-template-columns: repeat(2, 1fr) !important;
-  max-width: 640px;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+@media (max-width: 900px) {
+  .home-group-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
 
 /* ================= TRANG SẢN PHẨM ================= */
@@ -1598,9 +1601,7 @@ body {
   }
 
   /* 3 nhóm ở trang chủ: thẻ dùng hết bề ngang màn hình */
-  .home-group-grid {
-    max-width: none;
-  }
+
   .home-group-title h2 {
     font-size: 0.95rem;
   }
@@ -1734,4 +1735,101 @@ body {
   padding: 26px 16px 34px;
   color: #94a3b8;
   font-size: 0.92rem;
+}
+
+/* ================= 4 Ô DANH MỤC (trang chủ) ================= */
+/* Tiêu đề chung cho mọi khu ở trang chủ: cùng cỡ chữ, cùng khoảng cách */
+.khu-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.khu-dau h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.01em;
+}
+.khu-dau h2 svg { color: #0066cc; }
+.khu-dau button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  color: #0066cc;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.khu-dau button:hover { text-decoration: underline; }
+
+.dm-khu { margin-bottom: 22px; }
+.dm-luoi {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.dm-o {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.dm-o:hover {
+  border-color: #0066cc;
+  box-shadow: 0 6px 18px rgba(2, 43, 87, 0.08);
+  transform: translateY(-2px);
+}
+.dm-o.dang-chon {
+  border-color: #0066cc;
+  box-shadow: inset 0 0 0 1px #0066cc;
+  background: #f5faff;
+}
+.dm-anh {
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+.dm-anh img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.dm-chu strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.dm-chu strong svg { color: #0066cc; flex-shrink: 0; }
+.dm-chu small { display: block; margin-top: 2px; color: #64748b; font-size: 0.78rem; }
+.dm-so {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.dm-so.trong { background: #f1f5f9; color: #94a3b8; }
+
+@media (max-width: 720px) {
+  .dm-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .dm-o { padding: 10px; border-radius: 12px; }
+  .dm-chu strong { font-size: 0.86rem; }
+  .dm-chu small { display: none; }
 }
