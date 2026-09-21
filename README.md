@@ -134,12 +134,36 @@ Chạy chung **1 service duy nhất**: Express vừa trả API, vừa phục v�
 
 | Thứ | Để ở đâu | Biến môi trường |
 |---|---|---|
-| Sản phẩm, công trình, cài đặt | Kho dữ liệu Postgres (Neon) | `DATABASE_URL` |
-| Ảnh sản phẩm, ảnh banner | Cloudinary; **chưa có Cloudinary thì nằm luôn trong kho Neon** | `CLOUDINARY_URL` (không bắt buộc) |
-| Ảnh, video hậu trường thi công | Cloudinary (video nặng nên bắt buộc) | `CLOUDINARY_URL` |
+| Chữ nghĩa: sản phẩm, công trình, cài đặt, chú thích | Kho dữ liệu Postgres (Neon) | `DATABASE_URL` |
+| File: ảnh sản phẩm, ảnh banner, ảnh + **video** hậu trường | Kho file Neon (Object Storage), 5GB miễn phí | `NEON_S3_*` (4 biến) |
 
-Ảnh tải lên khi chưa có Cloudinary được cất trong bảng `anh` của kho Neon và phục vụ qua
-đường dẫn `/api/anh/<tên ảnh>` — deploy lại vẫn còn.
+### Vì sao tách chữ nghĩa và file
+
+File **không đi qua server mình**, nhờ vậy web không nặng và không chậm:
+
+- **Lúc đăng:** server chỉ ký một "giấy phép" 15 phút, trình duyệt tải thẳng file lên kho.
+  Video 50MB cũng không làm nghẽn server Render (chỉ có 512MB RAM).
+- **Lúc khách xem:** ảnh/video tải thẳng từ kho về máy khách, server không phải gánh.
+- Ảnh còn được **nén sẵn trên máy** trước khi tải lên (4MB → ~250KB).
+
+### Lấy 4 biến `NEON_S3_*`
+
+1. Neon → **Object storage** → **New bucket** → tên `cameratd`, mức truy cập **public_read**
+2. Tạo credential có quyền `storage:read` + `storage:write` (console, hoặc `neon credentials create`).
+   Khóa bí mật **chỉ hiện một lần**, copy ngay.
+3. Render → **Settings → Environment**, thêm 4 dòng:
+
+| Key | Value |
+|---|---|
+| `NEON_S3_ENDPOINT` | `https://br-....storage.c-2.us-east-2.aws.neon.tech` |
+| `NEON_S3_BUCKET` | `cameratd` |
+| `NEON_S3_KEY` | `nak_live_...` |
+| `NEON_S3_SECRET` | `nsk_live_...` |
+
+Server tự bật CORS cho bucket lúc khởi động, log ghi `[KHO FILE] Da bat kho file Neon`.
+
+**Chưa đặt 4 biến này thì web vẫn chạy**, chỉ là lùi về cách cũ: ảnh cất trong bảng `anh` của
+kho dữ liệu (phục vụ qua `/api/anh/<tên>`), còn **video nằm trên đĩa máy chủ và mất khi deploy**.
 
 **Chưa đặt 2 biến này thì web vẫn chạy**, nhưng dữ liệu chỉ nằm trong máy chủ và sẽ mất khi
 deploy lại. Trong log sẽ có dòng `[CANH BAO] Chua dat DATABASE_URL`.

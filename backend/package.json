@@ -8,6 +8,8 @@
     "dev": "node --watch index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1136.0",
+    "@aws-sdk/s3-request-presigner": "^3.1136.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, RotateCcw } from 'lucide-react';
 import { api } from '../utils/api';
-import { nenAnh, coFile, coDataUrl } from '../utils/anh';
+import { nenAnhFile, coFile } from '../utils/anh';
 
 // phan = 'ticker' | 'banner': mỗi mục trong menu quản trị chỉ hiện đúng phần của nó.
 // Lưu vẫn gửi cả 2 giá trị để không làm mất phần kia.
@@ -42,12 +42,12 @@ export default function AdminSettings({ onBao, phan }) {
     }
     try {
       // Nén ngay trên máy trước khi gửi lên
-      const goi = await nenAnh(file);
-      if (coDataUrl(goi) > 6 * 1024 * 1024) {
+      const goi = await nenAnhFile(file);
+      if (goi.size > 6 * 1024 * 1024) {
         onBao('Ảnh nén rồi vẫn quá nặng, thử ảnh khác.', 'error');
         return;
       }
-      const { url } = await api.uploadImage(goi, 'banner');
+      const { url } = await api.taiAnhLen(goi, 'banner');
       await luu({ ticker, banner: url });
     } catch (err) {
       onBao(err.message, 'error');

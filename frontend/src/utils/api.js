@@ -65,6 +65,28 @@ export const formatPrice = (amount) => {
   }).format(amount);
 };
 
+// Gui file bang XHR (fetch khong bao duoc da tai len bao nhieu %)
+const guiFile = (cach, url, than, dauMuc, onTienDo = () => {}) => new Promise((xong, hong) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open(cach, url);
+  Object.entries(dauMuc || {}).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+  xhr.upload.onprogress = (e) => e.lengthComputable && onTienDo(Math.round((e.loaded / e.total) * 100));
+  xhr.onload = () => {
+    let data = {};
+    try { data = JSON.parse(xhr.responseText); } catch { /* khong phai JSON, vd kho Neon tra rong */ }
+    if (xhr.status < 300) xong(data);
+    else hong(new Error(data.error?.message || data.error || `Tải lên thất bại (${xhr.status})`));
+  };
+  xhr.onerror = () => hong(new Error('Mất kết nối khi đang tải lên'));
+  xhr.send(than);
+});
+
+// Xin giay phep tai thang len kho file Neon. Chua bat kho thi tra { cach: 'server' }
+const xinPhep = (file, thuMuc, ten) => apiAdmin('/tai-len/chu-ky', {
+  method: 'POST',
+  body: JSON.stringify({ ten: ten || file.name, kieu: file.type, thuMuc })
+});
+
 export const api = {
   // Products
   async getProducts(params = {}) {
@@ -111,9 +133,22 @@ export const api = {
 
   saveSettings: (data) => apiAdmin('/settings', { method: 'PUT', body: JSON.stringify(data) }),
 
-  // Anh: gui base64, server ghi ra file va tra ve duong dan
-  uploadImage: (dataUrl, name) =>
-    apiAdmin('/upload', { method: 'POST', body: JSON.stringify({ data: dataUrl, name }) }),
+  // Anh san pham / banner. Co kho file Neon thi trinh duyet tai thang len kho,
+  // khong thi gui base64 qua server nhu cu (server cat vao kho du lieu).
+  async taiAnhLen(file, ten, onTienDo) {
+    const phep = await xinPhep(file, 'san-pham', ten);
+    if (phep.cach === 's3') {
+      await guiFile('PUT', phep.uploadUrl, file, { 'Content-Type': file.type }, onTienDo);
+      return { url: phep.url };
+    }
+    const dataUrl = await new Promise((xong, hong) => {
+      const doc = new FileReader();
+      doc.onload = () => xong(doc.result);
+      doc.onerror = () => hong(new Error('Không đọc được ảnh'));
+      doc.readAsDataURL(file);
+    });
+    return apiAdmin('/upload', { method: 'POST', body: JSON.stringify({ data: dataUrl, name: ten }) });
+  },
 
   // Nhat ky thi cong
   createProject: (data) => apiAdmin('/projects', { method: 'POST', body: JSON.stringify(data) }),
@@ -143,36 +178,32 @@ export const api = {
   //  - khong co  -> gui nguyen file len server minh (che do luu tren may)
   // Dung XHR thay vi fetch vi fetch khong bao duoc da tai len bao nhieu %.
   async taiLenGiaiTri(file, bai, onTienDo) {
+    // 1) Co kho file Neon: tai thang len kho roi bao lai server de ghi thanh bai.
+    //    Video nang khong di qua server minh nen khong bi nghen.
+    const phep = await xinPhep(file, 'giai-tri');
+    if (phep.cach === 's3') {
+      await guiFile('PUT', phep.uploadUrl, file, { 'Content-Type': file.type }, onTienDo);
+      return apiAdmin('/giai-tri/xong', { method: 'POST', body: JSON.stringify({ url: phep.url, ...bai }) });
+    }
+
+    // 2) Chua co kho file: Cloudinary (neu co) hoac gui thang qua server minh
     const { uploadUrl, ...thamSo } = await apiAdmin('/giai-tri/chu-ky', {
       method: 'POST',
       body: JSON.stringify(bai)
     });
 
-    return new Promise((xong, hong) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', uploadUrl);
-      xhr.upload.onprogress = (e) => e.lengthComputable && onTienDo(Math.round((e.loaded / e.total) * 100));
-      xhr.onload = () => {
-        let data = {};
-        try { data = JSON.parse(xhr.responseText); } catch { /* khong phai JSON */ }
-        if (xhr.status < 300) xong(data);
-        else hong(new Error(data.error?.message || data.error || 'Tải lên thất bại'));
-      };
-      xhr.onerror = () => hong(new Error('Mất kết nối khi đang tải lên'));
-
-      if (thamSo.signature) {
-        const form = new FormData();
-        Object.entries(thamSo).forEach(([k, v]) => form.append(k, v));
-        form.append('file', file);
-        xhr.send(form);
-      } else {
-        xhr.setRequestHeader('Authorization', `Bearer ${adminToken.get() || ''}`);
-        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-        xhr.setRequestHeader('X-Ten-File', encodeURIComponent(file.name));
-        xhr.setRequestHeader('X-Bai', encodeURIComponent(JSON.stringify(bai)));
-        xhr.send(file);
-      }
-    });
+    if (thamSo.signature) {
+      const form = new FormData();
+      Object.entries(thamSo).forEach(([k, v]) => form.append(k, v));
+      form.append('file', file);
+      return guiFile('POST', uploadUrl, form, null, onTienDo);
+    }
+    return guiFile('POST', uploadUrl, file, {
+      Authorization: `Bearer ${adminToken.get() || ''}`,
+      'Content-Type': file.type || 'application/octet-stream',
+      'X-Ten-File': encodeURIComponent(file.name),
+      'X-Bai': encodeURIComponent(JSON.stringify(bai))
+    }, onTienDo);
   },
 
   async getProduct(id) {

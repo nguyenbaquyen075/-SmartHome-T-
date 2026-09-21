@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Wand2, Link } from 'lucide-react';
 import { api } from '../utils/api';
-import { nenAnh, coFile, coDataUrl } from '../utils/anh';
+import { nenAnhFile, coFile } from '../utils/anh';
 import {
   DANH_MUC, DON_VI, MAU_THONG_SO, MAU_NOI_BAT, MAU_HUONG_DAN, BAO_HANH_MAC_DINH,
   BIEU_TUONG, BieuTuong, DaiNoiBat, doiNhan
@@ -74,14 +74,14 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       setDangTaiAnh(`${i + 1}/${files.length}`);
       try {
         // Nén ngay trên máy: ảnh điện thoại vài MB còn vài trăm KB
-        const goi = await nenAnh(file);
-        if (coDataUrl(goi) > TOI_DA_ANH) {
+        const goi = await nenAnhFile(file);
+        if (goi.size > TOI_DA_ANH) {
           onBao(`"${file.name}" nén rồi vẫn quá nặng, thử ảnh khác.`, 'error');
           continue;
         }
-        const { url } = await api.uploadImage(goi, f.name || file.name.replace(/\.[^.]+$/, ''));
+        const { url } = await api.taiAnhLen(goi, f.name || file.name.replace(/\.[^.]+$/, ''));
         setF((cu) => ({ ...cu, images: [...cu.images, url] }));
-        if (file.size > coDataUrl(goi) * 1.3) onBao(`Đã nén "${file.name}": ${coFile(file.size)} → ${coFile(coDataUrl(goi))}`);
+        if (file.size > goi.size * 1.3) onBao(`Đã nén "${file.name}": ${coFile(file.size)} → ${coFile(goi.size)}`);
       } catch (err) {
         onBao(err.message, 'error');
       }

@@ -3,6 +3,23 @@ import { Upload, Trash2, Pencil, Pin, PinOff, X, Play, Camera, HardDrive, Cloud 
 import { api, anhNho, ngayVN } from '../utils/api';
 import { nenAnhFile } from '../utils/anh';
 
+// Nhãn cho biết file đang được cất ở đâu, để anh nhìn là biết có an toàn không
+const KHO = {
+  'kho-neon': { chu: 'Lưu trên kho Neon', an: true, nhac: 'Ảnh và video nằm trên kho file Neon, deploy lại không mất' },
+  cloudinary: { chu: 'Lưu trên Cloudinary', an: true, nhac: 'File nằm trên Cloudinary, deploy lại không mất' },
+  'kho-du-lieu': { chu: 'Ảnh an toàn, video chưa', an: false, nhac: 'Ảnh cất trong kho dữ liệu nên còn; video nằm trên đĩa máy chủ, deploy lại sẽ mất' },
+  may: { chu: 'Lưu trên máy (chạy thử)', an: false, nhac: 'Chưa đặt kho ngoài: file nằm trên máy này, deploy lên Render sẽ mất' }
+};
+
+function NhanKho({ cheDo }) {
+  const k = KHO[cheDo] || KHO.may;
+  return (
+    <span className={`gtq-luu ${k.an ? 'cloudinary' : 'may'}`} title={k.nhac}>
+      {k.an ? <Cloud size={13} /> : <HardDrive size={13} />} {k.chu}
+    </span>
+  );
+}
+
 // Giới hạn của gói Cloudinary miễn phí (lưu trên máy cũng dùng luôn cho đơn giản)
 const TOI_DA = { image: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
 const homNay = () => new Date().toLocaleDateString('sv-SE');   // "2026-09-15" theo giờ máy
@@ -23,7 +40,7 @@ const BieuTuongLoai = ({ loai }) => (
 
 export default function AdminGiaiTri({ onBao }) {
   const [ds, setDs] = useState([]);
-  const [cheDo, setCheDo] = useState(null);       // 'cloudinary' | 'may'
+  const [cheDo, setCheDo] = useState(null);      // 'kho-neon' | 'cloudinary' | 'kho-du-lieu' | 'may'
   const [loc, setLoc] = useState('tat-ca');       // 'tat-ca' | 'image' | 'video'
   const [cho, setCho] = useState([]);             // file đã chọn, đang chờ đăng
   const [dangDang, setDangDang] = useState(false);
@@ -129,16 +146,7 @@ export default function AdminGiaiTri({ onBao }) {
           <h1>Hậu trường thi công</h1>
           <p>Ảnh, video hậu trường thi công. Đăng lên là khách xem được ngay ở trang chủ, bài ghim luôn nằm đầu.</p>
         </div>
-        {cheDo && (
-          <span
-            className={`gtq-luu ${cheDo}`}
-            title={cheDo === 'may' ? 'Chưa cấu hình CLOUDINARY_URL: file nằm trên máy này, deploy lên Render sẽ mất' : ''}
-          >
-            {cheDo === 'cloudinary'
-              ? <><Cloud size={13} /> Lưu trên Cloudinary</>
-              : <><HardDrive size={13} /> Lưu trên máy (chạy thử)</>}
-          </span>
-        )}
+        {cheDo && <NhanKho cheDo={cheDo} />}
       </div>
 
       {/* Vùng kéo thả */}

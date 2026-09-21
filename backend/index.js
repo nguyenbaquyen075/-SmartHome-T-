@@ -4,6 +4,7 @@ const compression = require('compression');
 const fs = require('fs');
 const path = require('path');
 const kho = require('./kho');
+const khoFile = require('./khoFile');
 
 const app = express();
 // Render dung proxy o truoc: bat cai nay moi doc duoc dia chi that cua khach
@@ -220,6 +221,33 @@ const taiAnhLenCloudinary = async (buf, tenFile) => {
   if (!r.ok) throw new Error(kq.error?.message || `Cloudinary loi ${r.status}`);
   return kq.secure_url;
 };
+
+// Xin "giay phep" de trinh duyet tu tai file len kho Neon (anh san pham, banner, hau truong).
+// File khong di qua server minh -> video nang van dang duoc, server khong nghen.
+// Chua bat kho file thi tra cach: 'server' de trinh duyet quay ve loi cu.
+const DUOI_THEO_KIEU = {
+  'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif',
+  'video/mp4': '.mp4', 'video/quicktime': '.mov', 'video/webm': '.webm'
+};
+
+app.post('/api/tai-len/chu-ky', canQuyen, async (req, res) => {
+  if (!khoFile.dangBat()) return res.json({ cach: 'server' });
+
+  const kieu = String(req.body?.kieu || '');
+  const duoi = DUOI_THEO_KIEU[kieu];
+  if (!duoi) return res.status(400).json({ error: 'Chỉ nhận ảnh JPG, PNG, WEBP, GIF hoặc video MP4, MOV, WEBM' });
+
+  const thuMuc = req.body?.thuMuc === THU_MUC_GIAI_TRI ? THU_MUC_GIAI_TRI : 'san-pham';
+  const goc = String(req.body?.ten || 'file').replace(/\.\w+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
+  const ten = `${thuMuc}/${goc || 'file'}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}${duoi}`;
+
+  try {
+    res.json({ cach: 's3', ten, uploadUrl: await khoFile.kyTaiLen(ten, kieu), url: khoFile.diaChi(ten) });
+  } catch (err) {
+    console.error('Loi ky tai len:', err.message);
+    res.status(502).json({ error: 'Không xin được phép tải lên, thử lại sau' });
+  }
+});
 
 // POST /api/upload - nhan anh dang base64 roi ghi ra file.
 // Dung base64 thay vi multipart de khoi them thu vien multer.
@@ -599,7 +627,8 @@ app.post('/api/giai-tri/chu-ky', canQuyen, (req, res) => {
 });
 
 // Cho trang quan tri biet dang luu o dau
-app.get('/api/giai-tri/che-do', canQuyen, (req, res) => res.json({ cheDo: cld ? 'cloudinary' : 'may' }));
+app.get('/api/giai-tri/che-do', canQuyen, (req, res) =>
+  res.json({ cheDo: khoFile.dangBat() ? 'kho-neon' : cld ? 'cloudinary' : kho.dangDungDB() ? 'kho-du-lieu' : 'may' }));
 
 // Luu tren may: nhan nguyen file (khong doi base64) nen video 100MB van qua duoc.
 // Thong tin bai gui kem trong header X-Bai de khoi phai them multer doc multipart.
@@ -634,6 +663,21 @@ app.post('/api/giai-tri/tai-len', canQuyen, express.raw({ type: () => true, limi
   }
 
   const moi = { id: `${THU_MUC_GIAI_TRI}/${tenFile}`, loai, url, ...chuanHoaBai(bai) };
+  if (!(await kho.ghi(KHO_GIAI_TRI, [...kho.doc(KHO_GIAI_TRI), moi]))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+});
+
+// Trinh duyet tai file len kho Neon xong thi bao lai day de ghi thanh bai
+app.post('/api/giai-tri/xong', canQuyen, async (req, res) => {
+  const ten = khoFile.tenTuDiaChi(req.body?.url);   // chi nhan file nam trong kho cua minh
+  if (!ten || !ten.startsWith(`${THU_MUC_GIAI_TRI}/`)) {
+    return res.status(400).json({ error: 'Đường dẫn file không hợp lệ' });
+  }
+  const duoi = path.extname(ten).toLowerCase();
+  const loai = Object.keys(DUOI_HOP_LE).find((k) => DUOI_HOP_LE[k].includes(duoi));
+  if (!loai) return res.status(400).json({ error: 'Chỉ nhận ảnh hoặc video' });
+
+  const moi = { id: ten, loai, url: req.body.url, ...chuanHoaBai(req.body) };
   if (!(await kho.ghi(KHO_GIAI_TRI, [...kho.doc(KHO_GIAI_TRI), moi]))) return res.status(500).json(LOI_LUU);
   res.status(201).json(moi);
 });
@@ -677,7 +721,9 @@ app.delete('/api/giai-tri', canQuyen, async (req, res) => {
     const bai = ds.find((b) => b.id === id);
     if (!bai) return res.status(404).json({ error: 'Không tìm thấy bài' });
     if (!(await kho.ghi(KHO_GIAI_TRI, ds.filter((b) => b.id !== id)))) return res.status(500).json(LOI_LUU);
-    if (bai.url.startsWith('/api/anh/')) await kho.xoaAnh(path.basename(bai.url));
+    const tenKho = khoFile.tenTuDiaChi(bai.url);
+    if (tenKho) await khoFile.xoa(tenKho);
+    else if (bai.url.startsWith('/api/anh/')) await kho.xoaAnh(path.basename(bai.url));
     else if (bai.url.startsWith(URL_FILE_MAY)) {
       fs.rmSync(path.join(GIAI_TRI_THU_MUC, path.basename(bai.url)), { force: true });
     }
@@ -720,6 +766,7 @@ kho.moKho({
   [KHO_CAI_DAT]: CAI_DAT_MAC_DINH,
   [KHO_GIAI_TRI]: []
 }).then(() => {
+  if (khoFile.dangBat()) khoFile.datPhepTrinhDuyet();
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`CameraTD Backend Server is running on http://localhost:${PORT}`);
   });
