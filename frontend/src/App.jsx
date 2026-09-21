@@ -134,6 +134,10 @@ export default function App() {
     }
   };
 
+  // Chua nhap san pham nao (khong phai do loc hay tim kiem): an bot cac muc trong
+  const chuaCoHang = !loading && products.length === 0
+    && !searchTerm.trim() && selectedCategory === 'Tất cả';
+
   const scrollToProducts = () => {
     if (productsRef.current) {
       productsRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -217,18 +221,18 @@ export default function App() {
           {/* Main Catalog Section */}
           <main ref={productsRef} className="container" style={{ flex: 1, paddingTop: '10px' }}>
             {/* Category Section (Matching user design: DANH MỤC SẢN PHẨM + 4 cards) */}
-            <CategoryFilter
+            {!chuaCoHang && <CategoryFilter
               selectedCategory={selectedCategory}
               setSelectedCategory={(cat) => {
                 setSelectedCategory(cat);
                 scrollToProducts();
               }}
               onViewAll={openProductsPage}
-            />
+            />}
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
             <div style={{
-              display: homeGroups.length > 0 ? 'none' : 'flex',
+              display: homeGroups.length > 0 || chuaCoHang ? 'none' : 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: '14px'
@@ -266,6 +270,9 @@ export default function App() {
               <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
                 <p>Đang tải dữ liệu thiết bị...</p>
               </div>
+            ) : chuaCoHang ? (
+              /* Cửa hàng chưa nhập sản phẩm: một dòng nhẹ nhàng, không bày khung trống */
+              <p className="trang-trong">Đang cập nhật sản phẩm…</p>
             ) : products.length === 0 ? (
               <div style={{
                 textAlign: 'center',

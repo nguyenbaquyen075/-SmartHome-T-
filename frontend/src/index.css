@@ -1727,3 +1727,11 @@ body {
     font-size: 0.68rem;
   }
 }
+
+/* Cửa hàng chưa nhập sản phẩm: chỉ một dòng chữ nhạt, không bày khung trống */
+.trang-trong {
+  text-align: center;
+  padding: 26px 16px 34px;
+  color: #94a3b8;
+  font-size: 0.92rem;
+}
