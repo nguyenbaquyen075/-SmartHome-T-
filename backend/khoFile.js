@@ -16,7 +16,20 @@ const CAU_HINH = {
 };
 const HAN_KY = 15 * 60;   // giay phep song 15 phut, du de tai video nang
 
-const dangBat = () => Boolean(CAU_HINH.endpoint && CAU_HINH.bucket && CAU_HINH.khoa && CAU_HINH.biMat);
+// Dia chi dan nham (thua dau tieng Viet, thieu https, co khoang trang) thi tai len se hong
+// ma khong ai biet vi sao. Kiem luon luc khoi dong, sai thi tat kho va bao ro rang.
+// Kiem thang chuoi tho: dau tieng Viet se bi URL() doi len dang xn-- nen kiem qua URL khong bat duoc
+const diaChiHopLe = () => /^https:\/\/[a-z0-9.-]+$/i.test(CAU_HINH.endpoint);
+
+const DU_CAU_HINH = Boolean(CAU_HINH.endpoint && CAU_HINH.bucket && CAU_HINH.khoa && CAU_HINH.biMat);
+const DIA_CHI_SAI = DU_CAU_HINH && !diaChiHopLe();
+if (DIA_CHI_SAI) {
+  console.error(`[KHO FILE] NEON_S3_ENDPOINT sai: "${CAU_HINH.endpoint}"`);
+  console.error('[KHO FILE] Phai la dang https://br-....aws.neon.tech, khong dau tieng Viet, khong khoang trang.');
+  console.error('[KHO FILE] Tam thoi tat kho file, anh van cat trong kho du lieu nhu truoc.');
+}
+
+const dangBat = () => DU_CAU_HINH && !DIA_CHI_SAI;
 
 // Bucket de public_read -> dia chi nay ai cung mo duoc, khong can ky
 const diaChi = (ten) => `${CAU_HINH.endpoint}/${CAU_HINH.bucket}/${ten}`;
