@@ -1736,3 +1736,22 @@ body {
   color: #94a3b8;
   font-size: 0.92rem;
 }
+
+/* Số sản phẩm trên ô danh mục: chấm đỏ nhỏ ở góc trên bên phải */
+.cat-card-so {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #e11d48;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(225, 29, 72, 0.35);
+  pointer-events: none;
+}

@@ -4,7 +4,8 @@ import { LayoutGrid, ArrowRight, Zap, Droplets, Camera } from 'lucide-react';
 export default function CategoryFilter({
   selectedCategory,
   setSelectedCategory,
-  onViewAll
+  onViewAll,
+  dem = {}
 }) {
   const [hoveredCat, setHoveredCat] = useState(null);
 
@@ -122,6 +123,9 @@ export default function CategoryFilter({
             (cat.name === 'Tất cả' && selectedCategory === 'Tất cả');
           const isHovered = hoveredCat === cat.name;
           const IconComponent = cat.icon;
+          // Số sản phẩm: quá 99 thì rút gọn cho khỏi vỡ ô
+          const so = dem[cat.name] || 0;
+          const soHien = so > 99 ? '99+' : so;
 
           return (
             <div
@@ -159,6 +163,9 @@ export default function CategoryFilter({
                 userSelect: 'none'
               }}
             >
+              {/* Số sản phẩm - chấm đỏ góc trên bên phải */}
+              {so > 0 && <span className="cat-card-so">{soHien}</span>}
+
               {/* Product illustration image at top */}
               <div style={{
                 height: '66px',

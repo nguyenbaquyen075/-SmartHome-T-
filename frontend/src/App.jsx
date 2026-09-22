@@ -53,6 +53,18 @@ export default function App() {
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
   const [homeGroups, setHomeGroups] = useState([]);
 
+  // Đếm số sản phẩm mỗi danh mục cho con số đỏ trên ô danh mục
+  const [demDanhMuc, setDemDanhMuc] = useState({});
+  useEffect(() => {
+    api.getProducts()
+      .then((ds) => {
+        const d = { 'Tất cả': ds.length };
+        ds.forEach((p) => { d[p.category] = (d[p.category] || 0) + 1; });
+        setDemDanhMuc(d);
+      })
+      .catch(() => {});
+  }, []);
+
 
   // Toast Notification
   const [toast, setToast] = useState(null);
@@ -227,6 +239,7 @@ export default function App() {
                 scrollToProducts();
               }}
               onViewAll={openProductsPage}
+              dem={demDanhMuc}
             />
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
