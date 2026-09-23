@@ -1,18 +1,41 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Wand2, Link } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Link } from 'lucide-react';
 import { api } from '../utils/api';
 import { nenAnhFile, coFile } from '../utils/anh';
-import {
-  DANH_MUC, DON_VI, MAU_THONG_SO, MAU_NOI_BAT, MAU_HUONG_DAN, BAO_HANH_MAC_DINH,
-  BIEU_TUONG, BieuTuong, DaiNoiBat, doiNhan
-} from '../utils/sanPham';
+import { DANH_MUC, DON_VI, doiNhan } from '../utils/sanPham';
 import { Truong, Khoi, ThanhLuu, DanhSachDong } from './AdminForm';
 import { useBanNhap, gioPhut } from '../utils/banNhap';
 
 const TOI_DA_ANH = 6 * 1024 * 1024;    // giới hạn của /api/upload (tính sau khi nén)
 const TOI_DA_CHON = 40 * 1024 * 1024;  // ảnh to hơn mức này thì máy nén cũng ì
 
+
 // Đổi dữ liệu sản phẩm sang dạng để sửa trên form
+const thongTinTuDuLieuCu = (sp) => {
+  if (sp?.thongTin?.length) {
+    return sp.thongTin.map((m) => {
+      const ds = Array.isArray(m.noiDung) ? [...m.noiDung] : [];
+      return {
+        tieuDe: m.tieuDe || '',
+        noiDung: ds,
+        vanBan: m.vanBan || ds.join('\n')
+      };
+    });
+  }
+  const muc = [];
+  if (sp?.description?.trim()) muc.push({ tieuDe: 'Giới thiệu', noiDung: [sp.description.trim()], vanBan: sp.description.trim() });
+  if (sp?.highlights?.length) muc.push({ tieuDe: 'Đặc điểm nổi bật', noiDung: [...sp.highlights], vanBan: sp.highlights.join('\n') });
+  const thongSo = Object.entries(sp?.specs || {}).map(([nhan, giaTri]) => `${doiNhan(nhan)}: ${giaTri}`);
+  if (thongSo.length) muc.push({ tieuDe: 'Thông số kỹ thuật', noiDung: thongSo, vanBan: thongSo.join('\n') });
+  if (sp?.huongDan?.length) muc.push({ tieuDe: 'Hướng dẫn sử dụng', noiDung: [...sp.huongDan], vanBan: sp.huongDan.join('\n') });
+  const baoHanh = [
+    sp?.baoHanh?.thoiGian && `Thời gian bảo hành: ${sp.baoHanh.thoiGian}`,
+    sp?.baoHanh?.doiTra && `Đổi trả: ${sp.baoHanh.doiTra}`
+  ].filter(Boolean);
+  if (baoHanh.length) muc.push({ tieuDe: 'Bảo hành & đổi trả', noiDung: baoHanh, vanBan: baoHanh.join('\n') });
+  return muc.length ? muc : [{ tieuDe: '', noiDung: [], vanBan: '' }];
+};
+
 const tuSanPham = (sp) => ({
   name: sp?.name || '',
   category: sp?.category || '',
@@ -21,18 +44,8 @@ const tuSanPham = (sp) => ({
   unit: sp?.unit || 'chiếc',
   featured: sp ? Boolean(sp.featured) : true,
   images: sp?.images?.length ? [...sp.images] : sp?.image ? [sp.image] : [],
-  noiBat: (sp?.noiBat || []).map((o) => ({ ghiChu: '', ...o })),
-  description: sp?.description || '',
-  highlights: [...(sp?.highlights || [])],
-  specs: Object.entries(sp?.specs || {}).map(([khoa, giaTri]) => ({ nhan: doiNhan(khoa), giaTri })),
-  huongDan: [...(sp?.huongDan || [])],
-  thoiGianBaoHanh: sp?.baoHanh?.thoiGian || BAO_HANH_MAC_DINH.thoiGian,
-  doiTra: sp?.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
+  thongTin: thongTinTuDuLieuCu(sp)
 });
-
-
-const khungThongSo = (dm) => (MAU_THONG_SO[dm] || []).map(([nhan]) => ({ nhan, giaTri: '' }));
-const khungNoiBat = (dm) => (MAU_NOI_BAT[dm] || []).map(([bieuTuong, nhan]) => ({ bieuTuong, nhan, giaTri: '', ghiChu: '' }));
 
 export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
   const { f, setF, daKhoiPhuc, luc, boBanNhap, xongBanNhap, huyBanNhap } =
@@ -45,28 +58,23 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
 
   const doi = (ten, giaTri) => setF((cu) => ({ ...cu, [ten]: giaTri }));
   const cacHang = [...new Set(ds.map((p) => p.brand).filter(Boolean))];
-  const mauThongSo = MAU_THONG_SO[f.category] || [];
-  const viDuThongSo = Object.fromEntries(Object.values(MAU_THONG_SO).flat());
-  // Gợi ý tiêu đề cho 4 ô nổi bật: gom hết mẫu của mọi danh mục, anh vẫn gõ chữ khác được
-  const goiYNhanNoiBat = [...new Set(Object.values(MAU_NOI_BAT).flat().map((m) => m[1]))];
+  // Bản nháp tạo trước khi có trường này vẫn mở được bình thường.
+  const thongTin = f.thongTin || thongTinTuDuLieuCu(sp);
 
-  // Chọn danh mục: tự điền khung thông số, 4 ô nổi bật, hướng dẫn của loại đó.
-  // Phần nào anh đã nhập giá trị thì giữ nguyên, không ghi đè.
-  const chonDanhMuc = (category) => setF((cu) => {
-    const huongDanLaMauCu = JSON.stringify(cu.huongDan) === JSON.stringify(MAU_HUONG_DAN[cu.category] || []);
-    return {
-      ...cu,
-      category,
-      specs: cu.specs.some((r) => r.giaTri.trim()) ? cu.specs : khungThongSo(category),
-      noiBat: cu.noiBat.some((o) => o.giaTri.trim()) ? cu.noiBat : khungNoiBat(category),
-      huongDan: cu.huongDan.length && !huongDanLaMauCu ? cu.huongDan : [...(MAU_HUONG_DAN[category] || [])]
-    };
-  });
+  const doiMuc = (index, khoa, giaTri) => {
+    doi('thongTin', thongTin.map((m, j) => (j === index ? { ...m, [khoa]: giaTri } : m)));
+  };
 
-  const themDongThieu = () => doi('specs', [
-    ...f.specs,
-    ...khungThongSo(f.category).filter((m) => !f.specs.some((r) => r.nhan === m.nhan))
-  ]);
+
+  const xoaMuc = (index) => {
+    doi('thongTin', thongTin.filter((_, j) => j !== index));
+  };
+
+  const themMuc = (tieuDe = '') => {
+    doi('thongTin', [...thongTin, { tieuDe, noiDung: [], vanBan: '' }]);
+  };
+
+
 
   // ---- Ảnh ----
   const taiAnh = async (e) => {
@@ -129,14 +137,20 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       unit: f.unit,
       featured: f.featured,
       images: f.images,
-      noiBat: f.noiBat.filter((o) => o.nhan.trim() && o.giaTri.trim()),
-      description: f.description,
-      highlights: sach(f.highlights),
-      specs: Object.fromEntries(
-        f.specs.filter((r) => r.nhan.trim() && r.giaTri.trim()).map((r) => [r.nhan.trim(), r.giaTri.trim()])
-      ),
-      huongDan: sach(f.huongDan),
-      baoHanh: { thoiGian: f.thoiGianBaoHanh, doiTra: f.doiTra }
+      noiBat: [],
+      description: '',
+      highlights: [],
+      thongTin: thongTin
+        .map((m) => {
+          const tieuDe = m.tieuDe.trim();
+          const raw = typeof m.vanBan === 'string' ? m.vanBan : (Array.isArray(m.noiDung) ? m.noiDung.join('\n') : '');
+          const dsDong = raw
+            .split(/\r?\n/)
+            .map((s) => s.replace(/^[-•*+]\s*/, '').trim())
+            .filter(Boolean);
+          return { tieuDe, noiDung: dsDong, vanBan: raw.trim() };
+        })
+        .filter((m) => m.tieuDe && m.noiDung.length)
     };
 
     setDangLuu(true);
@@ -152,8 +166,6 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       setDangLuu(false);
     }
   };
-
-  const noiBatDaNhap = f.noiBat.filter((o) => o.nhan.trim() && o.giaTri.trim());
 
   return (
     <form onSubmit={luu} noValidate>
@@ -191,8 +203,8 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             />
           </Truong>
 
-          <Truong nhan="Danh mục" batBuoc loi={loi.category && !f.category && 'Chọn danh mục'} goiY="Chọn là tự hiện khung thông số của loại này">
-            <select className="qt-input" value={f.category} onChange={(e) => chonDanhMuc(e.target.value)}>
+          <Truong nhan="Danh mục" batBuoc loi={loi.category && !f.category && 'Chọn danh mục'}>
+            <select className="qt-input" value={f.category} onChange={(e) => doi('category', e.target.value)}>
               <option value="">— Chọn danh mục —</option>
               {DANH_MUC.map((d) => <option key={d}>{d}</option>)}
             </select>
@@ -289,166 +301,63 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
         </div>
       </Khoi>
 
-      {/* 3. 4 ô nổi bật */}
-      <Khoi
-        so={3}
-        tieuDe="4 ô nổi bật"
-        moTa="Dải thông tin ngay dưới tên sản phẩm. Tiêu đề gõ tự do, bấm vào ô là hiện gợi ý"
-        nut={f.category && (
-          <button type="button" className="qt-nut-mau" onClick={() => doi('noiBat', khungNoiBat(f.category))}>
-            <Wand2 size={14} /> Dùng khung mẫu
-          </button>
-        )}
-      >
-        <datalist id="qt-nhan-nb">
-          {goiYNhanNoiBat.map((n) => <option key={n} value={n} />)}
-        </datalist>
-
-        {f.noiBat.map((o, i) => {
-          const viDu = (MAU_NOI_BAT[f.category] || []).find((m) => m[1] === o.nhan);
-          const doiO = (khoa, giaTri) => doi('noiBat', f.noiBat.map((x, j) => (j === i ? { ...x, [khoa]: giaTri } : x)));
-          return (
-            <div key={i} className="qt-nb">
-              <div className="qt-nb-icon">
-                <span className="qt-nb-xem"><BieuTuong loai={o.bieuTuong} /></span>
-                <select className="qt-input" value={o.bieuTuong} onChange={(e) => doiO('bieuTuong', e.target.value)} aria-label="Biểu tượng">
-                  {Object.entries(BIEU_TUONG).map(([k, b]) => <option key={k} value={k}>{b.ten}</option>)}
-                </select>
-              </div>
+      {/* 3. Thông tin sản phẩm với các mục tiêu đề lớn */}
+      <Khoi so={3} tieuDe="Thông tin sản phẩm">
+        {thongTin.map((muc, i) => (
+          <div key={i} className="qt-khung-con">
+            <div className="qt-khung-con-dau">
+              <span className="qt-khung-con-so">Mục {i + 1}</span>
               <input
                 className="qt-input"
-                list="qt-nhan-nb"
-                value={o.nhan}
-                onChange={(e) => doiO('nhan', e.target.value)}
-                placeholder="Tiêu đề, VD: Hồng ngoại"
-                aria-label="Tiêu đề ô nổi bật"
+                value={muc.tieuDe}
+                onChange={(e) => doiMuc(i, 'tieuDe', e.target.value)}
+                placeholder="Nhập tiêu đề lớn (VD: Thông số kỹ thuật, Đặc điểm nổi bật...)"
+                aria-label="Tiêu đề lớn"
               />
-              <input className="qt-input" value={o.giaTri} onChange={(e) => doiO('giaTri', e.target.value)} placeholder={`Giá trị, VD: ${viDu?.[2] || '30m'}`} aria-label="Giá trị" />
-              <input className="qt-input" value={o.ghiChu} onChange={(e) => doiO('ghiChu', e.target.value)} placeholder={viDu?.[3] ? `Ghi chú, VD: ${viDu[3]}` : 'Ghi chú (không bắt buộc)'} aria-label="Ghi chú" />
-              <button type="button" className="qt-xoa-o" onClick={() => doi('noiBat', f.noiBat.filter((_, j) => j !== i))} aria-label="Xóa ô">
-                <Trash2 size={15} />
+              <button
+                type="button"
+                className="qt-xoa-o"
+                onClick={() => xoaMuc(i)}
+                aria-label="Xóa mục lớn"
+                title="Xóa mục lớn này"
+              >
+                <Trash2 size={16} />
               </button>
             </div>
-          );
-        })}
 
-        {f.noiBat.length < 4 && (
-          <button type="button" className="qt-nut-them" onClick={() => doi('noiBat', [...f.noiBat, { bieuTuong: 'shield', nhan: '', giaTri: '', ghiChu: '' }])}>
-            <Plus size={15} /> Thêm ô
-          </button>
-        )}
-
-        {noiBatDaNhap.length > 0 && (
-          <div className="qt-xem-truoc">
-            <p>Xem trước trên trang chi tiết</p>
-            <DaiNoiBat ds={noiBatDaNhap} />
+            <div className="qt-khung-con-than">
+              <textarea
+                className="qt-input qt-textarea-noidung"
+                rows={5}
+                value={typeof muc.vanBan === 'string' ? muc.vanBan : (Array.isArray(muc.noiDung) ? muc.noiDung.join('\n') : '')}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const ds = val.split(/\r?\n/).map((s) => s.replace(/^[-•*+]\s*/, '').trim()).filter(Boolean);
+                  doi('thongTin', thongTin.map((m, j) => (j === i ? { ...m, vanBan: val, noiDung: ds } : m)));
+                }}
+                placeholder="Dán hoặc nhập nội dung tại đây..."
+              />
+              {(() => {
+                const raw = typeof muc.vanBan === 'string' ? muc.vanBan : (Array.isArray(muc.noiDung) ? muc.noiDung.join('\n') : '');
+                const soDong = raw.split(/\r?\n/).filter((s) => s.trim()).length;
+                return soDong > 0 ? (
+                  <div style={{ textAlign: 'right', marginTop: '4px' }}>
+                    <small style={{ color: '#64748b', fontSize: '0.78rem' }}>{soDong} dòng</small>
+                  </div>
+                ) : null;
+              })()}
+            </div>
           </div>
-        )}
-      </Khoi>
+        ))}
 
-      {/* 4. Giới thiệu */}
-      <Khoi so={4} tieuDe="Giới thiệu tổng quan" moTa="Đoạn văn mở đầu phần Giới thiệu ở trang chi tiết">
-        <textarea
-          className="qt-input"
-          rows={6}
-          value={f.description}
-          onChange={(e) => doi('description', e.target.value)}
-          placeholder="Sản phẩm dùng cho công trình nào, thiết kế, chất liệu, ưu điểm khi lắp đặt thực tế…"
-          maxLength={5000}
-        />
-        <small className="qt-dem">
-          {f.description.length} ký tự{f.description.length < 150 ? ' · nên viết từ 150 ký tự để khách đọc đủ ý' : ''}
-        </small>
-      </Khoi>
-
-      {/* 5. Đặc điểm nổi bật */}
-      <Khoi so={5} tieuDe="Đặc điểm nổi bật" moTa="Mỗi dòng một ý ngắn, nên có 3–5 dòng. Để trống thì lấy 4 thông số đầu tiên">
-        <DanhSachDong
-          ds={f.highlights}
-          onDoi={(v) => doi('highlights', v)}
-          placeholder="VD: Hồng ngoại 30m, quan sát rõ ban đêm"
-          nhanThem="Thêm đặc điểm"
-        />
-      </Khoi>
-
-      {/* 6. Thông số kỹ thuật */}
-      <Khoi
-        so={6}
-        tieuDe="Thông số kỹ thuật"
-        moTa={f.category
-          ? `Khung thông số của ${f.category}. Dòng nào để trống giá trị sẽ không hiện ra ngoài`
-          : 'Chọn danh mục ở phần 1 để hiện khung thông số'}
-        nut={mauThongSo.length > 0 && (
-          <button type="button" className="qt-nut-mau" onClick={themDongThieu}>
-            <Wand2 size={14} /> Thêm dòng còn thiếu theo mẫu
-          </button>
-        )}
-      >
-        <datalist id="qt-nhan-ts">
-          {Object.keys(viDuThongSo).map((n) => <option key={n} value={n} />)}
-        </datalist>
-
-        {f.specs.map((r, i) => {
-          const doiDong = (khoa, giaTri) => doi('specs', f.specs.map((x, j) => (j === i ? { ...x, [khoa]: giaTri } : x)));
-          return (
-            <div key={i} className="qt-ts">
-              <input
-                className="qt-input"
-                list="qt-nhan-ts"
-                value={r.nhan}
-                onChange={(e) => doiDong('nhan', e.target.value)}
-                placeholder="Tên thông số"
-                aria-label="Tên thông số"
-              />
-              <input
-                className="qt-input"
-                value={r.giaTri}
-                onChange={(e) => doiDong('giaTri', e.target.value)}
-                placeholder={viDuThongSo[r.nhan] ? `VD: ${viDuThongSo[r.nhan]}` : 'Giá trị'}
-                aria-label={`Giá trị ${r.nhan}`}
-              />
-              <button type="button" className="qt-xoa-o" onClick={() => doi('specs', f.specs.filter((_, j) => j !== i))} aria-label="Xóa dòng">
-                <Trash2 size={15} />
-              </button>
-            </div>
-          );
-        })}
-
-        <button type="button" className="qt-nut-them" onClick={() => doi('specs', [...f.specs, { nhan: '', giaTri: '' }])}>
-          <Plus size={15} /> Thêm dòng thông số
+        <button
+          type="button"
+          className="qt-nut-them"
+          style={{ width: '100%', padding: '12px', fontSize: '0.9rem', justifyContent: 'center' }}
+          onClick={() => themMuc()}
+        >
+          <Plus size={16} /> Thêm mục tiêu đề lớn mới
         </button>
-      </Khoi>
-
-      {/* 7. Hướng dẫn */}
-      <Khoi
-        so={7}
-        tieuDe="Hướng dẫn lắp đặt & sử dụng"
-        moTa="Các bước hiện theo thứ tự. Để trống thì trang chi tiết dùng hướng dẫn chung của danh mục"
-        nut={MAU_HUONG_DAN[f.category] && (
-          <button type="button" className="qt-nut-mau" onClick={() => doi('huongDan', [...MAU_HUONG_DAN[f.category]])}>
-            <Wand2 size={14} /> Dùng hướng dẫn mẫu
-          </button>
-        )}
-      >
-        <DanhSachDong
-          ds={f.huongDan}
-          onDoi={(v) => doi('huongDan', v)}
-          placeholder="Mô tả bước làm"
-          nhanThem="Thêm bước"
-          soThuTu
-        />
-      </Khoi>
-
-      {/* 8. Bảo hành */}
-      <Khoi so={8} tieuDe="Bảo hành & đổi trả" moTa="Hiện ở phần Chính sách bảo hành">
-        <div className="qt-hang">
-          <Truong nhan="Thời gian bảo hành" goiY='Trang chi tiết hiện "Bảo hành 24 tháng"'>
-            <input className="qt-input" value={f.thoiGianBaoHanh} onChange={(e) => doi('thoiGianBaoHanh', e.target.value)} placeholder="24 tháng" maxLength={60} />
-          </Truong>
-          <Truong nhan="Chính sách đổi trả">
-            <input className="qt-input" value={f.doiTra} onChange={(e) => doi('doiTra', e.target.value)} placeholder="1 đổi 1 trong 7 ngày" maxLength={120} />
-          </Truong>
-        </div>
       </Khoi>
 
       <ThanhLuu

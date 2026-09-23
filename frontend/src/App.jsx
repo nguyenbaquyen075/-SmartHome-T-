@@ -11,6 +11,7 @@ import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
 import { api } from './utils/api';
 import { MUC_DANH_MUC } from './utils/sanPham';
+import { gomAnhTheoDanhMuc } from './utils/anhChay';
 
 // Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
 // nho vay trang chu khong phai tai ~70KB code khong dung toi.
@@ -53,14 +54,16 @@ export default function App() {
   // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
   const [homeGroups, setHomeGroups] = useState([]);
 
-  // Đếm số sản phẩm mỗi danh mục cho con số đỏ trên ô danh mục
+  // Đếm số sản phẩm + gom ảnh đại diện mỗi danh mục (cho số đỏ và ảnh tự đảo trên ô danh mục)
   const [demDanhMuc, setDemDanhMuc] = useState({});
+  const [anhTheoDanhMuc, setAnhTheoDanhMuc] = useState({});
   useEffect(() => {
     api.getProducts()
       .then((ds) => {
         const d = { 'Tất cả': ds.length };
         ds.forEach((p) => { d[p.category] = (d[p.category] || 0) + 1; });
         setDemDanhMuc(d);
+        setAnhTheoDanhMuc(gomAnhTheoDanhMuc(ds));
       })
       .catch(() => {});
   }, []);
@@ -240,6 +243,7 @@ export default function App() {
               }}
               onViewAll={openProductsPage}
               dem={demDanhMuc}
+              anhTheoDanhMuc={anhTheoDanhMuc}
             />
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}

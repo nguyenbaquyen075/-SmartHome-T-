@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "id": "sp-1790043631143",
+    "name": "Aptomat Panasonic BBD",
+    "brand": "TD",
+    "category": "Thiết bị điện",
+    "subTitle": "",
+    "unit": "chiếc",
+    "featured": false,
+    "image": "/images/cat_style_new/prod_1.png",
+    "images": [
+      "/images/cat_style_new/prod_1.png"
+    ],
+    "noiBat": [],
+    "description": "",
+    "highlights": [],
+    "specs": {},
+    "huongDan": [],
+    "baoHanh": {
+      "thoiGian": "",
+      "doiTra": ""
+    },
+    "thongTin": [
+      {
+        "tieuDe": "thông số kĩ thuật",
+        "noiDung": [
+          "svdbrgbevccưvv"
+        ]
+      },
+      {
+        "tieuDe": "chính sách bảo hành",
+        "noiDung": [
+          "vfvncsdsjvnv"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sp-1790043631131",
+    "name": "Camera Imou Ranger 2",
+    "brand": "TD",
+    "category": "Thiết bị mạng",
+    "subTitle": "",
+    "unit": "chiếc",
+    "featured": false,
+    "image": "/images/cat_style_new/prod_1.png",
+    "images": [
+      "/images/cat_style_new/prod_1.png"
+    ],
+    "noiBat": [],
+    "description": "",
+    "highlights": [],
+    "specs": {},
+    "huongDan": [],
+    "baoHanh": {
+      "thoiGian": "",
+      "doiTra": ""
+    }
+  },
+  {
+    "id": "sp-1790043631113",
+    "name": "Camera Hikvision DS-2CD1327G0",
+    "brand": "TD",
+    "category": "Thiết bị mạng",
+    "subTitle": "",
+    "unit": "chiếc",
+    "featured": false,
+    "image": "/images/cat_style_new/prod_1.png",
+    "images": [
+      "/images/cat_style_new/prod_1.png"
+    ],
+    "noiBat": [],
+    "description": "",
+    "highlights": [],
+    "specs": {},
+    "huongDan": [],
+    "baoHanh": {
+      "thoiGian": "",
+      "doiTra": ""
+    }
+  }
+]

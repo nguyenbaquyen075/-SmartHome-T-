@@ -297,6 +297,100 @@
   cursor: pointer;
 }
 .qt-nut-them:hover { background: #eff6ff; border-style: solid; }
+.qt-khung-con {
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #f8fbff;
+  box-shadow: 0 1px 3px rgba(0, 102, 204, 0.04);
+}
+.qt-khung-con-dau {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.qt-khung-con-dau .qt-input {
+  flex: 1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 10px 14px;
+  background: #fff;
+  border-color: #bfdbfe;
+}
+.qt-khung-con-dau .qt-input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.12);
+}
+.qt-khung-con-so {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #0066cc;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.qt-khung-con-nhan {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+.qt-textarea-noidung {
+  min-height: 130px;
+  line-height: 1.6;
+  resize: vertical;
+  font-size: 0.9rem;
+  border-color: #cbd5e1;
+  background: #fff;
+  white-space: pre-wrap;
+}
+.qt-textarea-noidung:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.12);
+}
+.qt-goi-y-tieude {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+.qt-goi-y-tieude span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+.qt-goi-y-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  background: #fff;
+  color: #0066cc;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.qt-goi-y-chip:hover {
+  background: #0066cc;
+  border-color: #0066cc;
+  color: #fff;
+  transform: translateY(-1px);
+}
 .qt-nut-mau {
   display: inline-flex;
   align-items: center;

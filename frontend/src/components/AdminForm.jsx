@@ -54,6 +54,19 @@ export function DanhSachDong({ ds, onDoi, placeholder, nhanThem, soThuTu }) {
     onDoi(moi);
   };
 
+  const xuLyDan = (e, i) => {
+    const text = e.clipboardData?.getData('text');
+    if (text && text.includes('\n')) {
+      e.preventDefault();
+      const cacDong = text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+      if (cacDong.length > 0) {
+        const truoc = ds.slice(0, i);
+        const sau = ds.slice(i + 1);
+        onDoi([...truoc, ...cacDong, ...sau]);
+      }
+    }
+  };
+
   return (
     <>
       {ds.map((dong, i) => (
@@ -63,6 +76,7 @@ export function DanhSachDong({ ds, onDoi, placeholder, nhanThem, soThuTu }) {
             className="qt-input"
             value={dong}
             placeholder={placeholder}
+            onPaste={(e) => xuLyDan(e, i)}
             onChange={(e) => onDoi(ds.map((x, j) => (j === i ? e.target.value : x)))}
           />
           <div className="qt-dong-nut">

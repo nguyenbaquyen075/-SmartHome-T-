@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Package, HardHat, Clapperboard, Plus, Upload, AlertCircle } from 'lucide-react';
 import { api } from '../utils/api';
 import { DANH_MUC, thieuThongTin } from '../utils/sanPham';
+import { AnhChay, gomAnhTheoDanhMuc } from '../utils/anhChay';
 
 export default function AdminTongQuan({ onBao, diToi }) {
   const [duLieu, setDuLieu] = useState(null);
@@ -15,11 +16,13 @@ export default function AdminTongQuan({ onBao, diToi }) {
   if (!duLieu) return <p className="adm-trong">Đang tải…</p>;
 
   const { sanPham, congTrinh, giaiTri } = duLieu;
-  // Mỗi danh mục: số sản phẩm + ảnh của sản phẩm đầu tiên làm ảnh đại diện
-  const theoDanhMuc = DANH_MUC.map((dm) => {
-    const cungLoai = sanPham.filter((p) => p.category === dm);
-    return { dm, so: cungLoai.length, anh: cungLoai.find((p) => p.image)?.image };
-  });
+  // Ảnh đại diện mỗi danh mục (chỉ ảnh chính, không lấy ảnh phụ), tự đảo vài giây 1 lần
+  const anhTheoDanhMuc = gomAnhTheoDanhMuc(sanPham);
+  const theoDanhMuc = DANH_MUC.map((dm) => ({
+    dm,
+    so: sanPham.filter((p) => p.category === dm).length,
+    ds: anhTheoDanhMuc[dm] || []
+  }));
   const chuaDu = sanPham.filter((p) => thieuThongTin(p).length > 0);
 
   return (
@@ -68,7 +71,7 @@ export default function AdminTongQuan({ onBao, diToi }) {
       <section className="qt-khung">
         <h2>Sản phẩm theo danh mục</h2>
         <ul className="qt-dmo">
-          {theoDanhMuc.map(({ dm, so, anh }) => (
+          {theoDanhMuc.map(({ dm, so, ds }) => (
             <li key={dm}>
               <a
                 href={`#/san-pham/loc/${encodeURIComponent(dm)}`}
@@ -76,7 +79,7 @@ export default function AdminTongQuan({ onBao, diToi }) {
                 title={`Xem ${so} sản phẩm ${dm}`}
               >
                 <span className="qt-dmo-anh">
-                  {anh ? <img src={anh} alt="" loading="lazy" /> : <Package size={30} />}
+                  {ds.length ? <AnhChay ds={ds} alt="" /> : <Package size={30} />}
                 </span>
                 <span className="qt-dmo-so">{so}</span>
                 <span className="qt-dmo-ten">{dm}</span>

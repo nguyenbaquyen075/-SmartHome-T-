@@ -4,16 +4,11 @@ import {
   ChevronRight,
   ChevronLeft,
   ArrowLeft,
-  ShieldCheck,
-  RotateCcw,
-  Headphones,
   Heart,
   Share2,
   SlidersHorizontal,
   Check,
   FileText,
-  Cog,
-  BookOpen
 } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { doiNhan, DaiNoiBat, MAU_HUONG_DAN, BAO_HANH_MAC_DINH } from '../utils/sanPham';
@@ -25,25 +20,47 @@ export default function ProductDetailPage({
   onSelectProduct
 }) {
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const [activeTab, setActiveTab] = useState('intro');
   const [isLiked, setIsLiked] = useState(false);
 
-  // 4 Main Tabs: Giới thiệu, Thông số kỹ thuật, Hướng dẫn sử dụng, Chính sách bảo hành
+  const images = product?.images?.length ? product.images : [product?.image].filter(Boolean);
+  const hasIntro = Boolean(product?.description?.trim() || product?.highlights?.length);
+
+  const huongDan = product?.huongDan?.length
+    ? product.huongDan
+    : MAU_HUONG_DAN[product?.category] || MAU_HUONG_DAN['Phụ kiện'];
+  const baoHanh = {
+    thoiGian: product?.baoHanh?.thoiGian || BAO_HANH_MAC_DINH.thoiGian,
+    doiTra: product?.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
+  };
+  const thongTin = product?.thongTin?.length ? product.thongTin : [
+    Object.keys(product?.specs || {}).length && {
+      tieuDe: 'Thông số kỹ thuật',
+      noiDung: Object.entries(product.specs).map(([khoa, giaTri]) => `${doiNhan(khoa)}: ${giaTri}`)
+    },
+    huongDan?.length && { tieuDe: 'Hướng dẫn cài đặt & sử dụng', noiDung: huongDan },
+    { tieuDe: 'Bảo hành & đổi trả', noiDung: [`Bảo hành: ${baoHanh.thoiGian}`, `Đổi trả: ${baoHanh.doiTra}`] }
+  ].filter(Boolean);
+
   const tabs = [
-    { id: 'sec-intro', key: 'intro', label: 'Giới thiệu', short: 'Giới thiệu', icon: FileText },
-    { id: 'sec-specs', key: 'specs', label: 'Thông số kỹ thuật', short: 'Thông số', icon: Cog },
-    { id: 'sec-guide', key: 'guide', label: 'Hướng dẫn sử dụng', short: 'Hướng dẫn', icon: BookOpen },
-    { id: 'sec-warranty', key: 'warranty', label: 'Chính sách bảo hành', short: 'Bảo hành', icon: ShieldCheck }
-  ];
+    hasIntro && { id: 'sec-intro', key: 'intro', label: 'Giới thiệu', short: 'Giới thiệu', icon: FileText },
+    ...thongTin.map((muc, idx) => ({
+      id: `sec-info-${idx}`,
+      key: `info-${idx}`,
+      label: muc.tieuDe,
+      short: muc.tieuDe.length > 15 ? muc.tieuDe.slice(0, 14) + '…' : muc.tieuDe,
+      icon: FileText
+    }))
+  ].filter(Boolean);
+
+  const [activeTab, setActiveTab] = useState(tabs[0]?.key || 'intro');
 
   // Scroll to top when product changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedImgIdx(0);
-    setActiveTab('intro');
+    setActiveTab(tabs[0]?.key || 'intro');
   }, [product?.id]);
 
-  // ScrollSpy listener: tracks scroll position and lights up corresponding tab
   // ScrollSpy listener: tracks scroll position and lights up corresponding tab
   useEffect(() => {
     const handleScroll = () => {
@@ -77,18 +94,6 @@ export default function ProductDetailPage({
   };
 
   if (!product) return null;
-
-  // Chi hien anh that cua san pham, khong chen anh minh hoa khong lien quan
-  const images = product.images?.length ? product.images : [product.image].filter(Boolean);
-
-  // Huong dan va bao hanh: lay tu du lieu, chua nhap thi dung mau theo danh muc
-  const huongDan = product.huongDan?.length
-    ? product.huongDan
-    : MAU_HUONG_DAN[product.category] || MAU_HUONG_DAN['Phụ kiện'];
-  const baoHanh = {
-    thoiGian: product.baoHanh?.thoiGian || BAO_HANH_MAC_DINH.thoiGian,
-    doiTra: product.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
-  };
 
   // Related products
   const relatedProducts = allProducts
@@ -311,178 +316,125 @@ export default function ProductDetailPage({
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
           {/* Sticky Tab Navigation Bar - Stays permanently pinned at top while scrolling */}
-          <div className="pd-tabbar">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => scrollToTabSection(tab.id, tab.key)}
-                  className={`pd-tab ${isActive ? 'on' : ''}`}
-                >
-                  <Icon size={16} />
-                  <span className="pd-tab-full">{tab.label}</span>
-                  <span className="pd-tab-short">{tab.short}</span>
-                </button>
-              );
-            })}
-          </div>
+          {tabs.length > 0 && (
+            <div className="pd-tabbar">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => scrollToTabSection(tab.id, tab.key)}
+                    className={`pd-tab ${isActive ? 'on' : ''}`}
+                  >
+                    <Icon size={16} />
+                    <span className="pd-tab-full">{tab.label}</span>
+                    <span className="pd-tab-short">{tab.short}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Continuous Scrollable Content Sections */}
           <div style={{ padding: '28px 24px' }}>
-            {/* SECTION 1: GIỚI THIỆU TỔNG QUAN & THIẾT KẾ (MATCHING SCREENSHOT) */}
-            <section id="sec-intro" style={{ marginBottom: '40px' }}>
-              {/* Section Heading with blue bar */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
-                  1. Giới thiệu tổng quan & Thiết kế
-                </h2>
-              </div>
+            {/* Giới thiệu tổng quan cũ (nếu có) */}
+            {hasIntro && (
+              <>
+                <section id="sec-intro" style={{ marginBottom: '36px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                    <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
+                      Giới thiệu tổng quan & Thiết kế
+                    </h2>
+                  </div>
 
-              {/* 2-Column Section from Screenshot */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
-                gap: '28px',
-                alignItems: 'start'
-              }}>
-                {/* Left Text with blue indicator tag */}
-                <div>
-                  <p style={{
-                    fontSize: '0.92rem',
-                    color: '#334155',
-                    lineHeight: 1.7,
-                    position: 'relative',
-                    paddingLeft: '18px'
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
+                    gap: '28px',
+                    alignItems: 'start'
                   }}>
-                    <span style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: '7px',
-                      width: '8px',
-                      height: '8px',
-                      backgroundColor: '#93c5fd',
-                      borderRadius: '2px',
-                      display: 'inline-block'
-                    }}></span>
-                    {product.description || <><strong>{product.name}</strong> — thông tin chi tiết đang được cập nhật.</>}
-                  </p>
-                </div>
+                    {product.description && (
+                      <div>
+                        <p style={{
+                          fontSize: '0.92rem',
+                          color: '#334155',
+                          lineHeight: 1.7,
+                          position: 'relative',
+                          paddingLeft: '18px'
+                        }}>
+                          <span style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: '7px',
+                            width: '8px',
+                            height: '8px',
+                            backgroundColor: '#93c5fd',
+                            borderRadius: '2px',
+                            display: 'inline-block'
+                          }}></span>
+                          {product.description}
+                        </p>
+                      </div>
+                    )}
 
-                {/* Đặc điểm nổi bật: lấy từ dữ liệu, thiếu thì rút từ thông số */}
-                {(() => {
-                  const diem = product.highlights?.length
-                    ? product.highlights
-                    : Object.values(product.specs || {}).slice(0, 4);
-                  if (!diem.length) return null;
-                  return (
-                    <div className="pd-diem">
-                      <h4>Đặc điểm nổi bật</h4>
-                      <ul>
-                        {diem.map((d, i) => (
-                          <li key={i}>
-                            <Check size={14} strokeWidth={3} />
-                            <span>{d}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })()}
-              </div>
-            </section>
-
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
-
-            {/* SECTION 2: THÔNG SỐ KỸ THUẬT */}
-            <section id="sec-specs" style={{ marginBottom: '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
-                  2. Thông số kỹ thuật chi tiết
-                </h2>
-              </div>
-
-              {Object.keys(product.specs || {}).length > 0 ? (
-                <dl className="pd-ts">
-                  {Object.entries(product.specs).map(([khoa, giaTri]) => (
-                    <div key={khoa} className="pd-ts-o">
-                      <dt>{doiNhan(khoa)}</dt>
-                      <dd>{giaTri}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : (
-                <p className="pd-ts-trong">Sản phẩm này chưa có thông số chi tiết.</p>
-              )}
-            </section>
-
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
-
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
-
-            {/* SECTION 3: HƯỚNG DẪN SỬ DỤNG */}
-            <section id="sec-guide" style={{ marginBottom: '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
-                  3. Hướng dẫn cài đặt & sử dụng
-                </h2>
-              </div>
-
-              <ol className="pd-buoc">
-                {huongDan.map((noiDung, i) => (
-                  <li key={i}>
-                    <span className="pd-buoc-so">{i + 1}</span>
-                    <div>
-                      <strong>Bước {i + 1}</strong>
-                      <p>{noiDung}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
-
-            {/* SECTION 4: CHÍNH SÁCH BẢO HÀNH */}
-            <section id="sec-warranty">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
-                  4. Chính sách bảo hành & Cam kết
-                </h2>
-              </div>
-
-              <div className="pd-camket">
-                <div className="pd-camket-o">
-                  <div className="pd-camket-icon"><ShieldCheck size={20} /></div>
-                  <div className="pd-camket-tt">
-                    <strong>Bảo hành {baoHanh.thoiGian}</strong>
-                    <p>Chính hãng tại tất cả trung tâm bảo hành trên toàn quốc</p>
+                    {product.highlights?.length > 0 && (
+                      <div className="pd-diem">
+                        <h4>Đặc điểm nổi bật</h4>
+                        <ul>
+                          {product.highlights.map((d, i) => (
+                            <li key={i}>
+                              <Check size={14} strokeWidth={3} />
+                              <span>{d}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
+                </section>
+                {thongTin.length > 0 && (
+                  <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '30px 0' }} />
+                )}
+              </>
+            )}
+
+            {/* Các mục tiêu đề lớn của Thông tin sản phẩm */}
+            {thongTin.map((muc, i) => (
+              <section
+                key={`${muc.tieuDe}-${i}`}
+                id={`sec-info-${i}`}
+                style={{
+                  marginBottom: i === thongTin.length - 1 ? 0 : '36px',
+                  paddingBottom: i === thongTin.length - 1 ? 0 : '24px',
+                  borderBottom: i === thongTin.length - 1 ? 'none' : '1px solid #f1f5f9'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                  <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
+                  <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e293b' }}>
+                    {muc.tieuDe}
+                  </h2>
                 </div>
-                <div className="pd-camket-o">
-                  <div className="pd-camket-icon"><RotateCcw size={20} /></div>
-                  <div className="pd-camket-tt">
-                    <strong>{baoHanh.doiTra}</strong>
-                    <p>Áp dụng khi lỗi phần cứng từ nhà sản xuất</p>
-                  </div>
+                <div className="pd-diem">
+                  <ul>
+                    {muc.noiDung.map((noiDung, j) => (
+                      <li key={j}>
+                        <Check size={14} strokeWidth={3} />
+                        <span>{noiDung}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="pd-camket-o">
-                  <div className="pd-camket-icon"><Headphones size={20} /></div>
-                  <div className="pd-camket-tt">
-                    <strong>Hỗ trợ kỹ thuật</strong>
-                    <p>
-                      Gọi <a href="tel:0987654321">0987 654 321</a><br />
-                      Phục vụ 8:00 - 22:00 hàng ngày
-                    </p>
-                  </div>
-                </div>
+              </section>
+            ))}
+
+            {!hasIntro && thongTin.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#64748b', padding: '30px 0', fontSize: '0.92rem' }}>
+                Thông tin chi tiết về sản phẩm đang được cập nhật.
               </div>
-            </section>
+            )}
           </div>
         </div>
 

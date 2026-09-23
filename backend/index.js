@@ -494,6 +494,10 @@ app.get('/api/products/:id', (req, res) => {
 const chuoi = (v, max) => String(v ?? '').trim().slice(0, max);
 const dsChuoi = (v, soDong, max = 500) =>
   (Array.isArray(v) ? v : []).map((x) => chuoi(x, max)).filter(Boolean).slice(0, soDong);
+const dsThongTin = (v) => (Array.isArray(v) ? v : [])
+  .map((m) => ({ tieuDe: chuoi(m?.tieuDe, 120), noiDung: dsChuoi(m?.noiDung, 30, 1000) }))
+  .filter((m) => m.tieuDe && m.noiDung.length)
+  .slice(0, 20);
 
 const chuanHoaSanPham = (b = {}) => {
   const images = dsChuoi(b.images, 12);
@@ -517,6 +521,7 @@ const chuanHoaSanPham = (b = {}) => {
       .slice(0, 4),
     description: chuoi(b.description, 5000),
     highlights: dsChuoi(b.highlights, 12),
+    thongTin: dsThongTin(b.thongTin),
     specs,
     huongDan: dsChuoi(b.huongDan, 12),
     baoHanh: { thoiGian: chuoi(b.baoHanh?.thoiGian, 60), doiTra: chuoi(b.baoHanh?.doiTra, 120) }

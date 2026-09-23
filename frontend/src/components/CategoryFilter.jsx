@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { LayoutGrid, ArrowRight, Zap, Droplets, Camera } from 'lucide-react';
+import { AnhChay } from '../utils/anhChay';
 
 export default function CategoryFilter({
   selectedCategory,
   setSelectedCategory,
   onViewAll,
-  dem = {}
+  dem = {},
+  anhTheoDanhMuc = {}
 }) {
   const [hoveredCat, setHoveredCat] = useState(null);
 
@@ -166,7 +168,8 @@ export default function CategoryFilter({
               {/* Số sản phẩm - chấm đỏ góc trên bên phải */}
               {so > 0 && <span className="cat-card-so">{soHien}</span>}
 
-              {/* Product illustration image at top */}
+              {/* Ảnh đại diện: chỉ ảnh chính của sản phẩm, tự đảo vài giây 1 lần.
+                  Danh mục chưa có hàng thì dùng ảnh minh họa mặc định. */}
               <div style={{
                 height: '66px',
                 display: 'flex',
@@ -175,8 +178,9 @@ export default function CategoryFilter({
                 width: '100%',
                 overflow: 'visible'
               }}>
-                <img
-                  src={cat.image}
+                <AnhChay
+                  ds={anhTheoDanhMuc[cat.name] || []}
+                  macDinh={cat.image}
                   alt={cat.alt}
                   style={{
                     maxHeight: '100%',
@@ -184,9 +188,6 @@ export default function CategoryFilter({
                     objectFit: 'contain',
                     transition: 'transform 0.2s ease',
                     transform: isHovered || isActive ? 'scale(1.05)' : 'scale(1)'
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
                   }}
                 />
               </div>
