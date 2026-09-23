@@ -55,7 +55,34 @@
     "baoHanh": {
       "thoiGian": "",
       "doiTra": ""
-    }
+    },
+    "thongTin": [
+      {
+        "tieuDe": "Thông tin sản phẩm",
+        "noiDung": [
+          "Độ phân giải 2K",
+          "Xoay 360 độ giám sát toàn cảnh",
+          "Có màu vào ban đêm",
+          "Phát hiện dáng người sử dụng công nghệ AI",
+          "chiều",
+          "Hỗ trợ lên đến 12 điểm preset",
+          "Hỗ trợ 3 chế độ hoạt động: màu ban đêm hồng ngoại ban đêm màu thông minh",
+          "Cảnh báo bằng còi báo động và đèn chớp",
+          "Hồng ngoại 30m đèn trợ sáng 20m",
+          "Thiết kế chống chịu thời tiết",
+          "Công nghệ video H.265",
+          "Tích hợp thông minh với Google Assistant & Amazon Alexa",
+          "Hỗ trợ thẻ MicroSD (lên đến 512 GB) & dịch vụ lưu trữ EZVIZ CloudPlay"
+        ]
+      },
+      {
+        "tieuDe": "kết nối",
+        "noiDung": [
+          "Nguồn DC 12V/1A",
+          "Tiêu chuẩn chống nước IP65"
+        ]
+      }
+    ]
   },
   {
     "id": "sp-1790043631113",
