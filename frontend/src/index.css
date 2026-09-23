@@ -304,10 +304,8 @@ body {
   text-align: center;
 }
 
-/* --- Đặc điểm nổi bật: chỉ một vạch xanh bên trái, không đóng hộp --- */
 .pd-diem {
-  border-left: 3px solid #bfdbfe;
-  padding-left: 18px;
+  padding-left: 0;
 }
 .pd-diem h4 {
   font-size: 0.86rem;
@@ -418,67 +416,6 @@ body {
   text-decoration: none;
 }
 .pd-camket-o a:hover { text-decoration: underline; }
-
-/* ================= THANH TAB TRANG CHI TIẾT ================= */
-.pd-tabbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: #f0f7ff;
-  border-bottom: 1px solid #bfdbfe;
-  border-radius: 11px 11px 0 0;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 14px rgba(0, 102, 204, 0.1);
-}
-
-.pd-tab {
-  background-color: transparent;
-  color: #475569;
-  border: none;
-  padding: 9px 18px;
-  border-radius: 8px;
-  font: inherit;
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-  transition: background-color 0.15s, color 0.15s;
-}
-.pd-tab svg {
-  color: #64748b;
-  flex-shrink: 0;
-}
-.pd-tab:hover {
-  background-color: #e0f2fe;
-  color: #0066cc;
-}
-.pd-tab:hover svg {
-  color: #0066cc;
-}
-.pd-tab.on {
-  background-color: #0066cc;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.28);
-}
-.pd-tab.on svg,
-.pd-tab.on:hover svg {
-  color: #fff;
-}
-.pd-tab.on:hover {
-  background-color: #0066cc;
-  color: #fff;
-}
-
-.pd-tab-short {
-  display: none;
-}
 
 /* ================= LOGO & TÊN TRÊN HEADER ================= */
 .navbar-logo {
@@ -1578,26 +1515,6 @@ body {
   }
   .rel-track .store-product-card > div:first-of-type {
     height: 88px !important;
-  }
-
-  /* Thanh tab: 4 nhãn tiếng Việt không đủ chỗ trên 1 hàng -> xếp lưới 2x2
-     để thấy hết, thay vì cuộn ngang khiến người dùng tưởng bị cắt mất */
-  .pd-tabbar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 8px 10px;
-  }
-  .pd-tab {
-    padding: 9px 6px;
-    font-size: 0.8rem;
-    gap: 6px;
-  }
-  .pd-tab-full {
-    display: none;
-  }
-  .pd-tab-short {
-    display: inline;
   }
 
   /* 3 nhóm ở trang chủ: thẻ dùng hết bề ngang màn hình */

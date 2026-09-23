@@ -8,7 +8,7 @@ import {
   Share2,
   SlidersHorizontal,
   Check,
-  FileText,
+  CircleCheck,
 } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { doiNhan, DaiNoiBat, MAU_HUONG_DAN, BAO_HANH_MAC_DINH } from '../utils/sanPham';
@@ -41,57 +41,11 @@ export default function ProductDetailPage({
     { tieuDe: 'Bảo hành & đổi trả', noiDung: [`Bảo hành: ${baoHanh.thoiGian}`, `Đổi trả: ${baoHanh.doiTra}`] }
   ].filter(Boolean);
 
-  const tabs = [
-    hasIntro && { id: 'sec-intro', key: 'intro', label: 'Giới thiệu', short: 'Giới thiệu', icon: FileText },
-    ...thongTin.map((muc, idx) => ({
-      id: `sec-info-${idx}`,
-      key: `info-${idx}`,
-      label: muc.tieuDe,
-      short: muc.tieuDe.length > 15 ? muc.tieuDe.slice(0, 14) + '…' : muc.tieuDe,
-      icon: FileText
-    }))
-  ].filter(Boolean);
-
-  const [activeTab, setActiveTab] = useState(tabs[0]?.key || 'intro');
-
   // Scroll to top when product changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedImgIdx(0);
-    setActiveTab(tabs[0]?.key || 'intro');
   }, [product?.id]);
-
-  // ScrollSpy listener: tracks scroll position and lights up corresponding tab
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
-
-      for (let i = tabs.length - 1; i >= 0; i--) {
-        const item = tabs[i];
-        const element = document.getElementById(item.id);
-        if (element) {
-          const top = element.offsetTop;
-          if (scrollPosition >= top) {
-            setActiveTab(item.key);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [tabs]);
-
-  const scrollToTabSection = (id, key) => {
-    setActiveTab(key);
-    const elem = document.getElementById(id);
-    if (elem) {
-      const yOffset = -65; // Position heading right below the sticky tab bar
-      const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
 
   if (!product) return null;
 
@@ -306,7 +260,7 @@ export default function ProductDetailPage({
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. STICKY HORIZONTAL TAB BAR WITH ICONS (ALWAYS VISIBLE ON SCROLL)        */}
+        {/* 3. NỘI DUNG SẢN PHẨM (GIỚI THIỆU + CÁC MỤC THÔNG TIN)                     */}
         {/* ========================================================================= */}
         <div style={{
           backgroundColor: '#fff',
@@ -315,35 +269,14 @@ export default function ProductDetailPage({
           marginBottom: '40px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
-          {/* Sticky Tab Navigation Bar - Stays permanently pinned at top while scrolling */}
-          {tabs.length > 0 && (
-            <div className="pd-tabbar">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.key;
-                return (
-                  <button
-                    key={tab.key}
-                    onClick={() => scrollToTabSection(tab.id, tab.key)}
-                    className={`pd-tab ${isActive ? 'on' : ''}`}
-                  >
-                    <Icon size={16} />
-                    <span className="pd-tab-full">{tab.label}</span>
-                    <span className="pd-tab-short">{tab.short}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Continuous Scrollable Content Sections */}
+          {/* Nội dung */}
           <div style={{ padding: '28px 24px' }}>
             {/* Giới thiệu tổng quan cũ (nếu có) */}
             {hasIntro && (
               <>
                 <section id="sec-intro" style={{ marginBottom: '36px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                    <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
+                    <CircleCheck size={20} color="#0066cc" aria-hidden="true" />
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
                       Giới thiệu tổng quan & Thiết kế
                     </h2>
@@ -412,7 +345,7 @@ export default function ProductDetailPage({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                  <div style={{ width: '4px', height: '22px', backgroundColor: '#0066cc', borderRadius: '2px' }}></div>
+                  <CircleCheck size={20} color="#0066cc" aria-hidden="true" />
                   <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e293b' }}>
                     {muc.tieuDe}
                   </h2>
