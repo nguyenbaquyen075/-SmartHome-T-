@@ -903,13 +903,6 @@ textarea.gtq-nhap { resize: vertical; line-height: 1.55; }
 .qt-dmo-o.trong .qt-dmo-so { background: #cbd5e1; box-shadow: none; }
 .qt-dmo-ten { font-size: 0.84rem; font-weight: 700; line-height: 1.3; }
 
-.qt-thieu { list-style: none; }
-.qt-thieu li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #f1f5f9; }
-.qt-thieu img { width: 46px; height: 46px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 8px; padding: 3px; flex-shrink: 0; }
-.qt-thieu div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.qt-thieu strong { font-size: 0.88rem; }
-.qt-thieu span { font-size: 0.78rem; color: #c2410c; }
-.qt-thieu .qt-nut { padding: 7px 12px; font-size: 0.8rem; }
 
 /* --- Trang đăng nhập --- */
 .qt-dn {

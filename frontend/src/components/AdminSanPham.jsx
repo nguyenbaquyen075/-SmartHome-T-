@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Pencil, Trash2, ExternalLink, Star } from 'lucide-react';
 import { api } from '../utils/api';
-import { thieuThongTin } from '../utils/sanPham';
 import { useDanhMuc } from '../utils/danhMuc';
 import AdminSanPhamForm from './AdminSanPhamForm';
 
@@ -83,7 +82,6 @@ export default function AdminSanPham({ onBao, diToi, con }) {
         ) : (
           <ul className="qt-ds">
             {hien.map((p) => {
-              const thieu = thieuThongTin(p);
               return (
                 <li key={p.id} className="qt-ds-dong">
                   <img src={p.image} alt="" />
@@ -92,9 +90,6 @@ export default function AdminSanPham({ onBao, diToi, con }) {
                     <span>{p.category} · {p.brand}</span>
                     <div className="qt-ds-nhan">
                       {p.featured && <span className="qt-nhan vang"><Star size={11} /> Nổi bật</span>}
-                      {thieu.length
-                        ? <span className="qt-nhan cam">Thiếu: {thieu.join(', ')}</span>
-                        : <span className="qt-nhan xanh">Đủ thông tin</span>}
                     </div>
                   </div>
                   <div className="qt-ds-nut">

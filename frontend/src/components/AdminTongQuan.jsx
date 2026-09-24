@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, HardHat, Clapperboard, Plus, Upload, AlertCircle } from 'lucide-react';
+import { Package, HardHat, Clapperboard, Plus, Upload } from 'lucide-react';
 import { api } from '../utils/api';
-import { thieuThongTin } from '../utils/sanPham';
 import { useDanhMuc } from '../utils/danhMuc';
 import { AnhChay, gomAnhTheoDanhMuc } from '../utils/anhChay';
 
@@ -25,7 +24,6 @@ export default function AdminTongQuan({ onBao, diToi }) {
     so: sanPham.filter((p) => p.category === dm).length,
     ds: anhTheoDanhMuc[dm] || []
   }));
-  const chuaDu = sanPham.filter((p) => thieuThongTin(p).length > 0);
 
   return (
     <>
@@ -90,25 +88,6 @@ export default function AdminTongQuan({ onBao, diToi }) {
           ))}
         </ul>
       </section>
-
-      {chuaDu.length > 0 && (
-        <section className="qt-khung">
-          <h2><AlertCircle size={18} /> Sản phẩm chưa đủ thông tin ({chuaDu.length})</h2>
-          <p className="qt-phu">Bổ sung để trang chi tiết hiện đầy đủ cho khách xem.</p>
-          <ul className="qt-thieu">
-            {chuaDu.map((p) => (
-              <li key={p.id}>
-                <img src={p.image} alt="" />
-                <div>
-                  <strong>{p.name}</strong>
-                  <span>Thiếu: {thieuThongTin(p).join(', ')}</span>
-                </div>
-                <button className="qt-nut" onClick={() => diToi('san-pham', p.id)}>Bổ sung</button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
     </>
   );
 }
