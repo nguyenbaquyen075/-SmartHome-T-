@@ -3,7 +3,7 @@ import { Home, Phone, Mail, Clock, Zap, Droplet } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="site-footer" style={{
+    <footer style={{
       backgroundColor: '#0066cc',
       marginTop: '24px',
       padding: '16px 0 10px',
