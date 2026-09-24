@@ -76,7 +76,7 @@ export default function ProductDetailPage({
           </div>
 
           <button className="nut-tro-ve" onClick={onBack}>
-            <ArrowLeft size={15} />
+            <ArrowLeft size={19} />
             <span>Quay lại</span>
           </button>
         </div>

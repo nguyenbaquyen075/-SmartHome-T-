@@ -905,7 +905,7 @@ body {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 7px;
   /* padding phai de chu khong sat mep man hinh */
   padding: 4px 8px 4px 0;
   margin-right: 2px;
@@ -913,8 +913,8 @@ body {
   background: none;
   color: #0066cc;
   font: inherit;
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: 1.02rem;
+  font-weight: 700;
   cursor: pointer;
   transition: color 0.15s;
 }
