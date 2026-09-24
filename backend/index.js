@@ -798,7 +798,12 @@ app.post('/api/giai-tri/xong', canQuyen, async (req, res) => {
   const loai = Object.keys(DUOI_HOP_LE).find((k) => DUOI_HOP_LE[k].includes(duoi));
   if (!loai) return res.status(400).json({ error: 'Chỉ nhận ảnh hoặc video' });
 
-  const moi = { id: ten, loai, url: req.body.url, ...chuanHoaBai(req.body) };
+  // Ảnh bìa của video (khung hình đầu do trình duyệt chụp): chỉ nhận file nằm trong kho của mình
+  const tenBia = khoFile.tenTuDiaChi(req.body.poster);
+  const coBia = loai === 'video' && tenBia && tenBia.startsWith(`${THU_MUC_GIAI_TRI}/`)
+    && DUOI_HOP_LE.image.includes(path.extname(tenBia).toLowerCase());
+
+  const moi = { id: ten, loai, url: req.body.url, ...(coBia ? { poster: req.body.poster } : {}), ...chuanHoaBai(req.body) };
   if (!(await kho.ghi(KHO_GIAI_TRI, [...kho.doc(KHO_GIAI_TRI), moi]))) return res.status(500).json(LOI_LUU);
   res.status(201).json(moi);
 });
@@ -843,6 +848,8 @@ app.delete('/api/giai-tri', canQuyen, async (req, res) => {
     if (!bai) return res.status(404).json({ error: 'Không tìm thấy bài' });
     if (!(await kho.ghi(KHO_GIAI_TRI, ds.filter((b) => b.id !== id)))) return res.status(500).json(LOI_LUU);
     const tenKho = khoFile.tenTuDiaChi(bai.url);
+    const tenBia = khoFile.tenTuDiaChi(bai.poster);
+    if (tenBia) await khoFile.xoa(tenBia);   // xóa luôn ảnh bìa của video
     if (tenKho) await khoFile.xoa(tenKho);
     else if (bai.url.startsWith('/api/anh/')) await kho.xoaAnh(path.basename(bai.url));
     else if (bai.url.startsWith(URL_FILE_MAY)) {

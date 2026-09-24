@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Trash2, Pencil, Pin, PinOff, X, Play, Camera, HardDrive, Cloud } from 'lucide-react';
-import { api, anhNho, ngayVN } from '../utils/api';
+import { api, anhNho, ngayVN, kieuFile } from '../utils/api';
 import { nenAnhFile } from '../utils/anh';
 
 // Nhãn cho biết file đang được cất ở đâu, để anh nhìn là biết có an toàn không
@@ -59,7 +59,8 @@ export default function AdminGiaiTri({ onBao }) {
   const themFile = (files) => {
     const moi = [];
     for (const file of Array.from(files)) {
-      const loai = file.type.startsWith('video/') ? 'video' : file.type.startsWith('image/') ? 'image' : null;
+      const kieu = kieuFile(file);
+      const loai = kieu.startsWith('video/') ? 'video' : kieu.startsWith('image/') ? 'image' : null;
       if (!loai) {
         onBao(`"${file.name}" không phải ảnh hay video`, 'error');
       } else if (file.size > TOI_DA[loai]) {

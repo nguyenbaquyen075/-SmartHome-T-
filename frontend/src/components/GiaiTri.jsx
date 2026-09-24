@@ -179,6 +179,7 @@ function XemKieuTikTok({ ds, batDau, onClose }) {
               <>
                 <video
                   src={xemDay(m)}
+                  poster={anhNho(m, 720, 16 / 9) || undefined}
                   loop
                   playsInline
                   preload="none"
