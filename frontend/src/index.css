@@ -437,7 +437,10 @@ body {
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
-  line-height: 1.05;
+  /* Chữ hoa có dấu (Ệ, Ư, Ớ...) cao hơn chữ thường; line-height quá thấp + overflow:hidden
+     ở bản điện thoại làm cắt mất dấu phía trên */
+  line-height: 1.35;
+  padding-top: 3px;
   white-space: nowrap;
 }
 .navbar-name-sub {
