@@ -301,8 +301,8 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
         </div>
       </Khoi>
 
-      {/* 3. Thông tin sản phẩm với các mục tiêu đề lớn */}
-      <Khoi so={3} tieuDe="Thông tin sản phẩm">
+      {/* 3. Mô tả với các mục tiêu đề lớn */}
+      <Khoi so={3} tieuDe="Mô tả">
         {thongTin.map((muc, i) => (
           <div key={i} className="qt-khung-con">
             <div className="qt-khung-con-dau">
