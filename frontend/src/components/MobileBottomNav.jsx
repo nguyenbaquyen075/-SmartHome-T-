@@ -29,16 +29,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '6px',
+          gap: '3px',
           color: activeTab === 'home' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '12px 16px'
+          padding: '6px 18px'
         }}
       >
         <Home size={25} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.92rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
           Trang chủ
         </span>
       </button>
@@ -50,16 +50,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '6px',
+          gap: '3px',
           color: activeTab === 'products' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '12px 16px'
+          padding: '6px 18px'
         }}
       >
         <LayoutGrid size={25} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.92rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
           Sản phẩm
         </span>
       </button>
@@ -71,16 +71,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '6px',
+          gap: '3px',
           color: '#64748b',
           cursor: 'pointer',
-          padding: '12px 16px'
+          padding: '6px 18px'
         }}
       >
         <User size={25} />
-        <span style={{ fontSize: '0.92rem', fontWeight: 500 }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: 500 }}>
           Tài khoản
         </span>
       </button>
