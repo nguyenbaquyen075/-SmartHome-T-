@@ -11,7 +11,7 @@ import {
   CircleCheck,
 } from 'lucide-react';
 import ProductCard from './ProductCard';
-import { doiNhan, DaiNoiBat } from '../utils/sanPham';
+import { doiNhan } from '../utils/sanPham';
 
 export default function ProductDetailPage({
   product,
@@ -232,9 +232,6 @@ export default function ProductDetailPage({
                 {product.subTitle}
               </p>
             )}
-
-            {/* 4 ô nổi bật: nhập trong quản trị, chưa nhập thì ẩn cho khỏi hiện sai */}
-            <DaiNoiBat ds={product.noiBat} />
 
             {/* Extra Utilities */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '0.85rem', color: '#64748b' }}>
