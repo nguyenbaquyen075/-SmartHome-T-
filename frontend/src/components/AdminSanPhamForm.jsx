@@ -329,6 +329,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
               <textarea
                 className="qt-input qt-textarea-noidung"
                 rows={5}
+                ref={(el) => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
                 value={typeof muc.vanBan === 'string' ? muc.vanBan : (Array.isArray(muc.noiDung) ? muc.noiDung.join('\n') : '')}
                 onChange={(e) => {
                   const val = e.target.value;
