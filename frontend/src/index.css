@@ -896,10 +896,22 @@ body {
 .nut-dong-crumb {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;          /* 1 hàng duy nhất, "Quay lại" không rớt xuống dòng */
   min-width: 0;
+  overflow: hidden;
 }
+.nut-dong-crumb > * { flex-shrink: 0; white-space: nowrap; }
+/* Mục cuối (tên danh mục) dài quá thì cắt bằng "…" thay vì đẩy nút Quay lại xuống dòng */
+.nut-dong-crumb > :last-child {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pp-crumb.nut-dong-hang { padding-top: 10px; }
+/* Cùng cỡ chữ + độ đậm với trang chi tiết (.pp-crumb button đang ghi đè) */
+.pp-crumb button.nut-tro-ve { font-size: 0.84rem; font-weight: 600; }
 .nut-tro-ve {
   /* Chỉ là chữ, không khung */
   flex-shrink: 0;
