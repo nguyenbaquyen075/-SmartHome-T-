@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Trash2, SlidersHorizontal, Check } from 'lucide-react';
+import { X, Trash2, SlidersHorizontal } from 'lucide-react';
 
 export default function ComparisonModal({
   compareList,

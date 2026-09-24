@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import HeroBanner from './components/HeroBanner';
 import CategoryFilter from './components/CategoryFilter';
@@ -18,7 +18,7 @@ import { gomAnhTheoDanhMuc } from './utils/anhChay';
 const ProductDetailPage = lazy(() => import('./components/ProductDetailPage'));
 const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
 const ProductsPage = lazy(() => import('./components/ProductsPage'));
-import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
+import { Flame, ArrowRight, Check, Info } from 'lucide-react';
 
 export default function App() {
   // Moi danh muc la 1 nhom o trang chu (danh sach do trang Quan tri > Danh muc quyet dinh)
@@ -90,15 +90,14 @@ export default function App() {
   // Bam "Tài khoản" -> sang trang quan tri rieng (chua dang nhap thi hien trang dang nhap)
   const moQuanTri = () => window.location.assign('/admin');
 
-  // Trang chu o muc "Tất cả": 3 nhom, moi nhom 2 san pham
-  const [homeGroups, setHomeGroups] = useState([]);
-
   // Đếm số sản phẩm + gom ảnh đại diện mỗi danh mục (cho số đỏ và ảnh tự đảo trên ô danh mục)
   const [demDanhMuc, setDemDanhMuc] = useState({});
   const [anhTheoDanhMuc, setAnhTheoDanhMuc] = useState({});
+  const [tatCa, setTatCa] = useState([]);   // toàn bộ sản phẩm, 1 lần tải cho số đếm, ảnh danh mục và các nhóm trang chủ
   useEffect(() => {
     api.getProducts()
       .then((ds) => {
+        setTatCa(ds);
         const d = { 'Tất cả': ds.length };
         ds.forEach((p) => { d[p.category] = (d[p.category] || 0) + 1; });
         setDemDanhMuc(d);
@@ -138,31 +137,18 @@ export default function App() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchProductsList();
-    }, 200);
+    // Chỉ chờ 200ms khi đang gõ tìm kiếm; vào trang hay đổi danh mục thì tải ngay
+    const timer = setTimeout(fetchProductsList, searchTerm.trim() ? 200 : 0);
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory]);
 
-  // Lay 2 san pham dau moi nhom. Goi API thay vi loc o client vi backend
-  // gom nhieu danh muc con vao 1 nhom (vd Thiết bị điện gom ca Đèn chiếu sáng).
-  useEffect(() => {
-    if (selectedCategory !== 'Tất cả' || searchTerm.trim()) {
-      setHomeGroups([]);
-      return;
-    }
-    let huy = false;
-    Promise.all(
-      danhMuc.map((m) => ({ name: m.ten, icon: iconDanhMuc(m.icon) })).map((g) =>
-        api.getProducts({ category: g.name })
-          .then((list) => ({ ...g, items: list.slice(0, 4) }))
-          .catch(() => ({ ...g, items: [] }))
-      )
-    ).then((res) => {
-      if (!huy) setHomeGroups(res.filter((g) => g.items.length > 0));
-    });
-    return () => { huy = true; };
-  }, [selectedCategory, searchTerm, danhMuc]);
+  // 4 sản phẩm đầu mỗi danh mục: lọc ngay từ danh sách đã tải, không gọi thêm API cho từng nhóm
+  const homeGroups = useMemo(() => {
+    if (selectedCategory !== 'Tất cả' || searchTerm.trim()) return [];
+    return danhMuc
+      .map((m) => ({ name: m.ten, icon: iconDanhMuc(m.icon), items: tatCa.filter((p) => p.category === m.ten).slice(0, 4) }))
+      .filter((g) => g.items.length > 0);
+  }, [danhMuc, tatCa, selectedCategory, searchTerm]);
 
   // Sync with URL hash for direct product view
   useEffect(() => {

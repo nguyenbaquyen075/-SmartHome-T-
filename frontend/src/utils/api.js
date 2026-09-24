@@ -87,6 +87,18 @@ const xinPhep = (file, thuMuc, ten) => apiAdmin('/tai-len/chu-ky', {
   body: JSON.stringify({ ten: ten || file.name, kieu: file.type, thuMuc })
 });
 
+// Nhiều nơi cùng hỏi 1 địa chỉ trong lúc đang chờ thì chỉ gửi 1 yêu cầu (chỉ gộp lúc đang bay,
+// không lưu cache nên sửa trong quản trị xong tải lại là thấy ngay)
+const dangGoi = new Map();
+const layChung = (url, loi) => {
+  if (!dangGoi.has(url)) {
+    dangGoi.set(url, fetch(url)
+      .then((res) => { if (!res.ok) throw new Error(loi); return res.json(); })
+      .finally(() => dangGoi.delete(url)));
+  }
+  return dangGoi.get(url);
+};
+
 export const api = {
   // Products
   async getProducts(params = {}) {
@@ -96,9 +108,7 @@ export const api = {
         query.append(key, value);
       }
     });
-    const res = await fetch(`${API_BASE}/products?${query.toString()}`);
-    if (!res.ok) throw new Error('Không thể tải danh sách sản phẩm');
-    return res.json();
+    return layChung(`${API_BASE}/products?${query.toString()}`, 'Không thể tải danh sách sản phẩm');
   },
 
   // Quan tri
@@ -141,9 +151,7 @@ export const api = {
 
   // Cai dat trang (thanh chay + anh banner)
   async getSettings() {
-    const res = await fetch(`${API_BASE}/settings`);
-    if (!res.ok) throw new Error('Không tải được cài đặt');
-    return res.json();
+    return layChung(`${API_BASE}/settings`, 'Không tải được cài đặt');
   },
 
   saveSettings: (data) => apiAdmin('/settings', { method: 'PUT', body: JSON.stringify(data) }),
@@ -172,18 +180,14 @@ export const api = {
 
   // Danh muc san pham
   async getDanhMuc() {
-    const res = await fetch(`${API_BASE}/danh-muc`);
-    if (!res.ok) throw new Error('Không thể tải danh mục');
-    return res.json();
+    return layChung(`${API_BASE}/danh-muc`, 'Không thể tải danh mục');
   },
   themDanhMuc: (data) => apiAdmin('/danh-muc', { method: 'POST', body: JSON.stringify(data) }),
   suaDanhMuc: (id, data) => apiAdmin(`/danh-muc/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   xoaDanhMuc: (id) => apiAdmin(`/danh-muc/${id}`, { method: 'DELETE' }),
 
   async getProjects() {
-    const res = await fetch(`${API_BASE}/projects`);
-    if (!res.ok) throw new Error('Không thể tải nhật ký thi công');
-    return res.json();
+    return layChung(`${API_BASE}/projects`, 'Không thể tải nhật ký thi công');
   },
 
   // Giai tri (hau truong thi cong)

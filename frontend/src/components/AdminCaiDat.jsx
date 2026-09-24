@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, KeyRound, ShieldCheck, Database, HardDrive, Cloud, Eye, EyeOff, LogOut, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { KeyRound, ShieldCheck, Database, HardDrive, Cloud, Eye, EyeOff, LogOut, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import { Truong, Khoi } from './AdminForm';
 
