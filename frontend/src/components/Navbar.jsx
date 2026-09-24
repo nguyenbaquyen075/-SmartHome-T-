@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Truck, 
   ShieldCheck, 
   Headphones, 
   User, 
@@ -10,12 +9,7 @@ import {
   Droplet, 
   Menu, 
   X, 
-  ChevronDown,
-  Camera,
-  Wrench,
-  Cog,
-  Package,
-  Sparkles
+  ChevronDown
 } from 'lucide-react';
 import { useDanhMuc, mucMenu } from '../utils/danhMuc';
 

@@ -4,7 +4,7 @@ import { api } from '../utils/api';
 import { nenAnhFile, coFile } from '../utils/anh';
 import { DON_VI, doiNhan } from '../utils/sanPham';
 import { useDanhMuc } from '../utils/danhMuc';
-import { Truong, Khoi, ThanhLuu, DanhSachDong } from './AdminForm';
+import { Truong, Khoi, ThanhLuu } from './AdminForm';
 import { useBanNhap, gioPhut } from '../utils/banNhap';
 
 const TOI_DA_ANH = 6 * 1024 * 1024;    // giới hạn của /api/upload (tính sau khi nén)
@@ -130,7 +130,6 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       return;
     }
 
-    const sach = (dsDong) => dsDong.map((s) => s.trim()).filter(Boolean);
     const duLieu = {
       name: f.name,
       category: f.category,
