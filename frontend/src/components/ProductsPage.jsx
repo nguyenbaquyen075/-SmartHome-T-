@@ -92,19 +92,19 @@ export default function ProductsPage({
       {/* Duong dan */}
       <nav className="pp-crumb nut-dong-hang">
         <div className="nut-dong-crumb">
-          <button onClick={onGoHome}><Home size={17} /> Trang chủ</button>
-          <ChevronRight size={16} />
+          <button onClick={onGoHome}><Home size={14} /> Trang chủ</button>
+          <ChevronRight size={13} />
           <span>Sản phẩm</span>
           {category !== 'Tất cả' && (
             <>
-              <ChevronRight size={16} />
+              <ChevronRight size={13} />
               <span className="pp-crumb-cur">{category}</span>
             </>
           )}
         </div>
 
         <button className="nut-tro-ve" onClick={onGoHome}>
-          <ArrowLeft size={17} />
+          <ArrowLeft size={15} />
           <span>Quay lại</span>
         </button>
       </nav>
