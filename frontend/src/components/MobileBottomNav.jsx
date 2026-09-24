@@ -13,8 +13,7 @@ export default function MobileBottomNav({
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: '#fff',
-      borderTop: '1px solid #e2e8f0',
+      backgroundColor: '#0066cc',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-around',
@@ -32,7 +31,7 @@ export default function MobileBottomNav({
           flexDirection: 'row',
           alignItems: 'center',
           gap: '6px',
-          color: activeTab === 'home' ? '#0066cc' : '#64748b',
+          color: activeTab === 'home' ? '#fff' : '#bfdbfe',
           cursor: 'pointer',
           padding: '6px 12px'
         }}
@@ -53,7 +52,7 @@ export default function MobileBottomNav({
           flexDirection: 'row',
           alignItems: 'center',
           gap: '6px',
-          color: activeTab === 'products' ? '#0066cc' : '#64748b',
+          color: activeTab === 'products' ? '#fff' : '#bfdbfe',
           cursor: 'pointer',
           padding: '6px 12px'
         }}
@@ -74,7 +73,7 @@ export default function MobileBottomNav({
           flexDirection: 'row',
           alignItems: 'center',
           gap: '6px',
-          color: '#64748b',
+          color: '#bfdbfe',
           cursor: 'pointer',
           padding: '6px 12px'
         }}
