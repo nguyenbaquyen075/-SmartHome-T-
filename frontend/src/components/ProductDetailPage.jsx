@@ -61,22 +61,22 @@ export default function ProductDetailPage({
     <div style={{ backgroundColor: '#f0f7fd', minHeight: '100vh', paddingBottom: '60px' }}>
       {/* 1. Breadcrumbs (Matching Screenshot) */}
       <div style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 0' }}>
-        <div className="container nut-dong-hang" style={{ fontSize: '0.95rem', color: '#64748b' }}>
+        <div className="container nut-dong-hang" style={{ fontSize: '0.82rem', color: '#64748b' }}>
           <div className="nut-dong-crumb">
           <button
             onClick={onBack}
             style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: 0 }}
           >
-            <Home size={17} />
+            <Home size={14} />
           </button>
-          <ChevronRight size={16} color="#94a3b8" />
+          <ChevronRight size={13} color="#94a3b8" />
           <span style={{ cursor: 'pointer' }} onClick={onBack}>Camera</span>
-          <ChevronRight size={16} color="#94a3b8" />
+          <ChevronRight size={13} color="#94a3b8" />
           <span style={{ cursor: 'pointer' }} onClick={onBack}>{product.category}</span>
           </div>
 
           <button className="nut-tro-ve" onClick={onBack}>
-            <ArrowLeft size={17} />
+            <ArrowLeft size={15} />
             <span>Quay lại</span>
           </button>
         </div>

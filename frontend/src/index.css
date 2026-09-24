@@ -679,7 +679,7 @@ body {
   align-items: center;
   gap: 6px;
   color: #94a3b8;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   margin-bottom: 12px;
 }
 .pp-crumb button {
@@ -905,7 +905,7 @@ body {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   /* padding phai de chu khong sat mep man hinh */
   padding: 4px 8px 4px 0;
   margin-right: 2px;
@@ -913,7 +913,7 @@ body {
   background: none;
   color: #0066cc;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 0.84rem;
   font-weight: 600;
   cursor: pointer;
   transition: color 0.15s;
