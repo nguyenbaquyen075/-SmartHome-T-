@@ -170,6 +170,16 @@ export const api = {
   updateProject: (id, data) => apiAdmin(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProject: (id) => apiAdmin(`/projects/${id}`, { method: 'DELETE' }),
 
+  // Danh muc san pham
+  async getDanhMuc() {
+    const res = await fetch(`${API_BASE}/danh-muc`);
+    if (!res.ok) throw new Error('Không thể tải danh mục');
+    return res.json();
+  },
+  themDanhMuc: (data) => apiAdmin('/danh-muc', { method: 'POST', body: JSON.stringify(data) }),
+  suaDanhMuc: (id, data) => apiAdmin(`/danh-muc/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  xoaDanhMuc: (id) => apiAdmin(`/danh-muc/${id}`, { method: 'DELETE' }),
+
   async getProjects() {
     const res = await fetch(`${API_BASE}/projects`);
     if (!res.ok) throw new Error('Không thể tải nhật ký thi công');

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Pencil, Trash2, ExternalLink, Star } from 'lucide-react';
 import { api } from '../utils/api';
-import { DANH_MUC, thieuThongTin } from '../utils/sanPham';
+import { thieuThongTin } from '../utils/sanPham';
+import { useDanhMuc } from '../utils/danhMuc';
 import AdminSanPhamForm from './AdminSanPhamForm';
 
 // #/san-pham = danh sách, #/san-pham/loc/<danh mục> = danh sách lọc sẵn (từ Tổng quan),
 // #/san-pham/moi = thêm, #/san-pham/<id> = sửa
 export default function AdminSanPham({ onBao, diToi, con }) {
+  const dsDanhMuc = useDanhMuc();
   const [ds, setDs] = useState(null);
   const [tim, setTim] = useState('');
   const [danhMuc, setDanhMuc] = useState(() => (con[0] === 'loc' ? decodeURIComponent(con[1] || '') : ''));
@@ -70,7 +72,7 @@ export default function AdminSanPham({ onBao, diToi, con }) {
           </label>
           <select className="qt-input qt-loc-dm" value={danhMuc} onChange={(e) => setDanhMuc(e.target.value)}>
             <option value="">Tất cả danh mục</option>
-            {DANH_MUC.map((d) => <option key={d}>{d}</option>)}
+            {dsDanhMuc.map((d) => <option key={d.id}>{d.ten}</option>)}
           </select>
         </div>
 
