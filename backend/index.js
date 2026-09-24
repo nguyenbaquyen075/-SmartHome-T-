@@ -808,7 +808,7 @@ app.use('/images/tai-len', express.static(path.join(__dirname, '..', 'frontend',
 const CLIENT_DIST = path.join(__dirname, '..', 'frontend', 'dist');
 // Asset co hash trong ten -> cache 1 nam; index.html luon lay moi
 app.use(express.static(CLIENT_DIST, { maxAge: '1y', index: false }));
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(CLIENT_DIST, 'index.html'));
 });
 
