@@ -166,13 +166,3 @@ export const MAU_HUONG_DAN = {
 };
 
 export const BAO_HANH_MAC_DINH = { thoiGian: '24 tháng', doiTra: '1 đổi 1 trong 7 ngày' };
-
-// Liet ke phan con thieu de quan tri biet can bo sung gi
-export const thieuThongTin = (sp) => [
-  !(sp.images?.length || sp.image) && 'ảnh',
-  !sp.subTitle && 'mô tả ngắn',
-  !sp.description && 'giới thiệu',
-  !sp.highlights?.length && 'đặc điểm',
-  !Object.keys(sp.specs || {}).length && 'thông số',
-  !sp.huongDan?.length && 'hướng dẫn'
-].filter(Boolean);
