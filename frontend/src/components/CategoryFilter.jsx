@@ -146,7 +146,7 @@ export default function CategoryFilter({
               style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '0px', // Không bo góc
-                border: (isActive || isHovered) ? '1.5px solid #60a5fa' : '1.5px solid transparent', // Viền xanh nhạt nhẹ nhàng, thanh thoát
+                border: (isActive || isHovered) ? '1.5px solid #0066cc' : '1.5px solid #60a5fa', // Viền xanh mặc định, đậm hơn khi chọn/rê chuột
                 padding: '10px 14px 12px 14px',
                 height: '122px', // Chiều cao chuẩn thanh thoát
                 display: 'flex',
@@ -223,7 +223,7 @@ export default function CategoryFilter({
                   style={{
                     fontSize: '0.88rem',
                     fontWeight: 800,
-                    color: isActive ? '#0066cc' : '#0f2942',
+                    color: '#0066cc',
                     lineHeight: 1.25,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
