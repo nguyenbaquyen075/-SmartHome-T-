@@ -104,7 +104,7 @@ export default function ProductsPage({
         </div>
 
         <button className="nut-tro-ve" onClick={onGoHome}>
-          <ArrowLeft size={15} />
+          <ArrowLeft size={19} />
           <span>Quay lại</span>
         </button>
       </nav>
