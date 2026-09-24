@@ -43,7 +43,7 @@ export default function ProjectDiary() {
           <div style={{ color: '#0066cc', display: 'flex' }}>
             <HardHat size={20} />
           </div>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1e293b' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0066cc' }}>
             NHẬT KÝ THI CÔNG
           </h2>
         </div>

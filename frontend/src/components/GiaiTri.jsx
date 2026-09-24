@@ -47,7 +47,7 @@ export default function GiaiTri() {
           <div style={{ color: '#0066cc', display: 'flex' }}>
             <Clapperboard size={20} />
           </div>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1e293b' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0066cc' }}>
             HẬU TRƯỜNG THI CÔNG
           </h2>
         </div>

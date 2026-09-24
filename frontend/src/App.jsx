@@ -257,7 +257,7 @@ export default function App() {
                 <div style={{ color: '#0066cc' }}>
                   <Flame size={20} fill="#0066cc" />
                 </div>
-                <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1e293b' }}>
+                <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0066cc' }}>
                   SẢN PHẨM NỔI BẬT
                 </h2>
               </div>
