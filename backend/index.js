@@ -684,6 +684,9 @@ const sapXep = (ds) => ds.sort((a, b) => Number(Boolean(b.ghim)) - Number(Boolea
 // Chi dong vao bai trong thu muc giai-tri; cam ".." de khong lan sang file khac tren Cloudinary
 const laBaiHopLe = (id, loai) => /^giai-tri\/[\w-][\w.-]*$/.test(String(id)) && ['image', 'video'].includes(loai);
 
+// Bài này nằm trong kho dữ liệu (đăng từ trước khi dùng Cloudinary) chứ không phải trên Cloudinary
+const trongKho = (id) => kho.doc(KHO_GIAI_TRI).some((b) => b.id === id);
+
 const giaiMa = (s) => { try { return decodeURIComponent(s || ''); } catch { return ''; } };
 
 const goiCloudinary = async (duongDan, tuyChon = {}) => {
@@ -719,6 +722,9 @@ app.get('/api/giai-tri', async (req, res) => {
         ngay: r.context?.custom?.ngay || r.created_at.slice(0, 10),
         ghim: r.context?.custom?.ghim === '1'
       }));
+    // Bài đã đăng từ trước lên kho Neon vẫn giữ nguyên trong kho dữ liệu: gộp vào để không biến mất khi đổi sang Cloudinary
+    const co = new Set(ds.map((b) => b.id));
+    kho.doc(KHO_GIAI_TRI).forEach((b) => { if (!co.has(b.id)) ds.push(b); });
     sapXep(ds);
     cacheGiaiTri = { luc: Date.now(), ds };
     res.json(ds);
@@ -817,12 +823,13 @@ app.put('/api/giai-tri', canQuyen, async (req, res) => {
   if (!laBaiHopLe(id, loai)) return res.status(400).json({ error: 'Bài không hợp lệ' });
   const bai = chuanHoaBai(req.body);
 
-  if (!cld) {
+  if (!cld || trongKho(id)) {
     const ds = kho.doc(KHO_GIAI_TRI);
     const i = ds.findIndex((b) => b.id === id);
     if (i === -1) return res.status(404).json({ error: 'Không tìm thấy bài' });
     ds[i] = { ...ds[i], ...bai };
     if (!(await kho.ghi(KHO_GIAI_TRI, ds))) return res.status(500).json(LOI_LUU);
+    cacheGiaiTri = null;
     return res.json(ds[i]);
   }
   try {
@@ -842,11 +849,12 @@ app.delete('/api/giai-tri', canQuyen, async (req, res) => {
   const { id, loai } = req.body || {};
   if (!laBaiHopLe(id, loai)) return res.status(400).json({ error: 'Bài không hợp lệ' });
 
-  if (!cld) {
+  if (!cld || trongKho(id)) {
     const ds = kho.doc(KHO_GIAI_TRI);
     const bai = ds.find((b) => b.id === id);
     if (!bai) return res.status(404).json({ error: 'Không tìm thấy bài' });
     if (!(await kho.ghi(KHO_GIAI_TRI, ds.filter((b) => b.id !== id)))) return res.status(500).json(LOI_LUU);
+    cacheGiaiTri = null;
     const tenKho = khoFile.tenTuDiaChi(bai.url);
     const tenBia = khoFile.tenTuDiaChi(bai.poster);
     if (tenBia) await khoFile.xoa(tenBia);   // xóa luôn ảnh bìa của video
