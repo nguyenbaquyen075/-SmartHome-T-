@@ -18,7 +18,7 @@ export default function MobileBottomNav({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-around',
-      padding: '8px 0',
+      padding: '3px 0',
       zIndex: 990,
       boxShadow: '0 -2px 10px rgba(0,0,0,0.06)'
     }}>
@@ -31,14 +31,14 @@ export default function MobileBottomNav({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '1px',
           color: activeTab === 'home' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '4px 12px'
+          padding: '2px 12px'
         }}
       >
-        <Home size={22} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
+        <Home size={20} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
+        <span style={{ fontSize: '0.66rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
           Trang chủ
         </span>
       </button>
@@ -52,14 +52,14 @@ export default function MobileBottomNav({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '1px',
           color: activeTab === 'products' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '4px 12px'
+          padding: '2px 12px'
         }}
       >
-        <LayoutGrid size={22} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
+        <LayoutGrid size={20} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
+        <span style={{ fontSize: '0.66rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
           Sản phẩm
         </span>
       </button>
@@ -73,14 +73,14 @@ export default function MobileBottomNav({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '1px',
           color: '#64748b',
           cursor: 'pointer',
-          padding: '4px 12px'
+          padding: '2px 12px'
         }}
       >
-        <User size={22} />
-        <span style={{ fontSize: '0.72rem', fontWeight: 500 }}>
+        <User size={20} />
+        <span style={{ fontSize: '0.66rem', fontWeight: 500 }}>
           Tài khoản
         </span>
       </button>
