@@ -35,9 +35,9 @@ const bienDoi = (m, thamSo, duoiMoi) => {
   return duoiMoi ? url.replace(/\.\w+$/, duoiMoi) : url;
 };
 
-// Video luu tren may khong co anh bia -> tra null, noi dung tu lay khung hinh dau cua video
+// Video luu tren kho Neon co anh bia (poster) do trinh duyet chup luc dang; khong co thi tra null, tu lay khung hinh dau cua video
 export const anhNho = (m, rong = 440, tiLe = 0.75) => {
-  if (!laCloudinary(m)) return m.loai === 'video' ? null : m.url;
+  if (!laCloudinary(m)) return m.loai === 'video' ? (m.poster || null) : m.url;
   const cat = `c_fill,w_${rong},h_${Math.round(rong * tiLe)},q_auto`;
   return m.loai === 'video' ? bienDoi(m, `so_0,${cat}`, '.jpg') : bienDoi(m, `${cat},f_auto`);
 };
@@ -81,10 +81,45 @@ const guiFile = (cach, url, than, dauMuc, onTienDo = () => {}) => new Promise((x
   xhr.send(than);
 });
 
+// Loại file: ưu tiên file.type, có máy (Windows/Android) để trống với .mov/.mp4 thì suy từ đuôi file
+const KIEU_THEO_DUOI = {
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+  mp4: 'video/mp4', m4v: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm'
+};
+export const kieuFile = (file) =>
+  file.type || KIEU_THEO_DUOI[String(file.name).split('.').pop().toLowerCase()] || '';
+
 // Xin giay phep tai thang len kho file Neon. Chua bat kho thi tra { cach: 'server' }
 const xinPhep = (file, thuMuc, ten) => apiAdmin('/tai-len/chu-ky', {
   method: 'POST',
-  body: JSON.stringify({ ten: ten || file.name, kieu: file.type, thuMuc })
+  body: JSON.stringify({ ten: ten || file.name, kieu: kieuFile(file), thuMuc })
+});
+
+// Chụp khung hình đầu của video làm ảnh bìa (nhẹ hơn nhiều so với để trang tải cả video chỉ để lấy hình).
+// Trình duyệt không đọc được video (vd HEVC) hoặc quá 8 giây thì trả null, video vẫn đăng bình thường.
+export const layAnhBia = (file) => new Promise((xong) => {
+  const url = URL.createObjectURL(file);
+  const v = document.createElement('video');
+  let da = false;
+  const ket = (kq) => { if (da) return; da = true; clearTimeout(han); URL.revokeObjectURL(url); xong(kq); };
+  const han = setTimeout(() => ket(null), 8000);
+  v.muted = true;
+  v.playsInline = true;
+  v.preload = 'auto';
+  v.onerror = () => ket(null);
+  v.onloadeddata = () => { v.currentTime = Math.min(0.5, (v.duration || 1) / 2); };
+  v.onseeked = () => {
+    if (!v.videoWidth) return ket(null);
+    try {
+      const rong = 360;
+      const c = document.createElement('canvas');
+      c.width = rong;
+      c.height = Math.round((rong * v.videoHeight) / v.videoWidth);
+      c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      c.toBlob((b) => ket(b ? new File([b], 'bia.jpg', { type: 'image/jpeg' }) : null), 'image/jpeg', 0.8);
+    } catch { ket(null); }
+  };
+  v.src = url;
 });
 
 // Nhiều nơi cùng hỏi 1 địa chỉ trong lúc đang chờ thì chỉ gửi 1 yêu cầu (chỉ gộp lúc đang bay,
@@ -212,7 +247,21 @@ export const api = {
     const phep = await xinPhep(file, 'giai-tri');
     if (phep.cach === 's3') {
       await guiFile('PUT', phep.uploadUrl, file, phep.dauMuc, onTienDo);
-      return apiAdmin('/giai-tri/xong', { method: 'POST', body: JSON.stringify({ url: phep.url, ...bai }) });
+      // Video: chụp + tải ảnh bìa lên cùng chỗ. Lỗi ở bước này không được làm hỏng bài đăng.
+      let poster = '';
+      if (kieuFile(file).startsWith('video/')) {
+        try {
+          const bia = await layAnhBia(file);
+          if (bia) {
+            const p = await xinPhep(bia, 'giai-tri', 'bia');
+            if (p.cach === 's3') {
+              await guiFile('PUT', p.uploadUrl, bia, p.dauMuc);
+              poster = p.url;
+            }
+          }
+        } catch { /* không có ảnh bìa vẫn đăng được */ }
+      }
+      return apiAdmin('/giai-tri/xong', { method: 'POST', body: JSON.stringify({ url: phep.url, poster, ...bai }) });
     }
 
     // 2) Chua co kho file: Cloudinary (neu co) hoac gui thang qua server minh
@@ -229,7 +278,7 @@ export const api = {
     }
     return guiFile('POST', uploadUrl, file, {
       Authorization: `Bearer ${adminToken.get() || ''}`,
-      'Content-Type': file.type || 'application/octet-stream',
+      'Content-Type': kieuFile(file) || 'application/octet-stream',
       'X-Ten-File': encodeURIComponent(file.name),
       'X-Bai': encodeURIComponent(JSON.stringify(bai))
     }, onTienDo);
