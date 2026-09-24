@@ -171,7 +171,6 @@ export const BAO_HANH_MAC_DINH = { thoiGian: '24 tháng', doiTra: '1 đổi 1 tr
 export const thieuThongTin = (sp) => [
   !(sp.images?.length || sp.image) && 'ảnh',
   !sp.subTitle && 'mô tả ngắn',
-  !sp.noiBat?.length && '4 ô nổi bật',
   !sp.description && 'giới thiệu',
   !sp.highlights?.length && 'đặc điểm',
   !Object.keys(sp.specs || {}).length && 'thông số',
