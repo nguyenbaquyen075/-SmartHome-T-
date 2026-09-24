@@ -18,7 +18,7 @@ export default function MobileBottomNav({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-around',
-      padding: '3px 0',
+      padding: '2px 0',
       zIndex: 990,
       boxShadow: '0 -2px 10px rgba(0,0,0,0.06)'
     }}>
@@ -29,16 +29,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          gap: '1px',
+          gap: '6px',
           color: activeTab === 'home' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '2px 12px'
+          padding: '6px 12px'
         }}
       >
-        <Home size={20} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.66rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
+        <Home size={18} strokeWidth={activeTab === 'home' ? 2.5 : 2} />
+        <span style={{ fontSize: '0.76rem', fontWeight: activeTab === 'home' ? 700 : 500 }}>
           Trang chủ
         </span>
       </button>
@@ -50,16 +50,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          gap: '1px',
+          gap: '6px',
           color: activeTab === 'products' ? '#0066cc' : '#64748b',
           cursor: 'pointer',
-          padding: '2px 12px'
+          padding: '6px 12px'
         }}
       >
-        <LayoutGrid size={20} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
-        <span style={{ fontSize: '0.66rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
+        <LayoutGrid size={18} strokeWidth={activeTab === 'products' ? 2.5 : 2} />
+        <span style={{ fontSize: '0.76rem', fontWeight: activeTab === 'products' ? 700 : 500 }}>
           Sản phẩm
         </span>
       </button>
@@ -71,16 +71,16 @@ export default function MobileBottomNav({
           background: 'none',
           border: 'none',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          gap: '1px',
+          gap: '6px',
           color: '#64748b',
           cursor: 'pointer',
-          padding: '2px 12px'
+          padding: '6px 12px'
         }}
       >
-        <User size={20} />
-        <span style={{ fontSize: '0.66rem', fontWeight: 500 }}>
+        <User size={18} />
+        <span style={{ fontSize: '0.76rem', fontWeight: 500 }}>
           Tài khoản
         </span>
       </button>
