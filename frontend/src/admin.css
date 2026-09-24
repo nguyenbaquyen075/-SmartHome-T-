@@ -346,7 +346,8 @@
 .qt-textarea-noidung {
   min-height: 130px;
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   font-size: 0.9rem;
   border-color: #cbd5e1;
   background: #fff;
