@@ -58,7 +58,7 @@ export default function ProductDetailPage({
 
 
   return (
-    <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div style={{ backgroundColor: '#e6f2fb', minHeight: '100vh', paddingBottom: '60px' }}>
       {/* 1. Breadcrumbs (Matching Screenshot) */}
       <div style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 0' }}>
         <div className="container nut-dong-hang" style={{ fontSize: '0.82rem', color: '#64748b' }}>
