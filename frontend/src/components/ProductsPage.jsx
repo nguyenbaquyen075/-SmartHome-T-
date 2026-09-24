@@ -12,7 +12,8 @@ const SORTS = [
 export default function ProductsPage({
   initialCategory = 'Tất cả',
   onViewDetails,
-  onGoHome
+  onGoHome,
+  onBack
 }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(['Tất cả']);
@@ -103,7 +104,7 @@ export default function ProductsPage({
           )}
         </div>
 
-        <button className="nut-tro-ve" onClick={onGoHome}>
+        <button className="nut-tro-ve" onClick={onBack || onGoHome}>
           <ArrowLeft size={15} />
           <span>Quay lại</span>
         </button>
