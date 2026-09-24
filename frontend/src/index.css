@@ -679,7 +679,7 @@ body {
   align-items: center;
   gap: 6px;
   color: #94a3b8;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   margin-bottom: 12px;
 }
 .pp-crumb button {
@@ -913,8 +913,8 @@ body {
   background: none;
   color: #0066cc;
   font: inherit;
-  font-size: 1.02rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
   transition: color 0.15s;
 }
