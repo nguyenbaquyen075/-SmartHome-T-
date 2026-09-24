@@ -34,11 +34,52 @@ export default function App() {
   // Trang danh sach san pham: null = dang o trang chu, chuoi = danh muc dang mo
   const [productsPageCat, setProductsPageCat] = useState(null);
 
-  const openProductsPage = (cat = 'Tất cả') => {
-    setViewingProduct(null);
-    setProductsPageCat(cat);
+  // ---- Điều hướng bằng lịch sử trình duyệt ----
+  // Mỗi lần sang trang mới là 1 mục lịch sử: bấm "Quay lại" (hoặc vuốt/nút back của điện thoại)
+  // về đúng trang vừa xem, giữ nguyên vị trí cuộn. n = số bước đã đi trong web này.
+  const apDung = (st) => {
+    setViewingProduct(st.v === 'detail' ? st.product : null);
+    setProductsPageCat(st.v === 'products' ? st.cat : null);
+  };
+  const dieuHuong = (st) => {
+    const hienTai = window.history.state || {};
+    if (hienTai.v === st.v && hienTai.cat === st.cat && st.v !== 'detail') {
+      apDung(st);   // đang ở đúng trang này rồi, không thêm mục lịch sử
+      return;
+    }
+    window.history.replaceState({ ...hienTai, y: window.scrollY }, '');   // nhớ vị trí cuộn trang đang rời
+    window.history.pushState(
+      { ...st, n: (hienTai.n || 0) + 1 },
+      '',
+      st.v === 'detail' ? `#product=${st.product.id}` : window.location.pathname
+    );
+    apDung(st);
     window.scrollTo({ top: 0 });
   };
+  // Quay lại trang trước; mở thẳng bằng link (chưa đi bước nào) thì về trang chủ
+  const quayLai = () => {
+    if ((window.history.state?.n || 0) > 0) {
+      window.history.back();
+    } else {
+      window.history.replaceState({ v: 'home', n: 0 }, '', window.location.pathname);
+      apDung({ v: 'home' });
+    }
+  };
+  const veTrangChu = () => dieuHuong({ v: 'home' });
+
+  useEffect(() => {
+    window.history.scrollRestoration = 'manual';
+    if (!window.history.state) window.history.replaceState({ v: 'home', n: 0 }, '');
+    const khiLui = (e) => {
+      const st = e.state || { v: 'home', n: 0 };
+      apDung(st);
+      setTimeout(() => window.scrollTo(0, st.y || 0), 60);   // chờ trang vẽ xong rồi cuộn về chỗ cũ
+    };
+    window.addEventListener('popstate', khiLui);
+    return () => window.removeEventListener('popstate', khiLui);
+  }, []);
+
+  const openProductsPage = (cat = 'Tất cả') => dieuHuong({ v: 'products', cat });
 
   // Comparison state (up to 3 items)
   const [compareList, setCompareList] = useState([]);
@@ -138,12 +179,7 @@ export default function App() {
   }, [products]);
 
   const handleSelectProduct = (product) => {
-    setViewingProduct(product);
-    if (product) {
-      window.location.hash = `product=${product.id}`;
-    } else {
-      window.location.hash = '';
-    }
+    if (product) dieuHuong({ v: 'detail', product }); else quayLai();
   };
 
   // Chua nhap san pham nao (khong phai do loc hay tim kiem): an bot cac muc trong
@@ -187,36 +223,43 @@ export default function App() {
         searchTerm={searchTerm}
         setSearchTerm={(term) => {
           setSearchTerm(term);
-          if (viewingProduct) setViewingProduct(null);
+          if (viewingProduct || productsPageCat !== null) veTrangChu();
         }}
         compareList={compareList}
         setIsCompareOpen={setIsCompareOpen}
         setIsAdmin={moQuanTri}
         setSelectedCategory={(cat) => {
           setSelectedCategory(cat);
-          setViewingProduct(null);
+          if (viewingProduct || productsPageCat !== null) veTrangChu();
         }}
       />
 
-      {/* Chi tiet san pham > Trang danh sach san pham > Trang chu */}
-      {viewingProduct ? (
+      {/* Chi tiet san pham > Trang danh sach san pham > Trang chu.
+          Trang danh sach van giu nguyen (chi an) khi xem chi tiet de quay lai con bo loc + vi tri cu */}
+      {viewingProduct && (
         <Suspense fallback={null}>
         <ProductDetailPage
           product={viewingProduct}
           allProducts={products}
-          onBack={() => handleSelectProduct(null)}
+          onBack={quayLai}
           onSelectProduct={handleSelectProduct}
         />
         </Suspense>
-      ) : productsPageCat !== null ? (
-        <Suspense fallback={null}>
-          <ProductsPage
-            initialCategory={productsPageCat}
-            onViewDetails={handleSelectProduct}
-            onGoHome={() => setProductsPageCat(null)}
-          />
-        </Suspense>
-      ) : (
+      )}
+      {productsPageCat !== null && (
+        <div style={{ display: viewingProduct ? 'none' : 'block' }}>
+          <Suspense fallback={null}>
+            <ProductsPage
+              key={productsPageCat}
+              initialCategory={productsPageCat}
+              onViewDetails={handleSelectProduct}
+              onGoHome={veTrangChu}
+              onBack={quayLai}
+            />
+          </Suspense>
+        </div>
+      )}
+      {!viewingProduct && productsPageCat === null && (
         <>
           {/* Thanh chạy thông báo, nằm ngay trên banner */}
           <PromoTicker />
@@ -382,8 +425,7 @@ export default function App() {
               : ''
           }
           onGoHome={() => {
-            setViewingProduct(null);
-            setProductsPageCat(null);
+            veTrangChu();
             setSelectedCategory('Tất cả');
             setSearchTerm('');
             window.scrollTo({ top: 0, behavior: 'smooth' });

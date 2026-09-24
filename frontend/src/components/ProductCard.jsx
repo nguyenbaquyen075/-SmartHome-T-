@@ -10,12 +10,17 @@ export default function ProductCard({
   const isAboveFold = index < 4;
 
   return (
-    <div className="store-product-card">
+    <div
+      className="store-product-card"
+      role="link"
+      tabIndex={0}
+      onClick={() => onViewDetails(product)}
+      onKeyDown={(e) => { if (e.key === 'Enter') onViewDetails(product); }}
+      style={{ cursor: 'pointer' }}
+    >
       {/* Product Image */}
-      <div 
-        onClick={() => onViewDetails(product)}
+      <div
         style={{
-          cursor: 'pointer',
           width: '100%',
           height: '140px',
           display: 'flex',
@@ -45,13 +50,11 @@ export default function ProductCard({
 
       {/* Product Title */}
       <h3
-        onClick={() => onViewDetails(product)}
         style={{
           fontSize: '0.88rem',
           fontWeight: 600,
           color: '#1e293b',
           lineHeight: 1.35,
-          cursor: 'pointer',
           marginBottom: '4px',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -82,7 +85,7 @@ export default function ProductCard({
       {/* Xem chi tiet */}
       <div style={{ marginTop: 'auto' }}>
         <button
-          onClick={() => onViewDetails(product)}
+          type="button"
           className="btn-primary"
           style={{
             width: '100%',
