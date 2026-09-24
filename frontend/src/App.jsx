@@ -157,7 +157,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#e6f2fb' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f0f7fd' }}>
       {/* Toast Notification */}
       {toast && (
         <div style={{
