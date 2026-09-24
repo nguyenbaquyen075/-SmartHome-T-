@@ -1,7 +1,8 @@
 import React from 'react';
 import { Home, LayoutGrid, User } from 'lucide-react';
 
-// Thanh dưới kiểu app: nền trắng bo tròn góc trên, icon trên chữ, mục đang chọn màu xanh + gạch chân
+// Thanh dưới kiểu app (style ở .bnav trong index.css): nền trắng bo góc trên,
+// mục đang chọn có viên thuốc xanh nhạt sau icon, chữ đậm màu thương hiệu.
 export default function MobileBottomNav({
   activeTab = 'home',
   onGoHome,
@@ -15,48 +16,19 @@ export default function MobileBottomNav({
   ];
 
   return (
-    <nav style={{
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: '#fff',
-      borderRadius: '22px 22px 0 0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-around',
-      padding: '10px 8px calc(10px + env(safe-area-inset-bottom))',
-      zIndex: 990,
-      boxShadow: '0 -4px 18px rgba(15, 23, 42, 0.10)'
-    }}>
+    <nav className="bnav" aria-label="Điều hướng chính">
       {muc.map(({ id, nhan, Icon, onClick }) => {
         const chon = activeTab === id;
         return (
           <button
             key={id}
+            type="button"
+            className={`bnav-item${chon ? ' on' : ''}`}
             onClick={onClick}
             aria-current={chon ? 'page' : undefined}
-            style={{
-              background: 'none',
-              border: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: chon ? '#0066cc' : '#94a3b8',
-              cursor: 'pointer',
-              padding: '2px 16px',
-              flex: 1
-            }}
           >
-            <Icon size={27} strokeWidth={chon ? 2.2 : 1.8} />
-            <span style={{ fontSize: '0.82rem', fontWeight: chon ? 700 : 500 }}>{nhan}</span>
-            <span style={{
-              width: '46px',
-              height: '3px',
-              borderRadius: '2px',
-              backgroundColor: chon ? '#0066cc' : 'transparent'
-            }} />
+            <span className="bnav-pill"><Icon size={23} strokeWidth={chon ? 2.3 : 1.9} /></span>
+            <span className="bnav-nhan">{nhan}</span>
           </button>
         );
       })}
