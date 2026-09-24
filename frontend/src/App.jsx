@@ -371,7 +371,7 @@ export default function App() {
       </div>
 
       {/* Dải trắng dưới chân trang cho thanh điều hướng đè lên (chỉ điện thoại) */}
-      <div className="mobile-only" style={{ height: 'calc(54px + env(safe-area-inset-bottom))', backgroundColor: '#fff' }} />
+      <div className="mobile-only" style={{ height: 'calc(68px + env(safe-area-inset-bottom))', backgroundColor: '#fff' }} />
 
       {/* Mobile Fixed Bottom Navigation Bar (Hidden on desktop) */}
       <div className="mobile-only">
