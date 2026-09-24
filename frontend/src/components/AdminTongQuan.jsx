@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Package, HardHat, Clapperboard, Plus, Upload, AlertCircle } from 'lucide-react';
 import { api } from '../utils/api';
-import { DANH_MUC, thieuThongTin } from '../utils/sanPham';
+import { thieuThongTin } from '../utils/sanPham';
+import { useDanhMuc } from '../utils/danhMuc';
 import { AnhChay, gomAnhTheoDanhMuc } from '../utils/anhChay';
 
 export default function AdminTongQuan({ onBao, diToi }) {
+  const dsDanhMuc = useDanhMuc();
   const [duLieu, setDuLieu] = useState(null);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export default function AdminTongQuan({ onBao, diToi }) {
   const { sanPham, congTrinh, giaiTri } = duLieu;
   // Ảnh đại diện mỗi danh mục (chỉ ảnh chính, không lấy ảnh phụ), tự đảo vài giây 1 lần
   const anhTheoDanhMuc = gomAnhTheoDanhMuc(sanPham);
-  const theoDanhMuc = DANH_MUC.map((dm) => ({
+  const theoDanhMuc = dsDanhMuc.map((d) => d.ten).map((dm) => ({
     dm,
     so: sanPham.filter((p) => p.category === dm).length,
     ds: anhTheoDanhMuc[dm] || []

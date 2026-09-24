@@ -22,8 +22,17 @@ const KHO_SAN_PHAM = 'products';
 const KHO_CONG_TRINH = 'projects';
 const KHO_CAI_DAT = 'settings';
 const KHO_GIAI_TRI = 'giai-tri';
+const KHO_DANH_MUC = 'danh-muc';     // danh muc san pham, them/sua/xoa trong trang quan tri
 const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
 const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
+
+// Danh muc luc moi cai dat: dung 3 danh muc web dang co. icon la khoa trong frontend/src/utils/danhMuc.jsx
+const DANH_MUC_MAC_DINH = [
+  { id: 'dm-mang', ten: 'Thiết bị mạng', icon: 'cctv', anh: '/images/cat_style_new/prod_3.png' },
+  { id: 'dm-dien', ten: 'Thiết bị điện', icon: 'zap', anh: '/images/cat_style_new/prod_1.png' },
+  { id: 'dm-nuoc', ten: 'Thiết bị nước', icon: 'droplets', anh: '/images/cat_style_new/prod_2.png' }
+];
+const docDanhMuc = () => kho.doc(KHO_DANH_MUC, DANH_MUC_MAC_DINH);
 
 // Kho hong (mat mang, DB day...) thi bao that cho admin, khong bao "da luu" gia
 const LOI_LUU = { error: 'Không lưu được dữ liệu, kiểm tra mạng rồi thử lại' };
@@ -403,11 +412,69 @@ app.get('/api/anh/:id', async (req, res) => {
   }
 });
 
-// GET /api/categories
+// GET /api/categories (chi ten, co 'Tất cả' dau tien - trang san pham dung)
 app.get('/api/categories', (req, res) => {
-  const products = kho.doc(KHO_SAN_PHAM);
-  const categories = ['Tất cả', ...new Set(products.map((p) => p.category))];
-  res.json(categories);
+  res.json(['Tất cả', ...docDanhMuc().map((d) => d.ten)]);
+});
+
+// ---- Danh muc san pham (quan tri them / sua / xoa) ----
+const ICON_DANH_MUC = ['cctv', 'zap', 'droplets', 'wifi', 'wrench', 'lightbulb', 'shield', 'package', 'plug', 'sun'];
+const trungTen = (ds, ten, boQuaId) =>
+  ds.some((d) => d.id !== boQuaId && d.ten.toLowerCase() === ten.toLowerCase());
+
+// GET /api/danh-muc - ai cung doc duoc
+app.get('/api/danh-muc', (req, res) => res.json(docDanhMuc()));
+
+// Kiem tra ten + icon, tra ve { loi } hoac { ten, icon }
+const kiemDanhMuc = (b, ds, boQuaId) => {
+  const ten = chuoi(b.ten, 60);
+  if (!ten) return { loi: 'Nhập tên danh mục' };
+  if (ten.toLowerCase() === 'tất cả') return { loi: '"Tất cả" là mục có sẵn, chọn tên khác' };
+  if (trungTen(ds, ten, boQuaId)) return { loi: 'Đã có danh mục tên này' };
+  return { ten, icon: ICON_DANH_MUC.includes(b.icon) ? b.icon : 'package' };
+};
+
+// POST /api/danh-muc
+app.post('/api/danh-muc', canQuyen, async (req, res) => {
+  const ds = docDanhMuc();
+  const v = kiemDanhMuc(req.body, ds);
+  if (v.loi) return res.status(400).json({ error: v.loi });
+  const moi = { id: `dm-${Date.now()}`, ten: v.ten, icon: v.icon, anh: '' };
+  ds.push(moi);
+  if (!(await kho.ghi(KHO_DANH_MUC, ds))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+});
+
+// PUT /api/danh-muc/:id - doi ten thi san pham thuoc danh muc nay doi theo
+app.put('/api/danh-muc/:id', canQuyen, async (req, res) => {
+  const ds = docDanhMuc();
+  const i = ds.findIndex((d) => d.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy danh mục' });
+  const v = kiemDanhMuc(req.body, ds, ds[i].id);
+  if (v.loi) return res.status(400).json({ error: v.loi });
+
+  const tenCu = ds[i].ten;
+  ds[i] = { ...ds[i], ten: v.ten, icon: v.icon };
+  if (!(await kho.ghi(KHO_DANH_MUC, ds))) return res.status(500).json(LOI_LUU);
+
+  if (tenCu !== v.ten) {
+    const sp = kho.doc(KHO_SAN_PHAM).map((p) => (p.category === tenCu ? { ...p, category: v.ten } : p));
+    if (!(await kho.ghi(KHO_SAN_PHAM, sp))) return res.status(500).json(LOI_LUU);
+  }
+  res.json(ds[i]);
+});
+
+// DELETE /api/danh-muc/:id - con san pham thi khong cho xoa, tranh san pham mo coi
+app.delete('/api/danh-muc/:id', canQuyen, async (req, res) => {
+  const ds = docDanhMuc();
+  const d = ds.find((x) => x.id === req.params.id);
+  if (!d) return res.status(404).json({ error: 'Không tìm thấy danh mục' });
+  const dem = kho.doc(KHO_SAN_PHAM).filter((p) => p.category === d.ten).length;
+  if (dem > 0) {
+    return res.status(409).json({ error: `Còn ${dem} sản phẩm thuộc "${d.ten}". Chuyển hoặc xóa các sản phẩm đó trước.` });
+  }
+  if (!(await kho.ghi(KHO_DANH_MUC, ds.filter((x) => x.id !== d.id)))) return res.status(500).json(LOI_LUU);
+  res.json({ success: true });
 });
 
 // GET /api/brands
@@ -529,7 +596,8 @@ const chuanHoaSanPham = (b = {}) => {
 };
 
 const loiSanPham = (sp) =>
-  (!sp.name || !sp.brand || !sp.category || !sp.image) && 'Cần có tên, danh mục, thương hiệu và ít nhất 1 ảnh';
+  (!sp.name || !sp.brand || !sp.category || !sp.image) && 'Cần có tên, danh mục, thương hiệu và ít nhất 1 ảnh'
+  || (!docDanhMuc().some((d) => d.ten === sp.category) && 'Danh mục không còn tồn tại, chọn lại danh mục');
 
 // POST /api/products (them san pham)
 app.post('/api/products', canQuyen, async (req, res) => {
@@ -817,6 +885,7 @@ kho.moKho({
   [KHO_SAN_PHAM]: [],
   [KHO_CONG_TRINH]: [],
   [KHO_CAI_DAT]: CAI_DAT_MAC_DINH,
+  [KHO_DANH_MUC]: DANH_MUC_MAC_DINH,
   [KHO_GIAI_TRI]: [],
   [KHO_QUAN_TRI]: {}
 }).then(() => {

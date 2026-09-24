@@ -10,7 +10,7 @@ import ProjectDiary from './components/ProjectDiary';
 import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
 import { api } from './utils/api';
-import { MUC_DANH_MUC } from './utils/sanPham';
+import { useDanhMuc, iconDanhMuc } from './utils/danhMuc';
 import { gomAnhTheoDanhMuc } from './utils/anhChay';
 
 // Tach khoi bundle dau: 3 man nay chi tai khi nguoi dung thuc su mo den,
@@ -20,11 +20,9 @@ const ComparisonModal = lazy(() => import('./components/ComparisonModal'));
 const ProductsPage = lazy(() => import('./components/ProductsPage'));
 import { Flame, ArrowRight, Check, Info, Camera, Zap, Droplets } from 'lucide-react';
 
-// 3 nhom hien o trang chu, ten khop voi 4 o DANH MUC SAN PHAM
-// 3 nhom hang o trang chu, lay tu danh sach dung chung (bo "Tất cả" o dau)
-const HOME_GROUPS = MUC_DANH_MUC.slice(1).map((m) => ({ name: m.ten, icon: m.Icon }));
-
 export default function App() {
+  // Moi danh muc la 1 nhom o trang chu (danh sach do trang Quan tri > Danh muc quyet dinh)
+  const danhMuc = useDanhMuc();
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,7 +112,7 @@ export default function App() {
     }
     let huy = false;
     Promise.all(
-      HOME_GROUPS.map((g) =>
+      danhMuc.map((m) => ({ name: m.ten, icon: iconDanhMuc(m.icon) })).map((g) =>
         api.getProducts({ category: g.name })
           .then((list) => ({ ...g, items: list.slice(0, 4) }))
           .catch(() => ({ ...g, items: [] }))
@@ -123,7 +121,7 @@ export default function App() {
       if (!huy) setHomeGroups(res.filter((g) => g.items.length > 0));
     });
     return () => { huy = true; };
-  }, [selectedCategory, searchTerm]);
+  }, [selectedCategory, searchTerm, danhMuc]);
 
   // Sync with URL hash for direct product view
   useEffect(() => {

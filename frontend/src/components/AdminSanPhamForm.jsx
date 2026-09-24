@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Link } from 'lucide-react';
 import { api } from '../utils/api';
 import { nenAnhFile, coFile } from '../utils/anh';
-import { DANH_MUC, DON_VI, doiNhan } from '../utils/sanPham';
+import { DON_VI, doiNhan } from '../utils/sanPham';
+import { useDanhMuc } from '../utils/danhMuc';
 import { Truong, Khoi, ThanhLuu, DanhSachDong } from './AdminForm';
 import { useBanNhap, gioPhut } from '../utils/banNhap';
 
@@ -48,6 +49,7 @@ const tuSanPham = (sp) => ({
 });
 
 export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
+  const dsDanhMuc = useDanhMuc();
   const { f, setF, daKhoiPhuc, luc, boBanNhap, xongBanNhap, huyBanNhap } =
     useBanNhap(`cameratd_dang_nhap_sp_${sp?.id || 'moi'}`, () => tuSanPham(sp));
   const huy = huyBanNhap(onHuy);
@@ -206,7 +208,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
           <Truong nhan="Danh mục" batBuoc loi={loi.category && !f.category && 'Chọn danh mục'}>
             <select className="qt-input" value={f.category} onChange={(e) => doi('category', e.target.value)}>
               <option value="">— Chọn danh mục —</option>
-              {DANH_MUC.map((d) => <option key={d}>{d}</option>)}
+              {dsDanhMuc.map((d) => <option key={d.id}>{d.ten}</option>)}
             </select>
           </Truong>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { LayoutGrid, ArrowRight, Zap, Droplets, Camera } from 'lucide-react';
+import { LayoutGrid, ArrowRight } from 'lucide-react';
 import { AnhChay } from '../utils/anhChay';
+import { useDanhMuc, iconDanhMuc, ANH_TAT_CA } from '../utils/danhMuc';
 
 export default function CategoryFilter({
   selectedCategory,
@@ -11,36 +12,17 @@ export default function CategoryFilter({
 }) {
   const [hoveredCat, setHoveredCat] = useState(null);
 
-  // 4 mục người dùng yêu cầu: Tất cả, Thiết bị điện, Thiết bị mạng, Thiết bị nước
+  // "Tất cả" + danh mục lấy từ trang Quản trị > Danh mục
+  const danhMuc = useDanhMuc();
   const categories = [
-    {
-      name: 'Tất cả',
-      label: 'Tất cả',
-      icon: LayoutGrid,
-      image: '/images/cat_style_new/prod_all.jpg',
-      alt: 'Tất cả sản phẩm điện nước camera mạng'
-    },
-    {
-      name: 'Thiết bị điện',
-      label: 'Thiết bị điện',
-      icon: Zap,
-      image: '/images/cat_style_new/prod_1.png',
-      alt: 'Thiết bị điện, bóng đèn, công tắc, ổ cắm, dây điện'
-    },
-    {
-      name: 'Thiết bị mạng',
-      label: 'Thiết bị mạng',
-      icon: Camera,
-      image: '/images/cat_style_new/prod_3.png',
-      alt: 'Thiết bị mạng, camera an ninh, wifi giám sát'
-    },
-    {
-      name: 'Thiết bị nước',
-      label: 'Thiết bị nước',
-      icon: Droplets,
-      image: '/images/cat_style_new/prod_2.png',
-      alt: 'Thiết bị nước, máy bơm, vòi rửa, thiết bị vệ sinh'
-    }
+    { name: 'Tất cả', label: 'Tất cả', icon: LayoutGrid, image: ANH_TAT_CA, alt: 'Tất cả sản phẩm' },
+    ...danhMuc.map((d) => ({
+      name: d.ten,
+      label: d.ten,
+      icon: iconDanhMuc(d.icon),
+      image: d.anh || ANH_TAT_CA,
+      alt: d.ten
+    }))
   ];
 
   return (

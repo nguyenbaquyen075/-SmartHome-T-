@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck
+  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import AdminLogin from './AdminLogin';
 import AdminTongQuan from './AdminTongQuan';
 import AdminSanPham from './AdminSanPham';
+import AdminDanhMuc from './AdminDanhMuc';
 import AdminProjects from './AdminProjects';
 import AdminGiaiTri from './AdminGiaiTri';
 import AdminSettings from './AdminSettings';
@@ -27,6 +28,7 @@ const MENU = [
     muc: [
       { duong: 'thanh-chay', nhan: 'Thanh chữ chạy', moTa: 'Dòng thông báo chạy trên banner', Icon: Megaphone },
       { duong: 'banner', nhan: 'Ảnh banner', moTa: 'Ảnh lớn ở đầu trang chủ', Icon: Image },
+      { duong: 'danh-muc', nhan: 'Danh mục', moTa: 'Thêm, sửa, xóa danh mục sản phẩm', Icon: LayoutGrid },
       { duong: 'san-pham', nhan: 'Sản phẩm', moTa: 'Ảnh, thông số, mô tả chi tiết', Icon: Package, them: true },
       { duong: 'cong-trinh', nhan: 'Nhật ký thi công', moTa: 'Công trình đã làm', Icon: HardHat, them: true },
       { duong: 'giai-tri', nhan: 'Hậu trường thi công', moTa: 'Ảnh, video giải trí', Icon: Clapperboard }
@@ -172,6 +174,7 @@ export default function AdminApp() {
           <a className="qt-quaylai" href="#/tong-quan"><ArrowLeft size={15} /> Quay lại Tổng quan</a>
         )}
         {trang === 'tong-quan' && <AdminTongQuan {...chung} />}
+        {trang === 'danh-muc' && <AdminDanhMuc onBao={hienBao} />}
         {trang === 'san-pham' && <AdminSanPham {...chung} con={con} />}
         {trang === 'cong-trinh' && <AdminProjects {...chung} con={con} />}
         {trang === 'giai-tri' && <AdminGiaiTri onBao={hienBao} />}

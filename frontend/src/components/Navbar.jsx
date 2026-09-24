@@ -17,7 +17,7 @@ import {
   Package,
   Sparkles
 } from 'lucide-react';
-import { MUC_DANH_MUC, DANH_MUC } from '../utils/sanPham';
+import { useDanhMuc, mucMenu } from '../utils/danhMuc';
 
 export default function Navbar({
   searchTerm,
@@ -43,8 +43,9 @@ export default function Navbar({
   };
 
   // Lay tu danh sach dung chung (utils/sanPham.jsx) de menu khong lech voi trang chu
-  const navCategories = MUC_DANH_MUC.map((m) => ({ name: m.ten, icon: m.Icon }));
-  const allCategories = DANH_MUC;
+  const danhMuc = useDanhMuc();
+  const navCategories = mucMenu(danhMuc);
+  const allCategories = danhMuc.map((d) => d.ten);
 
   return (
     <header style={{ backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>

@@ -1,17 +1,7 @@
 // Du lieu dung chung cho trang chi tiet san pham va form quan tri
 import React from 'react';
-import { Moon, Droplets, ShieldCheck, Zap, Gauge, Sun, Clock, Ruler, Wifi, Wrench, LayoutGrid, Cctv } from 'lucide-react';
+import { Moon, Droplets, ShieldCheck, Zap, Gauge, Sun, Clock, Ruler, Wifi, Wrench } from 'lucide-react';
 
-// 3 danh muc hang + "Tất cả" = 4 o ngoai trang chu. Dung chung cho menu, trang chu,
-// trang san pham va form quan tri - sua o day la doi ca web.
-export const DANH_MUC = ['Thiết bị mạng', 'Thiết bị điện', 'Thiết bị nước'];
-
-export const MUC_DANH_MUC = [
-  { ten: 'Tất cả', Icon: LayoutGrid, anh: '/images/cat_style_new/prod_all.jpg', moTa: 'Toàn bộ sản phẩm' },
-  { ten: 'Thiết bị mạng', Icon: Cctv, anh: '/images/cat_style_new/prod_3.png', moTa: 'Camera, wifi, đầu ghi' },
-  { ten: 'Thiết bị điện', Icon: Zap, anh: '/images/cat_style_new/prod_1.png', moTa: 'Aptomat, dây điện, đèn' },
-  { ten: 'Thiết bị nước', Icon: Droplets, anh: '/images/cat_style_new/prod_2.png', moTa: 'Máy bơm, ống, vòi sen' }
-];
 export const DON_VI = ['chiếc', 'cái', 'bộ', 'mét', 'cuộn', 'bóng', 'hộp'];
 
 // Nhan tieng Viet cho khoa thong so cu (camelCase).
