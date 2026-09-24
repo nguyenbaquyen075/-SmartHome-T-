@@ -11,7 +11,7 @@ import {
   CircleCheck,
 } from 'lucide-react';
 import ProductCard from './ProductCard';
-import { doiNhan, DaiNoiBat, MAU_HUONG_DAN, BAO_HANH_MAC_DINH } from '../utils/sanPham';
+import { doiNhan, DaiNoiBat } from '../utils/sanPham';
 
 export default function ProductDetailPage({
   product,
@@ -25,20 +25,18 @@ export default function ProductDetailPage({
   const images = product?.images?.length ? product.images : [product?.image].filter(Boolean);
   const hasIntro = Boolean(product?.description?.trim() || product?.highlights?.length);
 
-  const huongDan = product?.huongDan?.length
-    ? product.huongDan
-    : MAU_HUONG_DAN[product?.category] || MAU_HUONG_DAN['Phụ kiện'];
-  const baoHanh = {
-    thoiGian: product?.baoHanh?.thoiGian || BAO_HANH_MAC_DINH.thoiGian,
-    doiTra: product?.baoHanh?.doiTra || BAO_HANH_MAC_DINH.doiTra
-  };
+  // Chỉ hiện những gì đã nhập. Sản phẩm cũ chưa có thongTin thì dựng từ dữ liệu cũ, không chèn nội dung mặc định.
+  const baoHanh = [
+    product?.baoHanh?.thoiGian && `Bảo hành: ${product.baoHanh.thoiGian}`,
+    product?.baoHanh?.doiTra && `Đổi trả: ${product.baoHanh.doiTra}`
+  ].filter(Boolean);
   const thongTin = product?.thongTin?.length ? product.thongTin : [
     Object.keys(product?.specs || {}).length && {
       tieuDe: 'Thông số kỹ thuật',
       noiDung: Object.entries(product.specs).map(([khoa, giaTri]) => `${doiNhan(khoa)}: ${giaTri}`)
     },
-    huongDan?.length && { tieuDe: 'Hướng dẫn cài đặt & sử dụng', noiDung: huongDan },
-    { tieuDe: 'Bảo hành & đổi trả', noiDung: [`Bảo hành: ${baoHanh.thoiGian}`, `Đổi trả: ${baoHanh.doiTra}`] }
+    product?.huongDan?.length && { tieuDe: 'Hướng dẫn cài đặt & sử dụng', noiDung: product.huongDan },
+    baoHanh.length && { tieuDe: 'Bảo hành & đổi trả', noiDung: baoHanh }
   ].filter(Boolean);
 
   // Scroll to top when product changes
