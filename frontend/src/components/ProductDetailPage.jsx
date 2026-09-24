@@ -227,6 +227,12 @@ export default function ProductDetailPage({
               {product.name}
             </h1>
 
+            {product.subTitle && (
+              <p style={{ fontSize: '0.95rem', color: '#475569', lineHeight: 1.6, marginBottom: '14px' }}>
+                {product.subTitle}
+              </p>
+            )}
+
             {/* 4 ô nổi bật: nhập trong quản trị, chưa nhập thì ẩn cho khỏi hiện sai */}
             <DaiNoiBat ds={product.noiBat} />
 
