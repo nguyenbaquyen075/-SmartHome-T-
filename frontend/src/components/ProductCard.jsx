@@ -71,9 +71,10 @@ export default function ProductCard({
         fontSize: '0.76rem',
         color: '#94a3b8',
         marginBottom: '6px',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden'
       }}>
         {product.subTitle || product.description || 'Chính hãng 100%'}
       </p>
