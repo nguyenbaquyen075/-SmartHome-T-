@@ -365,8 +365,10 @@ export default function App() {
         </>
       )}
 
-      {/* Footer */}
-      <Footer />
+      {/* Chân trang chỉ hiện trên máy tính; điện thoại dùng thanh điều hướng dưới như app */}
+      <div className="desktop-only">
+        <Footer />
+      </div>
 
       {/* Dải trắng dưới chân trang cho thanh điều hướng đè lên (chỉ điện thoại) */}
       <div className="mobile-only" style={{ height: 'calc(36px + env(safe-area-inset-bottom))', backgroundColor: '#fff' }} />
