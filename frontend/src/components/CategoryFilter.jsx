@@ -69,7 +69,7 @@ export default function CategoryFilter({
           <h2 style={{
             fontSize: '1.08rem',
             fontWeight: 800,
-            color: '#004085',
+            color: '#0066cc',
             margin: 0,
             letterSpacing: '0.2px',
             textTransform: 'uppercase',
