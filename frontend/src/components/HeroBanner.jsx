@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 
+const SLIDES = [1, 2, 3, 4].map((n) => `/images/slide_${n}.jpg`);
+
 export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
   // Anh banner thay duoc trong trang quan tri
   const [banner, setBanner] = useState(null);
   useEffect(() => {
     api.getSettings().then((s) => setBanner(s.banner || null)).catch(() => {});
   }, []);
+
+  // Trượt từ phải sang trái; ảnh đầu được nhân bản ở cuối để vòng lặp không trượt ngược
+  const slides = banner ? [banner] : SLIDES;
+  const track = slides.length > 1 ? [...slides, slides[0]] : slides;
+  const [idx, setIdx] = useState(0);
+  const [anim, setAnim] = useState(true);
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const t = setInterval(() => { setAnim(true); setIdx((i) => (i < slides.length ? i + 1 : i)); }, 4000);
+    return () => clearInterval(t);
+  }, [slides.length]);
 
   return (
     <div style={{ paddingTop: '10px', paddingBottom: '16px' }}>
@@ -22,7 +35,7 @@ export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
             backgroundColor: '#005bb5',
             position: 'relative',
             width: '100%',
-            aspectRatio: '1024 / 317',
+            aspectRatio: banner ? '1024 / 317' : '2159 / 728',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -38,20 +51,26 @@ export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
           }}
           title="Xem danh mục sản phẩm"
         >
-          <img
-            src={banner || '/images/banner_hero_1024.jpg'}
-            srcSet={banner ? undefined : '/images/banner_hero_640.jpg 640w, /images/banner_hero_1024.jpg 1024w, /images/banner_hero_2x.jpg 2048w'}
-            sizes={banner ? undefined : '(max-width: 768px) 100vw, 1024px'}
-            alt="SmartHome T&D Banner"
-            fetchPriority="high"
-            decoding="async"
+          <div
+            onTransitionEnd={() => { if (idx === slides.length) { setAnim(false); setIdx(0); } }}
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block'
+              display: 'flex', width: '100%', height: '100%',
+              transform: `translateX(-${idx * 100}%)`,
+              transition: anim ? 'transform 0.7s ease' : 'none'
             }}
-          />
+          >
+            {track.map((src, i) => (
+              <div key={i} style={{ flex: '0 0 100%', position: 'relative', overflow: 'hidden' }}>
+                <img
+                  src={src}
+                  alt="SmartHome T&D Banner"
+                  fetchPriority={i === 0 ? 'high' : undefined}
+                  decoding="async"
+                  style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
