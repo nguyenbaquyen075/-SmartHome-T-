@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 
-const SLIDES = [1, 2, 3, 4].map((n) => `/images/slide_${n}.jpg`);
+// Server cache ảnh 1 năm: đổi số v khi thay ảnh slide để trình duyệt tải lại
+const SLIDES = [1, 2, 3, 4].map((n) => `/images/slide_${n}.jpg?v=2`);
 
 export default function HeroBanner({ onSelectCategory, onViewCatalog }) {
   // Anh banner thay duoc trong trang quan tri
