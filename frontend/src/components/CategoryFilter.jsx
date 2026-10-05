@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LayoutGrid, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { AnhChay } from '../utils/anhChay';
 import { useDanhMuc, iconDanhMuc, ANH_TAT_CA } from '../utils/danhMuc';
@@ -25,7 +25,8 @@ export default function CategoryFilter({
   const [hoveredCat, setHoveredCat] = useState(null);
   const [moRong, setMoRong] = useState(false);
   const cot = useCotMotHang();
-  const [lech, setLech] = useState(0); // số lần đã đổi ô
+  const hangRef = useRef(null);
+  const chamLuc = useRef(0);                      // lúc người dùng vừa chạm/lướt, để tạm dừng tự chạy
 
   // "Tất cả" + danh mục lấy từ trang Quản trị > Danh mục
   const danhMuc = useDanhMuc();
@@ -40,17 +41,21 @@ export default function CategoryFilter({
     }))
   ];
 
-  // Khi chưa bấm "Xem thêm": cứ 1s một ô (lần lượt từ trái sang) được thay bằng danh mục kế tiếp, rê chuột vào thì dừng
+  // Chưa bấm "Xem thêm": một hàng lướt ngang được (vuốt tay hoặc kéo thanh cuộn).
+  // Không ai chạm thì cứ 1s tự cuộn sang 1 ô, hết hàng thì quay về đầu; chạm hoặc rê chuột vào thì dừng.
   const xoay = !moRong && categories.length > cot;
+  const hang = categories;
   useEffect(() => {
-    if (!xoay || hoveredCat) return;
-    const t = setInterval(() => setLech((l) => l + 1), 1000);
+    if (!xoay) return;
+    const t = setInterval(() => {
+      const el = hangRef.current;
+      if (!el || hoveredCat || Date.now() - chamLuc.current < 4000) return;
+      const buoc = el.firstElementChild.offsetWidth + 12;
+      const het = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+      el.scrollTo({ left: het ? 0 : el.scrollLeft + buoc, behavior: 'smooth' });
+    }, 1000);
     return () => clearInterval(t);
   }, [xoay, hoveredCat]);
-  // Ô s đã được thay ceil((lech - s) / cot) lần, mỗi lần nhảy cot danh mục
-  const hang = xoay
-    ? Array.from({ length: cot }, (_, s) => categories[(s + cot * Math.max(0, Math.ceil((lech - s) / cot))) % categories.length])
-    : categories;
 
   return (
     <div style={{ marginBottom: '18px' }}>
@@ -122,8 +127,14 @@ export default function CategoryFilter({
 
       {/* 2. 4 Khung Ô Danh Mục (Tất cả, Thiết bị điện, Thiết bị mạng, Thiết bị nước) */}
       <div
-        className="category-cards-grid"
-        style={{
+        ref={hangRef}
+        className={xoay ? 'category-cards-scroll' : 'category-cards-grid'}
+        onTouchStart={() => { chamLuc.current = Date.now(); }}
+        onWheel={() => { chamLuc.current = Date.now(); }}
+        style={xoay ? {
+          display: 'flex', gap: '12px', overflowX: 'auto', scrollSnapType: 'x proximity',
+          padding: '10px 10px 4px 0', margin: '-10px 0 0', scrollbarWidth: 'none'
+        } : {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '12px'
@@ -154,7 +165,7 @@ export default function CategoryFilter({
               className="cat-card-item"
               style={{
                 backgroundColor: '#ffffff',
-                borderRadius: '0px', // Không bo góc
+                borderRadius: '10px', // Bo góc nhẹ
                 border: (isActive || isHovered) ? '1.5px solid #0066cc' : '1.5px solid #60a5fa', // Viền xanh mặc định, đậm hơn khi chọn/rê chuột
                 padding: '10px 14px 12px 14px',
                 height: '122px', // Chiều cao chuẩn thanh thoát
@@ -163,7 +174,7 @@ export default function CategoryFilter({
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 position: 'relative',
-                overflow: 'hidden',
+                overflow: 'visible', // để số đếm nằm trên viền góc phải
                 boxShadow: isActive
                   ? '0 4px 16px rgba(96, 165, 250, 0.22)'
                   : isHovered
@@ -173,9 +184,9 @@ export default function CategoryFilter({
                 transition: 'all 0.18s ease',
                 userSelect: 'none',
                 // Ô mở thêm hiện lần lượt, cách nhau 0.05s
-                ...(i >= cot && { animation: 'catHien 0.25s ease backwards', animationDelay: `${(i - cot) * 0.05}s` }),
+                ...(moRong && i >= cot && { animation: 'catHien 0.25s ease backwards', animationDelay: `${(i - cot) * 0.05}s` }),
                 // Ô vừa được thay nhảy ra
-                ...(xoay && lech > 0 && i === (lech - 1) % cot && { animation: 'catHien 0.3s ease backwards' })
+                ...(xoay && { flex: `0 0 calc((100% - ${(cot - 1) * 12}px) / ${cot})`, scrollSnapAlign: 'start' })
               }}
             >
               {/* Số sản phẩm - chấm đỏ góc trên bên phải */}
@@ -269,6 +280,7 @@ export default function CategoryFilter({
 
       {/* Responsive CSS */}
       <style>{`
+        .category-cards-scroll::-webkit-scrollbar { display: none; }
         @keyframes catHien { from { opacity: 0; transform: translateY(8px) scale(0.92); } to { opacity: 1; transform: none; } }
         @media (max-width: 768px) {
           .category-cards-grid {

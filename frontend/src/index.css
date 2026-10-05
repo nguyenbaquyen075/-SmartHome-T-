@@ -799,12 +799,34 @@ body {
 
 .pp-filter-group { margin-bottom: 16px; }
 .pp-filter-group:last-child { margin-bottom: 0; }
-.pp-filter-group h4 {
+.pp-filter-group summary {
   font-size: 0.8rem;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
+.pp-filter-group summary em {
+  font-style: normal; background: #0066cc; color: #fff;
+  font-size: 0.68rem; padding: 0 6px; border-radius: 999px;
+}
+.pp-radio small { margin-left: auto; color: #94a3b8; font-size: 0.74rem; }
+.pp-cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
+.pp-cats button {
+  flex: none; cursor: pointer; background: #fff; border: 1.5px solid #bfdbfe; color: #0066cc;
+  font-size: 0.85rem; font-weight: 700; padding: 7px 16px; border-radius: 999px;
+}
+.pp-cats button.on { background: #0066cc; border-color: #0066cc; color: #fff; }
+.pp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.pp-chips button {
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  background: #eff6ff; border: 1px solid #bfdbfe; color: #0066cc;
+  font-size: 0.78rem; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+}
+.pp-chips .pp-chips-clear { background: none; border-color: transparent; color: #64748b; }
 
 .pp-radio {
   display: flex;
@@ -1719,8 +1741,11 @@ body {
 /* Số sản phẩm trên ô danh mục: chấm đỏ nhỏ ở góc trên bên phải */
 .cat-card-so {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: -9px;
+  right: -9px;
+  z-index: 2;
+  border: 2px solid #fff;
+  box-sizing: content-box;
   min-width: 20px;
   height: 20px;
   padding: 0 6px;

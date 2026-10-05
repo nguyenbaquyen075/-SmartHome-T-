@@ -40,6 +40,7 @@ const thongTinTuDuLieuCu = (sp) => {
 const tuSanPham = (sp) => ({
   name: sp?.name || '',
   category: sp?.category || '',
+  loai: sp?.loai || '',
   brand: sp?.brand || '',
   subTitle: sp?.subTitle || '',
   unit: sp?.unit || 'chiếc',
@@ -59,6 +60,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
   const [duongDanAnh, setDuongDanAnh] = useState('');
 
   const doi = (ten, giaTri) => setF((cu) => ({ ...cu, [ten]: giaTri }));
+  const loaiCuaDanhMuc = dsDanhMuc.find((d) => d.ten === f.category)?.loai || [];
   const cacHang = [...new Set(ds.map((p) => p.brand).filter(Boolean))];
   // Bản nháp tạo trước khi có trường này vẫn mở được bình thường.
   const thongTin = f.thongTin || thongTinTuDuLieuCu(sp);
@@ -133,6 +135,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
     const duLieu = {
       name: f.name,
       category: f.category,
+      loai: f.loai,
       brand: f.brand,
       subTitle: f.subTitle,
       unit: f.unit,
@@ -205,11 +208,20 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
           </Truong>
 
           <Truong nhan="Danh mục" batBuoc loi={loi.category && !f.category && 'Chọn danh mục'}>
-            <select className="qt-input" value={f.category} onChange={(e) => doi('category', e.target.value)}>
+            <select className="qt-input" value={f.category} onChange={(e) => setF((cu) => ({ ...cu, category: e.target.value, loai: '' }))}>
               <option value="">— Chọn danh mục —</option>
               {dsDanhMuc.map((d) => <option key={d.id}>{d.ten}</option>)}
             </select>
           </Truong>
+
+          {loaiCuaDanhMuc.length > 0 && (
+            <Truong nhan="Loại thiết bị" goiY="Dùng để khách lọc sản phẩm ở trang Sản phẩm. Thêm loại mới ở Quản trị > Danh mục">
+              <select className="qt-input" value={f.loai || ''} onChange={(e) => doi('loai', e.target.value)}>
+                <option value="">— Chưa chọn —</option>
+                {[...new Set([...loaiCuaDanhMuc, f.loai].filter(Boolean))].map((l) => <option key={l}>{l}</option>)}
+              </select>
+            </Truong>
+          )}
 
           <Truong nhan="Thương hiệu" batBuoc loi={loi.brand && !f.brand.trim() && 'Cần nhập thương hiệu'} goiY="Gõ tên mới hoặc chọn hãng đã có">
             <input

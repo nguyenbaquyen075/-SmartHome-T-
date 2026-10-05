@@ -28,9 +28,9 @@ const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
 
 // Danh muc luc moi cai dat: dung 3 danh muc web dang co. icon la khoa trong frontend/src/utils/danhMuc.jsx
 const DANH_MUC_MAC_DINH = [
-  { id: 'dm-mang', ten: 'Thiết bị mạng', icon: 'cctv', anh: '/images/cat_style_new/prod_3.png' },
-  { id: 'dm-dien', ten: 'Thiết bị điện', icon: 'zap', anh: '/images/cat_style_new/prod_1.png' },
-  { id: 'dm-nuoc', ten: 'Thiết bị nước', icon: 'droplets', anh: '/images/cat_style_new/prod_2.png' }
+  { id: 'dm-mang', ten: 'Thiết bị mạng', icon: 'cctv', loai: ['Camera', 'Đầu ghi', 'Ổ cứng', 'Router - Wifi', 'Phụ kiện'], anh: '/images/cat_style_new/prod_3.png' },
+  { id: 'dm-dien', ten: 'Thiết bị điện', icon: 'zap', loai: ['Aptomat', 'Ổ cắm - Công tắc', 'Quạt', 'Đèn', 'Dây điện'], anh: '/images/cat_style_new/prod_1.png' },
+  { id: 'dm-nuoc', ten: 'Thiết bị nước', icon: 'droplets', loai: ['Máy bơm', 'Vòi sen', 'Bình nóng lạnh', 'Phụ kiện'], anh: '/images/cat_style_new/prod_2.png' }
 ];
 const docDanhMuc = () => kho.doc(KHO_DANH_MUC, DANH_MUC_MAC_DINH);
 
@@ -431,7 +431,12 @@ const kiemDanhMuc = (b, ds, boQuaId) => {
   if (!ten) return { loi: 'Nhập tên danh mục' };
   if (ten.toLowerCase() === 'tất cả') return { loi: '"Tất cả" là mục có sẵn, chọn tên khác' };
   if (trungTen(ds, ten, boQuaId)) return { loi: 'Đã có danh mục tên này' };
-  return { ten, icon: ICON_DANH_MUC.includes(b.icon) ? b.icon : 'package' };
+  // Loại thiết bị thuộc danh mục (VD: Camera, Đầu ghi), bỏ trùng không phân biệt hoa thường
+  const loai = [];
+  for (const l of (Array.isArray(b.loai) ? b.loai : []).map((x) => chuoi(x, 40)).filter(Boolean)) {
+    if (!loai.some((x) => x.toLowerCase() === l.toLowerCase())) loai.push(l);
+  }
+  return { ten, icon: ICON_DANH_MUC.includes(b.icon) ? b.icon : 'package', loai: loai.slice(0, 30) };
 };
 
 // POST /api/danh-muc
@@ -439,7 +444,7 @@ app.post('/api/danh-muc', canQuyen, async (req, res) => {
   const ds = docDanhMuc();
   const v = kiemDanhMuc(req.body, ds);
   if (v.loi) return res.status(400).json({ error: v.loi });
-  const moi = { id: `dm-${Date.now()}`, ten: v.ten, icon: v.icon, anh: '' };
+  const moi = { id: `dm-${Date.now()}`, ten: v.ten, icon: v.icon, loai: v.loai, anh: '' };
   ds.push(moi);
   if (!(await kho.ghi(KHO_DANH_MUC, ds))) return res.status(500).json(LOI_LUU);
   res.status(201).json(moi);
@@ -454,7 +459,7 @@ app.put('/api/danh-muc/:id', canQuyen, async (req, res) => {
   if (v.loi) return res.status(400).json({ error: v.loi });
 
   const tenCu = ds[i].ten;
-  ds[i] = { ...ds[i], ten: v.ten, icon: v.icon };
+  ds[i] = { ...ds[i], ten: v.ten, icon: v.icon, loai: v.loai };
   if (!(await kho.ghi(KHO_DANH_MUC, ds))) return res.status(500).json(LOI_LUU);
 
   if (tenCu !== v.ten) {
@@ -577,6 +582,7 @@ const chuanHoaSanPham = (b = {}) => {
     name: chuoi(b.name, 200),
     brand: chuoi(b.brand, 80),
     category: chuoi(b.category, 80),
+    loai: chuoi(b.loai, 40),
     subTitle: chuoi(b.subTitle, 200),
     unit: chuoi(b.unit, 20) || 'chiếc',
     featured: Boolean(b.featured),

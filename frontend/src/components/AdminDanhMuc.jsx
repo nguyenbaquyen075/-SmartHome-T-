@@ -55,7 +55,7 @@ export default function AdminDanhMuc({ onBao }) {
           <p>{ds.length} danh mục, hiện ở trang chủ, menu và form thêm sản phẩm</p>
         </div>
         {!sua && (
-          <button className="btn-primary" onClick={() => setSua({ ten: '', icon: 'package' })}>
+          <button className="btn-primary" onClick={() => setSua({ ten: '', icon: 'package', loai: [] })}>
             <Plus size={16} /> Thêm danh mục
           </button>
         )}
@@ -71,6 +71,13 @@ export default function AdminDanhMuc({ onBao }) {
             maxLength={60}
             onChange={(e) => setSua({ ...sua, ten: e.target.value })}
             placeholder="Tên danh mục, VD: Thiết bị báo động"
+          />
+          <p className="qt-nhan-nhe" style={{ margin: '14px 0 6px' }}>Loại thiết bị (cách nhau bằng dấu phẩy)</p>
+          <input
+            className="qt-input"
+            value={sua.loai.join(', ')}
+            onChange={(e) => setSua({ ...sua, loai: e.target.value.split(',').map((x) => x.trimStart()) })}
+            placeholder="VD: Camera, Đầu ghi, Ổ cứng, Phụ kiện"
           />
           <p className="qt-nhan-nhe" style={{ margin: '14px 0 6px' }}>Biểu tượng</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -117,10 +124,10 @@ export default function AdminDanhMuc({ onBao }) {
                   <span className="qt-menu-icon" style={{ width: 44, height: 44 }}><Icon size={20} /></span>
                   <div className="qt-ds-tt">
                     <strong>{d.ten}</strong>
-                    <span>{dem[d.ten] || 0} sản phẩm</span>
+                    <span>{dem[d.ten] || 0} sản phẩm{d.loai?.length ? ` · ${d.loai.join(', ')}` : ''}</span>
                   </div>
                   <div className="qt-ds-nut">
-                    <button onClick={() => setSua({ id: d.id, ten: d.ten, icon: d.icon })} title="Sửa"><Pencil size={16} /></button>
+                    <button onClick={() => setSua({ id: d.id, ten: d.ten, icon: d.icon, loai: d.loai || [] })} title="Sửa"><Pencil size={16} /></button>
                     <button onClick={() => xoa(d)} title="Xóa" className="xoa"><Trash2 size={16} /></button>
                   </div>
                 </li>
