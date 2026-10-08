@@ -38,3 +38,8 @@ backend/data/giai-tri-file/
 
 # Tai khoan quan tri luu tren may (che do chay thu) - co ma bam mat khau
 backend/data/quan-tri.json
+
+# Ghi chú riêng của quản trị (không đưa lên GitHub)
+backend/data/ghi-chu.json
+backend/data/ghi-chu-thu-muc.json
+backend/data/ghi-chu-file/

@@ -213,6 +213,47 @@ export const api = {
   updateProject: (id, data) => apiAdmin(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProject: (id) => apiAdmin(`/projects/${id}`, { method: 'DELETE' }),
 
+  // Ghi chu quan tri
+  getGhiChu: () => apiAdmin('/ghi-chu'),
+  themGhiChu: (data) => apiAdmin('/ghi-chu', { method: 'POST', body: JSON.stringify(data) }),
+  suaGhiChu: (id, data) => apiAdmin(`/ghi-chu/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  xoaGhiChu: (id) => apiAdmin(`/ghi-chu/${id}`, { method: 'DELETE' }),
+
+  // Tệp đính kèm ghi chú (Word, Excel...): lưu trên server, tải về phải đăng nhập
+  async taiTepGhiChu(id, file) {
+    const res = await fetch(`${API_BASE}/ghi-chu/${id}/dinh-kem?ten=${encodeURIComponent(file.name)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken.get() || ''}`, 'Content-Type': file.type || 'application/octet-stream' },
+      body: file
+    });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Không tải được tệp lên');
+    return data;
+  },
+  async layTepGhiChu(fid, xem = false) {
+    const res = await fetch(`${API_BASE}/ghi-chu/dinh-kem/${fid}${xem ? '?xem=1' : ''}`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Không tải được tệp về');
+    return res.blob();
+  },
+  // Gửi nốt bản đang chờ khi người dùng đóng tab / tải lại trang (keepalive để trình duyệt vẫn gửi xong)
+  luuGhiChuKhiDong: (id, data) => fetch(`${API_BASE}/ghi-chu/${id}`, {
+    method: 'PUT', keepalive: true,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken.get() || ''}` },
+    body: JSON.stringify(data)
+  }).catch(() => {}),
+  async saoLuuGhiChu() {
+    const res = await fetch(`${API_BASE}/ghi-chu-sao-luu`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Không tạo được bản sao lưu');
+    return res.blob();
+  },
+  xoaTepGhiChu: (id, fid) => apiAdmin(`/ghi-chu/${id}/dinh-kem/${fid}`, { method: 'DELETE' }),
+  getThuMucGhiChu: () => apiAdmin('/ghi-chu-thu-muc'),
+  themThuMucGhiChu: (ten) => apiAdmin('/ghi-chu-thu-muc', { method: 'POST', body: JSON.stringify({ ten }) }),
+  suaThuMucGhiChu: (id, ten) => apiAdmin(`/ghi-chu-thu-muc/${id}`, { method: 'PUT', body: JSON.stringify({ ten }) }),
+  xoaThuMucGhiChu: (id) => apiAdmin(`/ghi-chu-thu-muc/${id}`, { method: 'DELETE' }),
+
   // Danh muc san pham
   async getDanhMuc() {
     return layChung(`${API_BASE}/danh-muc`, 'Không thể tải danh mục');

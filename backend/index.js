@@ -3,6 +3,7 @@ const cors = require('cors');
 const compression = require('compression');
 const fs = require('fs');
 const path = require('path');
+const { taoZip } = require('./zipTinh');
 const kho = require('./kho');
 const khoFile = require('./khoFile');
 
@@ -23,6 +24,8 @@ const KHO_CONG_TRINH = 'projects';
 const KHO_CAI_DAT = 'settings';
 const KHO_GIAI_TRI = 'giai-tri';
 const KHO_DANH_MUC = 'danh-muc';     // danh muc san pham, them/sua/xoa trong trang quan tri
+const KHO_GHI_CHU = 'ghi-chu';       // ghi chu rieng cua quan tri (kieu Notes tren iPhone/Mac)
+const KHO_GHI_CHU_TM = 'ghi-chu-thu-muc'; // thu muc chua ghi chu
 const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
 const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
 
@@ -399,6 +402,7 @@ app.post('/api/upload', canQuyen, async (req, res) => {
 
 // Anh nam trong kho: ten co san ky tu thoi gian nen khong bao gio doi -> cho cache 1 nam
 app.get('/api/anh/:id', async (req, res) => {
+  if (req.params.id.startsWith('gc-tep-')) return res.status(404).json({ error: 'Không tìm thấy ảnh' });   // tệp ghi chú là riêng tư
   if (!kho.dangDungDB()) return res.status(404).json({ error: 'Không có ảnh' });
   try {
     const anh = await kho.docAnh(req.params.id);
@@ -480,6 +484,216 @@ app.delete('/api/danh-muc/:id', canQuyen, async (req, res) => {
   }
   if (!(await kho.ghi(KHO_DANH_MUC, ds.filter((x) => x.id !== d.id)))) return res.status(500).json(LOI_LUU);
   res.json({ success: true });
+});
+
+// ---- Ghi chu cua quan tri: chi quan tri doc/ghi, khach khong thay ----
+const MAX_GHI_CHU = 500;
+const docGhiChu = () => kho.doc(KHO_GHI_CHU, []);
+const docThuMuc = () => kho.doc(KHO_GHI_CHU_TM, []);
+const chuanHoaGhiChu = (b = {}) => ({
+  thuMuc: docThuMuc().some((t) => t.id === b.thuMuc) ? b.thuMuc : '',
+  tieuDe: String(b.tieuDe ?? '').trim().slice(0, 200), noiDung: String(b.noiDung ?? '').slice(0, 50000), ghim: Boolean(b.ghim)
+});
+
+app.get('/api/ghi-chu', canQuyen, (req, res) => res.json(docGhiChu()));
+
+app.post('/api/ghi-chu', canQuyen, async (req, res) => {
+  const ds = docGhiChu();
+  if (ds.length >= MAX_GHI_CHU) return res.status(400).json({ error: `Tối đa ${MAX_GHI_CHU} ghi chú, hãy xóa bớt` });
+  const bay = new Date().toISOString();
+  const moi = { id: `gc-${Date.now()}`, ...chuanHoaGhiChu(req.body), taoLuc: bay, suaLuc: bay };
+  ds.unshift(moi);
+  if (!(await kho.ghi(KHO_GHI_CHU, ds))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+});
+
+// ---- Tep dinh kem ghi chu (Word, Excel, PDF...) luu tren server, may hong van con ----
+// Co DATABASE_URL: luu trong co so du lieu (bang anh). Chay o may minh: ghi file trong backend/data/ghi-chu-file.
+// Khac anh san pham: KHONG cong khai, muon tai ve phai dang nhap quan tri.
+const TIEN_TO_TEP = 'gc-tep-';
+const THU_MUC_TEP = path.join(__dirname, 'data', 'ghi-chu-file');
+const DUOI_TEP = ['doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'pdf', 'txt', 'png', 'jpg', 'jpeg', 'webp'];
+const TOI_DA_TEP = 15 * 1024 * 1024;
+const TEP_TOI_DA_MOI_GHI_CHU = 20;
+
+const luuTep = async (id, kieu, buf) => {
+  if (kho.dangDungDB()) return kho.ghiAnh(id, kieu, buf);
+  try {
+    fs.mkdirSync(THU_MUC_TEP, { recursive: true });
+    fs.writeFileSync(path.join(THU_MUC_TEP, id), buf);
+    return true;
+  } catch (err) {
+    console.error('Loi luu tep ghi chu:', err.message);
+    return false;
+  }
+};
+const docTep = async (id) => {
+  if (kho.dangDungDB()) return (await kho.docAnh(id))?.du_lieu || null;
+  try { return fs.readFileSync(path.join(THU_MUC_TEP, id)); } catch { return null; }
+};
+const xoaTep = async (id) => {
+  if (kho.dangDungDB()) return kho.xoaAnh(id);
+  try { fs.rmSync(path.join(THU_MUC_TEP, id), { force: true }); return true; } catch { return false; }
+};
+
+app.post('/api/ghi-chu/:id/dinh-kem', canQuyen, express.raw({ type: () => true, limit: '16mb' }), async (req, res) => {
+  const i = docGhiChu().findIndex((g) => g.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy ghi chú' });
+  const ds = docGhiChu();
+
+  const ten = chuoi(req.query.ten, 150).replace(/[\\/\r\n"]/g, '_') || 'tep';
+  const duoi = ten.split('.').pop().toLowerCase();
+  if (!DUOI_TEP.includes(duoi)) return res.status(400).json({ error: 'Chỉ nhận Word, Excel, PowerPoint, PDF, TXT, CSV hoặc ảnh' });
+  const buf = req.body;
+  if (!Buffer.isBuffer(buf) || !buf.length) return res.status(400).json({ error: 'Tệp trống' });
+  if (buf.length > TOI_DA_TEP) return res.status(413).json({ error: 'Tệp quá nặng, tối đa 15MB' });
+  if ((ds[i].dinhKem || []).length >= TEP_TOI_DA_MOI_GHI_CHU) {
+    return res.status(400).json({ error: `Mỗi ghi chú tối đa ${TEP_TOI_DA_MOI_GHI_CHU} tệp` });
+  }
+
+  const tep = { id: `${TIEN_TO_TEP}${Date.now()}-${crypto.randomBytes(4).toString('hex')}`, ten, kichThuoc: buf.length, luc: new Date().toISOString() };
+  if (!(await luuTep(tep.id, 'application/octet-stream', buf))) return res.status(500).json(LOI_LUU);
+  // Tải tệp mất vài giây, trong lúc đó ghi chú có thể vừa được tự lưu: đọc lại bản mới nhất rồi mới ghi,
+  // không dùng bản đọc từ đầu (sẽ đè mất chữ vừa gõ)
+  const moi = docGhiChu();
+  const j = moi.findIndex((g) => g.id === req.params.id);
+  if (j === -1) { xoaTep(tep.id); return res.status(404).json({ error: 'Ghi chú đã bị xóa' }); }
+  moi[j] = { ...moi[j], dinhKem: [...(moi[j].dinhKem || []), tep], suaLuc: new Date().toISOString() };
+  if (!(await kho.ghi(KHO_GHI_CHU, moi))) { xoaTep(tep.id); return res.status(500).json(LOI_LUU); }
+  res.status(201).json(tep);
+});
+
+app.get('/api/ghi-chu/dinh-kem/:fid', canQuyen, async (req, res) => {
+  const tep = docGhiChu().flatMap((g) => g.dinhKem || []).find((t) => t.id === req.params.fid);
+  if (!tep) return res.status(404).json({ error: 'Không tìm thấy tệp' });
+  const buf = await docTep(tep.id);
+  if (!buf) return res.status(404).json({ error: 'Tệp không còn trên máy chủ' });
+  // ?xem=1 với PDF, ảnh, TXT: trả đúng loại để trình duyệt mở ra xem; còn lại luôn tải về
+  const kieuXem = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', txt: 'text/plain; charset=utf-8' }[tep.ten.split('.').pop().toLowerCase()];
+  const xem = req.query.xem === '1' && kieuXem;
+  res.setHeader('Content-Type', xem ? kieuXem : 'application/octet-stream');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Disposition', `${xem ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(tep.ten)}`);
+  res.send(buf);
+});
+
+app.delete('/api/ghi-chu/:id/dinh-kem/:fid', canQuyen, async (req, res) => {
+  const ds = docGhiChu();
+  const i = ds.findIndex((g) => g.id === req.params.id);
+  if (i === -1 || !(ds[i].dinhKem || []).some((t) => t.id === req.params.fid)) return res.status(404).json({ error: 'Không tìm thấy tệp' });
+  ds[i] = { ...ds[i], dinhKem: ds[i].dinhKem.filter((t) => t.id !== req.params.fid) };
+  if (!(await kho.ghi(KHO_GHI_CHU, ds))) return res.status(500).json(LOI_LUU);
+  xoaTep(req.params.fid);
+  res.json({ success: true });
+});
+
+app.put('/api/ghi-chu/:id', canQuyen, async (req, res) => {
+  const ds = docGhiChu();
+  const i = ds.findIndex((g) => g.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy ghi chú' });
+  ds[i] = { ...ds[i], ...chuanHoaGhiChu(req.body), suaLuc: new Date().toISOString() };
+  if (!(await kho.ghi(KHO_GHI_CHU, ds))) return res.status(500).json(LOI_LUU);
+  res.json(ds[i]);
+});
+
+app.delete('/api/ghi-chu/:id', canQuyen, async (req, res) => {
+  const ds = docGhiChu();
+  const g = ds.find((x) => x.id === req.params.id);
+  if (!g) return res.status(404).json({ error: 'Không tìm thấy ghi chú' });
+  if (!(await kho.ghi(KHO_GHI_CHU, ds.filter((x) => x.id !== req.params.id)))) return res.status(500).json(LOI_LUU);
+  (g.dinhKem || []).forEach((t) => xoaTep(t.id));
+  res.json({ success: true });
+});
+
+// Thu muc ghi chu (1 cap): xoa thu muc thi ghi chu ben trong ve "Chua phan loai", khong mat
+app.get('/api/ghi-chu-thu-muc', canQuyen, (req, res) => res.json(docThuMuc()));
+
+const tenThuMucHopLe = (b, ds, boQuaId) => {
+  const ten = chuoi(b?.ten, 60);
+  if (!ten) return { loi: 'Nhập tên thư mục' };
+  if (ds.some((t) => t.id !== boQuaId && t.ten.toLowerCase() === ten.toLowerCase())) return { loi: 'Đã có thư mục tên này' };
+  return { ten };
+};
+
+app.post('/api/ghi-chu-thu-muc', canQuyen, async (req, res) => {
+  const ds = docThuMuc();
+  if (ds.length >= 100) return res.status(400).json({ error: 'Tối đa 100 thư mục' });
+  const v = tenThuMucHopLe(req.body, ds);
+  if (v.loi) return res.status(400).json({ error: v.loi });
+  const moi = { id: `tm-${Date.now()}`, ten: v.ten };
+  ds.push(moi);
+  if (!(await kho.ghi(KHO_GHI_CHU_TM, ds))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+});
+
+app.put('/api/ghi-chu-thu-muc/:id', canQuyen, async (req, res) => {
+  const ds = docThuMuc();
+  const i = ds.findIndex((t) => t.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy thư mục' });
+  const v = tenThuMucHopLe(req.body, ds, ds[i].id);
+  if (v.loi) return res.status(400).json({ error: v.loi });
+  ds[i] = { ...ds[i], ten: v.ten };
+  if (!(await kho.ghi(KHO_GHI_CHU_TM, ds))) return res.status(500).json(LOI_LUU);
+  res.json(ds[i]);
+});
+
+app.delete('/api/ghi-chu-thu-muc/:id', canQuyen, async (req, res) => {
+  const ds = docThuMuc();
+  if (!ds.some((t) => t.id === req.params.id)) return res.status(404).json({ error: 'Không tìm thấy thư mục' });
+  const ghiChu = docGhiChu().map((g) => (g.thuMuc === req.params.id ? { ...g, thuMuc: '' } : g));
+  if (!(await kho.ghi(KHO_GHI_CHU, ghiChu))) return res.status(500).json(LOI_LUU);
+  if (!(await kho.ghi(KHO_GHI_CHU_TM, ds.filter((t) => t.id !== req.params.id)))) return res.status(500).json(LOI_LUU);
+  res.json({ success: true });
+});
+
+// ---- Sao luu: tai ve 1 file .zip gom moi ghi chu (doc duoc bang Notepad/Word) + tep dinh kem + ban JSON day du ----
+const tenAnToan = (v, macDinh) => String(v || '').replace(/[\\/:*?"<>|\r\n]+/g, '_').trim().slice(0, 80) || macDinh;
+const duyNhat = (da, ten) => {
+  let t = ten;
+  for (let n = 2; da.has(t.toLowerCase()); n++) t = `${ten} (${n})`;
+  da.add(t.toLowerCase());
+  return t;
+};
+
+app.get('/api/ghi-chu-sao-luu', canQuyen, async (req, res) => {
+  try {
+    const thuMuc = docThuMuc();
+    const ghiChu = docGhiChu();
+    const muc = [];
+    const daThuMuc = new Set();
+    const tenThuMuc = new Map([['', 'Chưa phân loại']]);
+    thuMuc.forEach((t) => tenThuMuc.set(t.id, duyNhat(daThuMuc, tenAnToan(t.ten, 'Thư mục'))));
+    const daGhiChu = new Map();   // thu muc -> ten da dung
+
+    for (const g of ghiChu) {
+      const tm = tenThuMuc.get(g.thuMuc || '') || 'Chưa phân loại';
+      if (!daGhiChu.has(tm)) daGhiChu.set(tm, new Set());
+      const dir = `${tm}/${duyNhat(daGhiChu.get(tm), tenAnToan(g.tieuDe || String(g.noiDung).split('\n')[0], 'Ghi chú'))}`;
+      const tepTen = new Map((g.dinhKem || []).map((t) => [t.id, t.ten]));
+      const chu = String(g.noiDung || '').replace(/\[\[tep:([\w-]+)\]\]/g, (m, id) => `[Tệp đính kèm: ${tepTen.get(id) || 'đã xóa'}]`);
+      muc.push({
+        ten: `${dir}/ghi-chu.txt`,
+        duLieu: Buffer.from(`${g.tieuDe || ''}\r\nCập nhật: ${g.suaLuc || ''}\r\n\r\n${chu.replace(/\n/g, '\r\n')}\r\n`, 'utf8')
+      });
+      const daTep = new Set();
+      for (const t of g.dinhKem || []) {
+        const buf = await docTep(t.id);
+        if (!buf) continue;
+        const duoi = t.ten.includes('.') ? `.${t.ten.split('.').pop()}` : '';
+        const goc = duyNhat(daTep, tenAnToan(t.ten.slice(0, t.ten.length - duoi.length), 'tep'));
+        muc.push({ ten: `${dir}/${goc}${duoi}`, duLieu: buf });
+      }
+    }
+    muc.unshift({ ten: 'ghi-chu.json', duLieu: Buffer.from(JSON.stringify({ xuatLuc: new Date().toISOString(), thuMuc, ghiChu }, null, 2), 'utf8') });
+
+    const zip = taoZip(muc);
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="ghi-chu-sao-luu-${new Date().toISOString().slice(0, 10)}.zip"`);
+    res.send(zip);
+  } catch (err) {
+    console.error('Loi sao luu ghi chu:', err.message);
+    res.status(500).json({ error: 'Không tạo được bản sao lưu, thử lại sau' });
+  }
 });
 
 // GET /api/brands
@@ -908,6 +1122,8 @@ kho.moKho({
   [KHO_CAI_DAT]: CAI_DAT_MAC_DINH,
   [KHO_DANH_MUC]: DANH_MUC_MAC_DINH,
   [KHO_GIAI_TRI]: [],
+  [KHO_GHI_CHU]: [],
+  [KHO_GHI_CHU_TM]: [],
   [KHO_QUAN_TRI]: {}
 }).then(() => {
   if (khoFile.dangBat()) khoFile.datPhepTrinhDuyet();
