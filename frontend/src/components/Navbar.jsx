@@ -94,8 +94,7 @@ export default function Navbar({
             </div>
 
             <div className="navbar-name">
-              <div className="navbar-name-main">ĐIỆN NƯỚC CAMERA</div>
-              <div className="navbar-name-sub">Chất lượng tạo nên niềm tin</div>
+              <div className="navbar-name-main">Thiết bị_ Điện - Nước - Camera</div>
             </div>
           </div>
 
@@ -334,7 +333,7 @@ export default function Navbar({
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ padding: '16px', backgroundColor: '#0066cc', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontWeight: 800 }}>ĐIỆN NƯỚC CAMERA</div>
+              <div style={{ fontWeight: 800 }}>Thiết bị_ Điện - Nước - Camera</div>
               <button onClick={() => setMobileDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
                 <X size={20} />
               </button>

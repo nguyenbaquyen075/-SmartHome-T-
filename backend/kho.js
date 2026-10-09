@@ -129,6 +129,21 @@ const docAnh = async (id) => {
   return rows[0] || null;
 };
 
+// Liet ke moi anh/tep trong kho (de sao luu)
+const lietKeAnh = async () => (await pool.query('SELECT id, kieu FROM anh ORDER BY tao_luc')).rows;
+
+// Ghi de neu id da co (dung khi khoi phuc tu ban sao luu)
+const ghiAnhDe = async (id, kieu, buf) => {
+  try {
+    await pool.query(`INSERT INTO anh (id, kieu, du_lieu) VALUES ($1, $2, $3)
+      ON CONFLICT (id) DO UPDATE SET kieu = EXCLUDED.kieu, du_lieu = EXCLUDED.du_lieu`, [id, kieu, buf]);
+    return true;
+  } catch (err) {
+    console.error('[KHO] Khong ghi de duoc anh:', err.message);
+    return false;
+  }
+};
+
 const xoaAnh = async (id) => {
   try {
     await pool.query('DELETE FROM anh WHERE id = $1', [id]);
@@ -141,4 +156,4 @@ const xoaAnh = async (id) => {
 
 const dangDungDB = () => Boolean(pool);
 
-module.exports = { moKho, doc, ghi, ghiAnh, docAnh, xoaAnh, dangDungDB };
+module.exports = { moKho, doc, ghi, ghiAnh, ghiAnhDe, lietKeAnh, docAnh, xoaAnh, dangDungDB };

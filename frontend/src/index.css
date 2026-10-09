@@ -1759,3 +1759,9 @@ body {
   box-shadow: 0 1px 4px rgba(225, 29, 72, 0.35);
   pointer-events: none;
 }
+
+/* Tên cửa hàng dài hơn: chữ vừa một dòng trên mọi cỡ màn hình */
+.navbar-name-main { font-size: 1.3rem; letter-spacing: -0.2px; }
+@media (max-width: 768px) {
+  .navbar-name-main { font-size: clamp(0.72rem, 3.7vw, 1rem); letter-spacing: -0.2px; }
+}
