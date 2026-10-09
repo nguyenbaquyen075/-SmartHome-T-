@@ -218,6 +218,26 @@ export const api = {
   themNhanVien: (d) => apiAdmin('/cham-cong/nhan-vien', { method: 'POST', body: JSON.stringify(d) }),
   suaNhanVien: (id, d) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   xoaNhanVien: (id) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'DELETE' }),
+  // Sao lưu / khôi phục toàn bộ
+  saoLuuThongTin: () => apiAdmin('/sao-luu/thong-tin'),
+  async saoLuuToanBo() {
+    const res = await fetch(`${API_BASE}/sao-luu/toan-bo`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Không tạo được bản sao lưu');
+    return res.blob();
+  },
+  async khoiPhucSaoLuu(file) {
+    const res = await fetch(`${API_BASE}/sao-luu/khoi-phuc`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken.get() || ''}`, 'Content-Type': 'application/zip' },
+      body: file
+    });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Không khôi phục được');
+    return data;
+  },
+  hoanTacKhoiPhuc: () => apiAdmin('/sao-luu/hoan-tac', { method: 'POST' }),
   async xuatChamCong(thang) {
     const res = await fetch(`${API_BASE}/cham-cong/xuat?thang=${thang}`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
     if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }

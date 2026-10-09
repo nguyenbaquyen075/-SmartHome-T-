@@ -3,7 +3,7 @@ const cors = require('cors');
 const compression = require('compression');
 const fs = require('fs');
 const path = require('path');
-const { taoZip } = require('./zipTinh');
+const { taoZip, docZip } = require('./zipTinh');
 const { taoXlsx } = require('./xlsxTinh');
 const kho = require('./kho');
 const khoFile = require('./khoFile');
@@ -825,6 +825,129 @@ app.put('/api/cham-cong/luu', canQuyen, (req, res) => tuanTuChamCong(async () =>
   if (!(await kho.ghi(KHO_CHAM_CONG, d))) return res.status(500).json(LOI_LUU);
   res.json({ success: true });
 }));
+
+// ---- Sao luu / khoi phuc toan bo: 1 file .zip gom du lieu + tep dinh kem + anh luu trong kho ----
+// Khong gom tai khoan dang nhap (quan-tri) de file sao luu lo ra cung khong lo mat khau.
+// Anh/video nam tren kho ngoai (Neon S3, Cloudinary) khong nam trong file, chi giu duong dan; kho ngoai tu ben rieng.
+const DU_LIEU_SAO_LUU = {
+  [KHO_SAN_PHAM]: [], [KHO_CONG_TRINH]: [], [KHO_CAI_DAT]: CAI_DAT_MAC_DINH, [KHO_DANH_MUC]: DANH_MUC_MAC_DINH,
+  [KHO_GIAI_TRI]: [], [KHO_GHI_CHU]: [], [KHO_GHI_CHU_TM]: [], [KHO_CHAM_CONG]: { nhanVien: [], cong: {}, chuThich: {} }
+};
+const KHO_SAO_LUU_NK = 'sao-luu-nhat-ky';
+const KHO_SAO_LUU_TRUOC = 'sao-luu-truoc-khoi-phuc';
+const TOI_DA_SAO_LUU = 250 * 1024 * 1024;
+const MA_TEP_HOP_LE = /^[\w.-]{1,200}$/;
+
+app.get('/api/sao-luu/thong-tin', canQuyen, (req, res) => {
+  res.json({
+    lanCuoi: kho.doc(KHO_SAO_LUU_NK, {}).lanCuoi || null,
+    banTruoc: kho.doc(KHO_SAO_LUU_TRUOC, null)?.luc || null
+  });
+});
+
+app.get('/api/sao-luu/toan-bo', canQuyen, async (req, res) => {
+  try {
+    const muc = [];
+    const tep = [];
+    for (const [ten, macDinh] of Object.entries(DU_LIEU_SAO_LUU)) {
+      muc.push({ ten: `du-lieu/${ten}.json`, duLieu: Buffer.from(JSON.stringify(kho.doc(ten, macDinh), null, 2), 'utf8') });
+    }
+    let tong = 0;
+    if (kho.dangDungDB()) {
+      for (const a of await kho.lietKeAnh()) {
+        const x = await kho.docAnh(a.id);
+        if (!x) continue;
+        tong += x.du_lieu.length;
+        if (tong > TOI_DA_SAO_LUU) return res.status(413).json({ error: 'Dữ liệu quá lớn để sao lưu một lần (trên 250MB)' });
+        tep.push({ id: a.id, kieu: a.kieu });
+        muc.push({ ten: `tep/${a.id}`, duLieu: x.du_lieu });
+      }
+    } else if (fs.existsSync(THU_MUC_TEP)) {
+      for (const id of fs.readdirSync(THU_MUC_TEP)) {
+        tep.push({ id, kieu: 'application/octet-stream' });
+        muc.push({ ten: `tep/${id}`, duLieu: fs.readFileSync(path.join(THU_MUC_TEP, id)) });
+      }
+    }
+    const bay = new Date().toISOString();
+    muc.unshift({ ten: 'manifest.json', duLieu: Buffer.from(JSON.stringify({ phienBan: 1, taoLuc: bay, nhom: Object.keys(DU_LIEU_SAO_LUU), tep }, null, 2), 'utf8') });
+    const zip = taoZip(muc);
+    await kho.ghi(KHO_SAO_LUU_NK, { lanCuoi: bay });
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="sao-luu-smarthometd-${bay.slice(0, 10)}.zip"`);
+    res.send(zip);
+  } catch (err) {
+    console.error('Loi sao luu toan bo:', err.message);
+    res.status(500).json({ error: 'Không tạo được bản sao lưu, thử lại sau' });
+  }
+});
+
+// Ghi lai cac muc du lieu tu { ten: noiDung }
+const ghiCacMuc = async (du) => {
+  for (const [ten, noiDung] of Object.entries(du)) {
+    if (!(await kho.ghi(ten, noiDung))) throw new Error(`Không ghi được "${ten}"`);
+  }
+};
+
+app.post('/api/sao-luu/khoi-phuc', canQuyen, express.raw({ type: () => true, limit: '260mb' }), async (req, res) => {
+  let muc;
+  try { muc = docZip(req.body); } catch (err) { return res.status(400).json({ error: err.message }); }
+  let manifest;
+  try { manifest = JSON.parse(muc.find((x) => x.ten === 'manifest.json')?.duLieu.toString('utf8')); } catch { manifest = null; }
+  if (manifest?.phienBan !== 1) return res.status(400).json({ error: 'Đây không phải file sao lưu của web này' });
+
+  // Doc va kiem tra het truoc khi dung vao du lieu dang co
+  const du = {};
+  for (const x of muc) {
+    const khop = /^du-lieu\/([\w-]+)\.json$/.exec(x.ten);
+    if (!khop || !(khop[1] in DU_LIEU_SAO_LUU)) continue;
+    let noiDung;
+    try { noiDung = JSON.parse(x.duLieu.toString('utf8')); } catch { return res.status(400).json({ error: `Mục "${khop[1]}" trong file bị hỏng` }); }
+    const macDinh = DU_LIEU_SAO_LUU[khop[1]];
+    const dungKieu = Array.isArray(macDinh) ? Array.isArray(noiDung) : noiDung && typeof noiDung === 'object' && !Array.isArray(noiDung);
+    if (!dungKieu) return res.status(400).json({ error: `Mục "${khop[1]}" trong file sai định dạng` });
+    du[khop[1]] = noiDung;
+  }
+  if (!Object.keys(du).length) return res.status(400).json({ error: 'File không có dữ liệu để khôi phục' });
+
+  try {
+    // Giu ban dang co de hoan tac duoc (chi phan du lieu chu, khong gom tep)
+    const truoc = { luc: new Date().toISOString(), duLieu: Object.fromEntries(Object.entries(DU_LIEU_SAO_LUU).map(([t, d]) => [t, kho.doc(t, d)])) };
+    if (!(await kho.ghi(KHO_SAO_LUU_TRUOC, truoc))) return res.status(500).json(LOI_LUU);
+    await ghiCacMuc(du);
+
+    let soTep = 0;
+    for (const x of muc) {
+      if (!x.ten.startsWith('tep/')) continue;
+      const id = x.ten.slice(4);
+      if (!MA_TEP_HOP_LE.test(id)) continue;
+      const kieu = manifest.tep?.find((t) => t.id === id)?.kieu || 'application/octet-stream';
+      if (kho.dangDungDB()) {
+        if (await kho.ghiAnhDe(id, kieu, x.duLieu)) soTep += 1;
+      } else if (id.startsWith(TIEN_TO_TEP)) {
+        fs.mkdirSync(THU_MUC_TEP, { recursive: true });
+        fs.writeFileSync(path.join(THU_MUC_TEP, id), x.duLieu);
+        soTep += 1;
+      }
+    }
+    res.json({ khoiPhuc: Object.keys(du), soTep });
+  } catch (err) {
+    console.error('Loi khoi phuc:', err.message);
+    res.status(500).json({ error: `${err.message}. Bấm "Hoàn tác" để quay về dữ liệu trước khi khôi phục.` });
+  }
+});
+
+app.post('/api/sao-luu/hoan-tac', canQuyen, async (req, res) => {
+  const truoc = kho.doc(KHO_SAO_LUU_TRUOC, null);
+  if (!truoc?.duLieu) return res.status(404).json({ error: 'Không có bản nào để hoàn tác' });
+  try {
+    await ghiCacMuc(truoc.duLieu);
+    await kho.ghi(KHO_SAO_LUU_TRUOC, null);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Loi hoan tac:', err.message);
+    res.status(500).json(LOI_LUU);
+  }
+});
 
 // GET /api/brands
 app.get('/api/brands', (req, res) => {

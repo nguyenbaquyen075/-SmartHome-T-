@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { KeyRound, ShieldCheck, Database, HardDrive, Cloud, Eye, EyeOff, LogOut, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import { Truong, Khoi } from './AdminForm';
+import AdminSaoLuu from './AdminSaoLuu';
 
 // Mô tả từng kho để anh nhìn là biết dữ liệu có an toàn không
 const KHO_FILE = {
@@ -212,6 +213,7 @@ export default function AdminCaiDat({ onBao }) {
           kho={KHO_FILE[tt.kho.file] || KHO_FILE.may}
         />
       </section>
+      <AdminSaoLuu onBao={onBao} />
     </>
   );
 }

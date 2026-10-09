@@ -2105,3 +2105,10 @@ button.cc-ngay.sau:hover { border-color: var(--vien); }
   .cc-ho-so-nut .cc-icon { padding: 6px; }
   .cc-ho-so-nut svg { width: 15px; height: 15px; }
 }
+
+/* Sao lưu và khôi phục */
+.qt-sl-dong { margin: 4px 0 12px; color: #4b5563; font-size: 0.92rem; }
+.qt-sl-dong b { color: #1c1c1e; font-weight: 600; }
+.qt-sl-nut { display: flex; flex-wrap: wrap; gap: 8px; }
+.qt-sl-nut button { display: inline-flex; align-items: center; gap: 6px; }
+.qt-sl-ghi { margin: 14px 0 0; padding-left: 18px; color: #6b7280; font-size: 0.85rem; line-height: 1.5; }

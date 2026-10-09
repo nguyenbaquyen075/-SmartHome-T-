@@ -45,4 +45,35 @@ const taoZip = (muc) => {
   return Buffer.concat([...phan, cd, cuoi]);
 };
 
-module.exports = { taoZip };
+// Doc file .zip (ca file nen kieu "store" cua minh lan file nen deflate do Windows/macOS tao ra)
+const zlib = require('zlib');
+const docZip = (buf) => {
+  let e = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
+    if (buf.readUInt32LE(i) === 0x06054b50) { e = i; break; }
+  }
+  if (e < 0) throw new Error('Không phải file zip');
+  const so = buf.readUInt16LE(e + 10);
+  let p = buf.readUInt32LE(e + 16);
+  const ra = [];
+  for (let k = 0; k < so; k++) {
+    if (p + 46 > buf.length || buf.readUInt32LE(p) !== 0x02014b50) throw new Error('File zip bị hỏng');
+    const phuongPhap = buf.readUInt16LE(p + 10);
+    const nen = buf.readUInt32LE(p + 20);
+    const dai = buf.readUInt16LE(p + 28);
+    const them = buf.readUInt16LE(p + 30);
+    const chuThich = buf.readUInt16LE(p + 32);
+    const viTri = buf.readUInt32LE(p + 42);
+    const ten = buf.slice(p + 46, p + 46 + dai).toString('utf8');
+    p += 46 + dai + them + chuThich;
+    if (ten.endsWith('/')) continue;
+    const dauData = viTri + 30 + buf.readUInt16LE(viTri + 26) + buf.readUInt16LE(viTri + 28);
+    if (dauData + nen > buf.length) throw new Error('File zip bị cắt dở');
+    const tho = buf.slice(dauData, dauData + nen);
+    if (phuongPhap !== 0 && phuongPhap !== 8) throw new Error('Kiểu nén của file zip không được hỗ trợ');
+    ra.push({ ten, duLieu: phuongPhap === 0 ? tho : zlib.inflateRawSync(tho) });
+  }
+  return ra;
+};
+
+module.exports = { taoZip, docZip };
