@@ -52,7 +52,7 @@ export default function AdminProjects({ onBao, diToi, con }) {
       <div className="qt-tieude">
         <div>
           <h1>Nhật ký thi công</h1>
-          <p>{ds ? `${ds.length} công trình, mới nhất xếp trước` : 'Đang tải…'}</p>
+          <p>{ds ? `${ds.length} công trình` : 'Đang tải…'}</p>
         </div>
         <button className="btn-primary" onClick={() => diToi('cong-trinh', 'moi')}>
           <Plus size={16} /> Thêm công trình
@@ -111,7 +111,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
     e.target.value = '';
     if (!file) return;
     if (file.size > 6 * 1024 * 1024) {
-      onBao('Ảnh quá nặng (tối đa 6MB). Nén bớt rồi tải lại.', 'error');
+      onBao('Ảnh quá nặng, tối đa 6MB', 'error');
       return;
     }
     setDangTaiAnh(true);
@@ -158,7 +158,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
         <div>
           <button type="button" className="qt-quaylai" onClick={huy}><ArrowLeft size={15} /> Quay lại danh sách công trình</button>
           <h1>{ct ? 'Sửa công trình' : 'Thêm công trình'}</h1>
-          <p>Hiện ở mục Nhật ký thi công trên trang chủ</p>
+          <p>Hiển thị ở trang chủ</p>
         </div>
       </div>
 
@@ -174,7 +174,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
 
       <Khoi so={1} tieuDe="Thông tin công trình" moTa="Hiện trên thẻ công trình">
         <div className="qt-hang">
-          <Truong nhan="Lắp đặt gì" batBuoc rong loi={loi.title && !f.title.trim() && 'Cần nhập tên công trình'}>
+          <Truong nhan="Tên công trình" batBuoc rong loi={loi.title && !f.title.trim() && 'Cần nhập tên công trình'}>
             <input className="qt-input" value={f.title} onChange={doi('title')} placeholder="VD: Lắp đặt hệ thống 8 camera Hikvision" />
           </Truong>
           <Truong nhan="Địa chỉ" batBuoc rong loi={loi.address && !f.address.trim() && 'Cần nhập địa chỉ'}>
@@ -186,7 +186,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
           <Truong nhan="Ngày khởi công">
             <input className="qt-input" type="date" value={f.startDate} onChange={doi('startDate')} />
           </Truong>
-          <Truong nhan="Thi công (ngày)">
+          <Truong nhan="Số ngày thi công">
             <input className="qt-input" type="number" min="0" value={f.durationDays} onChange={doi('durationDays')} placeholder="2" />
           </Truong>
           <Truong nhan="Trạng thái">
@@ -198,7 +198,7 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
         </div>
       </Khoi>
 
-      <Khoi so={2} tieuDe="Ảnh công trình" moTa="Ảnh chụp thực tế, nên nén dưới 400KB">
+      <Khoi so={2} tieuDe="Ảnh công trình" moTa="Ảnh thực tế">
         <div className="qt-anh-cong-trinh">
           <div className="qt-anh-xem">
             {f.image ? <img src={f.image} alt="Ảnh công trình" /> : <span>Chưa có ảnh</span>}
@@ -208,18 +208,18 @@ function FormCongTrinh({ ct, onBao, onXong, onHuy }) {
               <Upload size={15} /> {dangTaiAnh ? 'Đang tải…' : f.image ? 'Đổi ảnh' : 'Chọn ảnh'}
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={chonAnh} hidden disabled={dangTaiAnh} />
             </label>
-            <input className="qt-input" value={f.image} onChange={doi('image')} placeholder="hoặc dán đường dẫn: /images/cong-trinh/anh.jpg" />
+            <input className="qt-input" value={f.image} onChange={doi('image')} placeholder="Hoặc dán đường dẫn ảnh" />
           </div>
         </div>
       </Khoi>
 
-      <Khoi so={3} tieuDe="Nội dung thi công" moTa="Hiện khi khách bấm vào công trình">
+      <Khoi so={3} tieuDe="Nội dung thi công" moTa="Hiện khi khách mở công trình">
         <textarea
           className="qt-input"
           rows={5}
           value={f.description}
           onChange={doi('description')}
-          placeholder="Mô tả công việc đã làm: khảo sát, đi dây, lắp đặt, bàn giao…"
+          placeholder="Mô tả công việc đã làm"
         />
       </Khoi>
 

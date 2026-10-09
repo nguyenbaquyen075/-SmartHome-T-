@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen
+  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import AdminLogin from './AdminLogin';
@@ -12,6 +12,7 @@ import AdminGiaiTri from './AdminGiaiTri';
 import AdminSettings from './AdminSettings';
 import AdminCaiDat from './AdminCaiDat';
 import AdminGhiChu from './AdminGhiChu';
+import AdminChamCong from './AdminChamCong';
 import '../admin.css';
 
 // Menu ☰: các mục của trang chủ xếp đúng thứ tự từ trên xuống như khách thấy.
@@ -20,20 +21,21 @@ const MENU = [
   {
     nhom: 'Chung',
     muc: [
-      { duong: 'tong-quan', nhan: 'Tổng quan', moTa: 'Số liệu và việc cần bổ sung', Icon: LayoutDashboard },
-      { duong: 'ghi-chu', nhan: 'Ghi chú', moTa: 'Sổ ghi chú riêng, tự động lưu', Icon: NotebookPen },
-      { duong: 'cai-dat', nhan: 'Cài đặt & bảo mật', moTa: 'Tài khoản, mật khẩu, nơi cất dữ liệu', Icon: ShieldCheck }
+      { duong: 'tong-quan', nhan: 'Tổng quan', moTa: 'Số liệu nhanh', Icon: LayoutDashboard },
+      { duong: 'ghi-chu', nhan: 'Ghi chú', moTa: 'Ghi chú riêng', Icon: NotebookPen },
+      { duong: 'cham-cong', nhan: 'Chấm công', moTa: 'Nhân viên và ngày công', Icon: CalendarCheck },
+      { duong: 'cai-dat', nhan: 'Cài đặt', moTa: 'Tài khoản và bảo mật', Icon: ShieldCheck }
     ]
   },
   {
-    nhom: 'Trang chủ · từ trên xuống',
+    nhom: 'Trang chủ',
     muc: [
-      { duong: 'thanh-chay', nhan: 'Thanh chữ chạy', moTa: 'Dòng thông báo chạy trên banner', Icon: Megaphone },
-      { duong: 'banner', nhan: 'Ảnh banner', moTa: 'Ảnh lớn ở đầu trang chủ', Icon: Image },
-      { duong: 'danh-muc', nhan: 'Danh mục', moTa: 'Thêm, sửa, xóa danh mục sản phẩm', Icon: LayoutGrid },
-      { duong: 'san-pham', nhan: 'Sản phẩm', moTa: 'Ảnh, thông số, mô tả chi tiết', Icon: Package, them: true },
+      { duong: 'thanh-chay', nhan: 'Thanh chữ chạy', moTa: 'Chữ chạy trên banner', Icon: Megaphone },
+      { duong: 'banner', nhan: 'Ảnh banner', moTa: 'Ảnh đầu trang', Icon: Image },
+      { duong: 'danh-muc', nhan: 'Danh mục', moTa: 'Nhóm sản phẩm', Icon: LayoutGrid },
+      { duong: 'san-pham', nhan: 'Sản phẩm', moTa: 'Quản lý sản phẩm', Icon: Package, them: true },
       { duong: 'cong-trinh', nhan: 'Nhật ký thi công', moTa: 'Công trình đã làm', Icon: HardHat, them: true },
-      { duong: 'giai-tri', nhan: 'Hậu trường thi công', moTa: 'Ảnh, video giải trí', Icon: Clapperboard }
+      { duong: 'giai-tri', nhan: 'Hậu trường thi công', moTa: 'Ảnh và video', Icon: Clapperboard }
     ]
   }
 ];
@@ -180,6 +182,7 @@ export default function AdminApp() {
         {trang === 'san-pham' && <AdminSanPham {...chung} con={con} />}
         {trang === 'cong-trinh' && <AdminProjects {...chung} con={con} />}
         {trang === 'giai-tri' && <AdminGiaiTri onBao={hienBao} />}
+        {trang === 'cham-cong' && <AdminChamCong {...chung} con={con} />}
         {trang === 'ghi-chu' && <AdminGhiChu onBao={hienBao} />}
         {trang === 'cai-dat' && <AdminCaiDat onBao={hienBao} />}
         {(trang === 'thanh-chay' || trang === 'banner') && (

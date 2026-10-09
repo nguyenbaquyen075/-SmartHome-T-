@@ -145,7 +145,7 @@ export default function AdminGiaiTri({ onBao }) {
       <div className="qt-tieude">
         <div>
           <h1>Hậu trường thi công</h1>
-          <p>Ảnh, video hậu trường thi công. Đăng lên là khách xem được ngay ở trang chủ, bài ghim luôn nằm đầu.</p>
+          <p>Ảnh và video hiện ở trang chủ</p>
         </div>
         {cheDo && <NhanKho cheDo={cheDo} />}
       </div>
@@ -163,7 +163,7 @@ export default function AdminGiaiTri({ onBao }) {
       >
         <Upload size={30} />
         <strong>Kéo thả ảnh, video vào đây</strong>
-        <small>hoặc bấm để chọn — chọn được nhiều file một lúc · ảnh ≤ 10MB · video ≤ 100MB</small>
+        <small>Chọn được nhiều tệp · ảnh tối đa 10MB · video tối đa 100MB</small>
       </div>
       <input
         ref={inputRef}
@@ -208,7 +208,7 @@ export default function AdminGiaiTri({ onBao }) {
                   className="gtq-nhap"
                   rows={2}
                   maxLength={300}
-                  placeholder="Chú thích vui…"
+                  placeholder="Chú thích"
                   value={x.chuThich}
                   disabled={dangDang}
                   onChange={(e) => suaCho(x.key, { chuThich: e.target.value })}
@@ -300,7 +300,7 @@ export default function AdminGiaiTri({ onBao }) {
                   maxLength={300}
                   value={dangSua.chuThich}
                   onChange={(e) => setDangSua({ ...dangSua, chuThich: e.target.value })}
-                  placeholder="Chú thích vui…"
+                  placeholder="Chú thích"
                 />
               </label>
 

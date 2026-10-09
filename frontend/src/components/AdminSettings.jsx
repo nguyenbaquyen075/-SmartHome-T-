@@ -24,7 +24,7 @@ export default function AdminSettings({ onBao, phan }) {
       const kq = await api.saveSettings(duLieu);
       setTicker(kq.ticker || []);
       setBanner(kq.banner || null);
-      onBao('Đã lưu, tải lại trang chủ là thấy');
+      onBao('Đã lưu');
     } catch (err) {
       onBao(err.message, 'error');
     } finally {
@@ -44,7 +44,7 @@ export default function AdminSettings({ onBao, phan }) {
       // Nén ngay trên máy trước khi gửi lên
       const goi = await nenAnhFile(file);
       if (goi.size > 6 * 1024 * 1024) {
-        onBao('Ảnh nén rồi vẫn quá nặng, thử ảnh khác.', 'error');
+        onBao('Ảnh quá nặng, chọn ảnh khác', 'error');
         return;
       }
       const { url } = await api.taiAnhLen(goi, 'banner');
@@ -61,7 +61,7 @@ export default function AdminSettings({ onBao, phan }) {
       {/* ===== Thanh chạy ===== */}
       {phan !== 'banner' && (
       <section>
-        <p className="adm-ghichu">Mỗi dòng là một thông điệp, chạy vòng liên tục ở trang chủ.</p>
+        <p className="adm-ghichu">Mỗi dòng là một thông báo, chạy lần lượt trên trang chủ.</p>
 
         {ticker.map((dong, i) => (
           <div key={i} className="adm-dong-ticker">
@@ -72,7 +72,7 @@ export default function AdminSettings({ onBao, phan }) {
                 moi[i] = e.target.value;
                 setTicker(moi);
               }}
-              placeholder="VD: 🔧 LẮP ĐẶT TẬN NƠI - MIỄN PHÍ KHẢO SÁT"
+              placeholder="Nội dung thông báo"
             />
             <button onClick={() => setTicker(ticker.filter((_, j) => j !== i))}
               title="Xóa dòng" className="xoa"><Trash2 size={15} /></button>
@@ -95,8 +95,7 @@ export default function AdminSettings({ onBao, phan }) {
       {phan !== 'ticker' && (
       <section>
         <p className="adm-ghichu">
-          Nên dùng ảnh ngang tỉ lệ khoảng 1024×317. Ảnh càng nặng trang càng chậm —
-          nén xuống dưới 400KB trước khi tải lên.
+          Dùng ảnh ngang, tỉ lệ khoảng 1024×317, dưới 400KB.
         </p>
 
         <div className="adm-banner-xem">

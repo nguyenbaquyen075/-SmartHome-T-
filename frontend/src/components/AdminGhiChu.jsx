@@ -429,7 +429,7 @@ export default function AdminGhiChu({ onBao }) {
         </div>
         <div className="gc-tim gc-tim-rong">
           <Search size={16} />
-          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm trong mọi ghi chú..." />
+          <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm ghi chú" />
         </div>
 
         {dangTai ? <p className="gc-trong">Đang tải…</p> : (
@@ -464,7 +464,7 @@ export default function AdminGhiChu({ onBao }) {
               )}
             </div>
             {ganDay.length === 0 ? (
-              <p className="gc-trong">Chưa có ghi chú nào. Mở một thư mục rồi bấm nút bút để viết.</p>
+              <p className="gc-trong">Chưa có ghi chú</p>
             ) : (
               <div className="gc-gan-day">
                 {ganDay.map((g) => (
@@ -476,7 +476,7 @@ export default function AdminGhiChu({ onBao }) {
                     </span>
                     <span className="gc-dong-phai">
                       <em>{new Date(g.suaLuc).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</em>
-                      <span className="gc-chip"><Folder size={14} /> {tenCua(g)}</span>
+                      <span className="gc-chip"><Folder size={14} /><span className="gc-chip-chu">{tenCua(g)}</span></span>
                     </span>
                     <ChevronRight size={18} className="gc-mui-ten" />
                   </button>
@@ -585,7 +585,7 @@ export default function AdminGhiChu({ onBao }) {
               <div className="gc-tep-hang">
               <input ref={oTep} type="file" multiple accept={DUOI_TEP} hidden onChange={chonTep} />
               <button className="gc-tep-them" onClick={() => oTep.current?.click()} disabled={dangTaiTep}>
-                <Paperclip size={16} /> {dangTaiTep ? 'Đang tải lên…' : 'Đính kèm Word, Excel, PDF…'}
+                <Paperclip size={16} /> {dangTaiTep ? 'Đang tải lên…' : 'Đính kèm tệp'}
               </button>
               <button className="gc-luu" onClick={luuTay} title="Lưu ghi chú"><Check size={16} strokeWidth={2.6} /> Lưu</button>
               </div>
@@ -594,7 +594,7 @@ export default function AdminGhiChu({ onBao }) {
         ) : (
           <div className="gc-chua-chon">
             <SquarePen size={40} />
-            <p>Chọn một ghi chú hoặc bấm <b>+</b> để viết mới</p>
+            <p>Chọn một ghi chú để xem</p>
           </div>
         )}
       </section>

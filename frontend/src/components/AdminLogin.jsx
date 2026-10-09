@@ -37,7 +37,7 @@ export default function AdminLogin({ onSuccess }) {
         <img className="qt-dn-logo" src="/images/logoTD.png" alt="SmartHome TD" onError={(e) => { e.currentTarget.hidden = true; }} />
         <div className="qt-dn-icon"><Lock size={24} /></div>
         <h1>Đăng nhập quản trị</h1>
-        <p>Khu vực dành cho chủ cửa hàng</p>
+        <p>Dành cho chủ cửa hàng</p>
 
         <label className="qt-dn-o">
           <span>Email hoặc số điện thoại</span>

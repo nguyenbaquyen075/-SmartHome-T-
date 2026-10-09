@@ -12,8 +12,8 @@ const KHO_FILE = {
 };
 
 const KHO_DU_LIEU = {
-  neon: { chu: 'Kho Neon (Postgres)', an: true, y: 'Sản phẩm, công trình, cài đặt đều còn sau khi deploy lại' },
-  file: { chu: 'File trong máy chủ', an: false, y: 'Chưa đặt DATABASE_URL — dữ liệu sẽ mất khi deploy' }
+  neon: { chu: 'Kho Neon (Postgres)', an: true, y: 'Dữ liệu được giữ lại khi cập nhật web' },
+  file: { chu: 'File trong máy chủ', an: false, y: 'Chưa nối kho dữ liệu, dữ liệu sẽ mất khi cập nhật web' }
 };
 
 function DongKho({ Icon, ten, kho }) {
@@ -93,31 +93,31 @@ export default function AdminCaiDat({ onBao }) {
     <>
       <div className="qt-tieude">
         <div>
-          <h1>Cài đặt &amp; bảo mật</h1>
-          <p>Tài khoản đăng nhập, mật khẩu và tình trạng lưu trữ của web.</p>
+          <h1>Cài đặt</h1>
+          <p>Tài khoản và lưu trữ dữ liệu</p>
         </div>
       </div>
 
       <form onSubmit={luu}>
-        <Khoi so={1} tieuDe="Tài khoản đăng nhập" moTa="Email hoặc số điện thoại dùng để vào trang quản trị">
+        <Khoi so={1} tieuDe="Tài khoản" moTa="Dùng để đăng nhập">
           <div className="qt-hang">
             <Truong nhan="Email hoặc số điện thoại" rong goiY={tt.nguon === 'kho'
-              ? `Đã đổi trong trang này${tt.doiLuc ? ` lúc ${new Date(tt.doiLuc).toLocaleString('vi-VN')}` : ''}`
-              : 'Đang lấy từ cài đặt máy chủ (biến ADMIN_TAI_KHOAN). Đổi ở đây là lưu vào kho, khỏi phụ thuộc Render.'}>
+              ? `Đã đổi${tt.doiLuc ? ` lúc ${new Date(tt.doiLuc).toLocaleString('vi-VN')}` : ''}`
+              : 'Đổi ở đây sẽ được lưu lại'}>
               <input
                 className="qt-input"
                 value={taiKhoan}
                 onChange={(e) => setTaiKhoan(e.target.value)}
-                placeholder="vd: anh@gmail.com hoặc 0987 654 321"
+                placeholder="Email hoặc số điện thoại"
                 autoComplete="username"
               />
             </Truong>
           </div>
         </Khoi>
 
-        <Khoi so={2} tieuDe="Đổi mật khẩu" moTa="Để trống nếu chỉ muốn đổi tài khoản">
+        <Khoi so={2} tieuDe="Mật khẩu mới" moTa="Bỏ trống nếu không đổi">
           <div className="qt-hang">
-            <Truong nhan="Mật khẩu mới" goiY="Ít nhất 8 ký tự, nên có cả chữ hoa và số">
+            <Truong nhan="Mật khẩu mới" goiY="Tối thiểu 8 ký tự, gồm chữ hoa và số">
               <div className="qt-o-mat-khau">
                 <input
                   className="qt-input"
@@ -133,20 +133,20 @@ export default function AdminCaiDat({ onBao }) {
               </div>
             </Truong>
 
-            <Truong nhan="Nhập lại mật khẩu mới" loi={nhapLai && matKhauMoi !== nhapLai && 'Chưa giống ô trên'}>
+            <Truong nhan="Nhập lại mật khẩu mới" loi={nhapLai && matKhauMoi !== nhapLai && 'Mật khẩu không khớp'}>
               <input
                 className="qt-input"
                 type={hien ? 'text' : 'password'}
                 value={nhapLai}
                 onChange={(e) => setNhapLai(e.target.value)}
-                placeholder="Gõ lại cho chắc"
+                placeholder="Nhập lại mật khẩu"
                 autoComplete="new-password"
               />
             </Truong>
           </div>
         </Khoi>
 
-        <Khoi so={3} tieuDe="Xác nhận là anh" moTa="Đổi tài khoản hay mật khẩu đều phải nhập mật khẩu đang dùng">
+        <Khoi so={3} tieuDe="Xác nhận" moTa="Nhập mật khẩu hiện tại để lưu thay đổi">
           <div className="qt-hang">
             <Truong nhan="Mật khẩu hiện tại" batBuoc={coThayDoi} rong>
               <input
@@ -154,7 +154,7 @@ export default function AdminCaiDat({ onBao }) {
                 type="password"
                 value={matKhauHienTai}
                 onChange={(e) => setMatKhauHienTai(e.target.value)}
-                placeholder="Mật khẩu đang dùng"
+                placeholder="Mật khẩu hiện tại"
                 autoComplete="current-password"
               />
             </Truong>
@@ -173,14 +173,14 @@ export default function AdminCaiDat({ onBao }) {
           <span className="qt-khoi-so"><ShieldCheck size={16} /></span>
           <div className="qt-khoi-chu">
             <h2>Bảo mật</h2>
-            <p>Nghi ngờ có người khác đang đăng nhập thì bấm nút dưới.</p>
+            <p>Đăng xuất khỏi các thiết bị khác</p>
           </div>
         </div>
 
         <div className="qt-bao-mat">
           <div>
             <strong>Đăng xuất khỏi mọi máy khác</strong>
-            <small>Mọi lần đăng nhập cũ (máy khác, điện thoại khác) đều bị đẩy ra. Máy này vẫn giữ nguyên.</small>
+            <small>Các thiết bị khác sẽ bị đăng xuất, thiết bị này giữ nguyên.</small>
           </div>
           <button type="button" className="qt-nut" onClick={dangXuatMoiNoi}>
             <LogOut size={15} /> Đăng xuất mọi nơi
@@ -190,7 +190,7 @@ export default function AdminCaiDat({ onBao }) {
         <div className="qt-bao-mat">
           <div>
             <strong>Phiên đăng nhập</strong>
-            <small>Tự hết hạn sau 7 ngày. Đổi mật khẩu là mọi phiên cũ hết hiệu lực ngay.</small>
+            <small>Phiên đăng nhập tự hết hạn sau 7 ngày.</small>
           </div>
           <span className="qt-nhan-nhe">{adminToken.get() ? 'Đang đăng nhập' : '—'}</span>
         </div>
@@ -200,12 +200,12 @@ export default function AdminCaiDat({ onBao }) {
         <div className="qt-khoi-dau">
           <span className="qt-khoi-so"><Database size={16} /></span>
           <div className="qt-khoi-chu">
-            <h2>Dữ liệu đang cất ở đâu</h2>
-            <p>Nhìn đây là biết deploy lại có mất gì không.</p>
+            <h2>Lưu trữ dữ liệu</h2>
+            <p>Nơi lưu sản phẩm, ảnh và ghi chú</p>
           </div>
         </div>
 
-        <DongKho Icon={Database} ten="Chữ nghĩa" kho={KHO_DU_LIEU[tt.kho.duLieu] || KHO_DU_LIEU.file} />
+        <DongKho Icon={Database} ten="Dữ liệu" kho={KHO_DU_LIEU[tt.kho.duLieu] || KHO_DU_LIEU.file} />
         <DongKho
           Icon={tt.kho.file === 'cloudinary' ? Cloud : tt.kho.file === 'may' ? HardDrive : Cloud}
           ten="Ảnh, video"

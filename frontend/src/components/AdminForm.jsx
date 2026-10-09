@@ -15,11 +15,10 @@ export function Truong({ nhan, batBuoc, goiY, loi, rong, children }) {
 }
 
 // Khung đánh số thứ tự cho từng phần của form
-export function Khoi({ so, tieuDe, moTa, nut, children }) {
+export function Khoi({ tieuDe, moTa, nut, children }) {
   return (
     <section className="qt-khung">
       <div className="qt-khoi-dau">
-        <span className="qt-khoi-so">{so}</span>
         <div className="qt-khoi-chu">
           <h2>{tieuDe}</h2>
           {moTa && <p>{moTa}</p>}

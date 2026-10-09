@@ -4,6 +4,7 @@ const compression = require('compression');
 const fs = require('fs');
 const path = require('path');
 const { taoZip } = require('./zipTinh');
+const { taoXlsx } = require('./xlsxTinh');
 const kho = require('./kho');
 const khoFile = require('./khoFile');
 
@@ -26,6 +27,7 @@ const KHO_GIAI_TRI = 'giai-tri';
 const KHO_DANH_MUC = 'danh-muc';     // danh muc san pham, them/sua/xoa trong trang quan tri
 const KHO_GHI_CHU = 'ghi-chu';       // ghi chu rieng cua quan tri (kieu Notes tren iPhone/Mac)
 const KHO_GHI_CHU_TM = 'ghi-chu-thu-muc'; // thu muc chua ghi chu
+const KHO_CHAM_CONG = 'cham-cong';   // nhan vien + bang cham cong theo ngay
 const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
 const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
 
@@ -696,6 +698,134 @@ app.get('/api/ghi-chu-sao-luu', canQuyen, async (req, res) => {
   }
 });
 
+// ---- Cham cong: nhan vien + cong theo ngay { cong: { <id>: { 'YYYY-MM-DD': 1 | 0.5 } }, chuThich: { <id>: { 'YYYY-MM-DD': 'chu' } } } ----
+const docChamCong = () => ({ nhanVien: [], cong: {}, chuThich: {}, ...kho.doc(KHO_CHAM_CONG, { nhanVien: [], cong: {}, chuThich: {} }) });
+// Bam tich lien tuc: cac yeu cau phai ghi lan luot, khong thi yeu cau sau doc ban cu roi de mat tich cua yeu cau truoc
+let hangChamCong = Promise.resolve();
+const tuanTuChamCong = (viec) => (hangChamCong = hangChamCong.then(viec, viec));
+
+const chuanNhanVien = (b = {}) => ({ ten: chuoi(b.ten, 80), chucVu: chuoi(b.chucVu, 60), sdt: chuoi(b.sdt, 20) });
+
+// Xuat bang cham cong 1 thang ra file Excel (.xlsx): moi nhan vien 1 dong, moi ngay 1 cot; sheet 2 la chu thich
+app.get('/api/cham-cong/xuat', canQuyen, (req, res) => {
+  const khop = /^(\d{4})-(\d{2})$/.exec(String(req.query.thang || ''));
+  if (!khop || +khop[2] < 1 || +khop[2] > 12) return res.status(400).json({ error: 'Tháng không hợp lệ' });
+  const nam = +khop[1];
+  const thang = +khop[2];
+  const d = docChamCong();
+  const soNgay = new Date(nam, thang, 0).getDate();
+  const homNayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+  const tienTo = `${nam}-${String(thang).padStart(2, '0')}-`;
+  const daQua = `${tienTo}${String(soNgay).padStart(2, '0')}` < homNayVN;   // thang da het: ngay khong cham la vang (do)
+  const THU = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+  const dau1 = [{ v: 'STT', s: 1 }, { v: 'Họ tên', s: 1 }, { v: 'Chức vụ', s: 1 }];
+  const dau2 = [{ v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }];
+  for (let n = 1; n <= soNgay; n++) {
+    const thu = new Date(nam, thang - 1, n).getDay();
+    dau1.push({ v: n, s: 1 });
+    dau2.push({ v: THU[thu], s: thu === 0 || thu === 6 ? 6 : 1 });
+  }
+  dau1.push({ v: 'Tổng công', s: 1 }, { v: 'Ngày 1 công', s: 1 }, { v: 'Ngày nửa công', s: 1 });
+  dau2.push({ v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 });
+
+  const hang = [[{ v: `BẢNG CHẤM CÔNG THÁNG ${thang}/${nam}`, s: 5 }], [], dau1, dau2];
+  d.nhanVien.forEach((nv, i) => {
+    const cong = d.cong[nv.id] || {};
+    const r = [{ v: i + 1, s: 7 }, { v: nv.ten, s: 0 }, { v: nv.chucVu || '', s: 0 }];
+    let tong = 0; let du = 0; let nua = 0;
+    for (let n = 1; n <= soNgay; n++) {
+      const g = cong[`${tienTo}${String(n).padStart(2, '0')}`] || 0;
+      tong += g;
+      if (g === 1) { du += 1; r.push({ v: 1, s: 2 }); } else if (g === 0.5) { nua += 1; r.push({ v: 0.5, s: 3 }); } else r.push({ v: '', s: daQua ? 4 : 0 });
+    }
+    r.push({ v: tong, s: 7 }, { v: du, s: 0 }, { v: nua, s: 0 });
+    hang.push(r);
+  });
+  hang.push([], [{ v: 'Chú giải: xanh = 1 công · vàng = nửa công · đỏ = vắng (tháng đã qua)', s: 0 }]);
+
+  const rong = [5, 24, 18, ...Array.from({ length: soNgay }, () => 4.5), 11, 12, 14];
+  const ct = [[{ v: 'Ngày', s: 1 }, { v: 'Nhân viên', s: 1 }, { v: 'Chú thích', s: 1 }]];
+  for (const nv of d.nhanVien) {
+    Object.entries(d.chuThich[nv.id] || {}).filter(([k]) => k.startsWith(tienTo)).sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([k, v]) => ct.push([{ v: k.split('-').reverse().join('/'), s: 0 }, { v: nv.ten, s: 0 }, { v: v, s: 0 }]));
+  }
+  const file = taoXlsx([
+    { ten: `Tháng ${thang}-${nam}`, hang, rong, dongKhoa: 4, cotKhoa: 3 },
+    { ten: 'Chú thích', hang: ct, rong: [12, 24, 60] }
+  ]);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="bang-cong-thang-${thang}-${nam}.xlsx"`);
+  res.send(file);
+});
+
+app.get('/api/cham-cong', canQuyen, (req, res) => res.json(docChamCong()));
+
+app.post('/api/cham-cong/nhan-vien', canQuyen, (req, res) => tuanTuChamCong(async () => {
+  const d = docChamCong();
+  const nv = chuanNhanVien(req.body);
+  if (!nv.ten) return res.status(400).json({ error: 'Nhập tên nhân viên' });
+  if (d.nhanVien.length >= 200) return res.status(400).json({ error: 'Tối đa 200 nhân viên' });
+  const moi = { id: `nv-${Date.now()}`, ...nv };
+  d.nhanVien.push(moi);
+  if (!(await kho.ghi(KHO_CHAM_CONG, d))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+}));
+
+app.put('/api/cham-cong/nhan-vien/:id', canQuyen, (req, res) => tuanTuChamCong(async () => {
+  const d = docChamCong();
+  const i = d.nhanVien.findIndex((n) => n.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy nhân viên' });
+  const nv = chuanNhanVien(req.body);
+  if (!nv.ten) return res.status(400).json({ error: 'Nhập tên nhân viên' });
+  d.nhanVien[i] = { ...d.nhanVien[i], ...nv };
+  if (!(await kho.ghi(KHO_CHAM_CONG, d))) return res.status(500).json(LOI_LUU);
+  res.json(d.nhanVien[i]);
+}));
+
+app.delete('/api/cham-cong/nhan-vien/:id', canQuyen, (req, res) => tuanTuChamCong(async () => {
+  const d = docChamCong();
+  if (!d.nhanVien.some((n) => n.id === req.params.id)) return res.status(404).json({ error: 'Không tìm thấy nhân viên' });
+  d.nhanVien = d.nhanVien.filter((n) => n.id !== req.params.id);
+  delete d.cong[req.params.id];
+  delete d.chuThich[req.params.id];
+  if (!(await kho.ghi(KHO_CHAM_CONG, d))) return res.status(500).json(LOI_LUU);
+  res.json({ success: true });
+}));
+
+// Luu nhieu thay doi 1 lan (bam nut Luu): moi muc { nhanVienId, ngay, gia?, chuThich? }.
+// gia = 1 (du cong), 0.5 (nua cong), 0 (bo tich); chuThich rong = xoa chu thich. Sai 1 muc la khong luu muc nao.
+const ngayHopLe = (ngay) => /^\d{4}-\d{2}-\d{2}$/.test(ngay || '') && new Date(`${ngay}T00:00:00Z`).toISOString().slice(0, 10) === ngay;
+app.put('/api/cham-cong/luu', canQuyen, (req, res) => tuanTuChamCong(async () => {
+  const homNayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+  const ds = req.body?.thayDoi;
+  if (!Array.isArray(ds) || ds.length > 3000) return res.status(400).json({ error: 'Dữ liệu không hợp lệ' });
+  const d = docChamCong();
+  for (const x of ds) {
+    if (!d.nhanVien.some((n) => n.id === x?.nhanVienId)) return res.status(404).json({ error: 'Không tìm thấy nhân viên' });
+    let hopLe = false;
+    try { hopLe = ngayHopLe(x.ngay); } catch { /* ngay vo nghia */ }
+    if (!hopLe) return res.status(400).json({ error: 'Ngày không hợp lệ' });
+    if (x.gia !== undefined && ![0, 0.5, 1].includes(x.gia)) return res.status(400).json({ error: 'Giá trị công không hợp lệ' });
+    // Ngay chua toi thi khong cham cong truoc duoc (tinh theo gio Viet Nam); bo tich (0) van duoc
+    if (x.gia > 0 && x.ngay > homNayVN) return res.status(400).json({ error: 'Chưa đến ngày này, không chấm công trước được' });
+    if (x.chuThich !== undefined && typeof x.chuThich !== 'string') return res.status(400).json({ error: 'Chú thích không hợp lệ' });
+  }
+  for (const x of ds) {
+    if (x.gia !== undefined) {
+      d.cong[x.nhanVienId] = d.cong[x.nhanVienId] || {};
+      if (x.gia === 0) delete d.cong[x.nhanVienId][x.ngay]; else d.cong[x.nhanVienId][x.ngay] = x.gia;
+    }
+    if (x.chuThich !== undefined) {
+      const chu = chuoi(x.chuThich, 200);
+      d.chuThich[x.nhanVienId] = d.chuThich[x.nhanVienId] || {};
+      if (!chu) delete d.chuThich[x.nhanVienId][x.ngay]; else d.chuThich[x.nhanVienId][x.ngay] = chu;
+    }
+  }
+  if (!(await kho.ghi(KHO_CHAM_CONG, d))) return res.status(500).json(LOI_LUU);
+  res.json({ success: true });
+}));
+
 // GET /api/brands
 app.get('/api/brands', (req, res) => {
   const products = kho.doc(KHO_SAN_PHAM);
@@ -1124,11 +1254,33 @@ kho.moKho({
   [KHO_GIAI_TRI]: [],
   [KHO_GHI_CHU]: [],
   [KHO_GHI_CHU_TM]: [],
+  [KHO_CHAM_CONG]: { nhanVien: [], cong: {}, chuThich: {} },
   [KHO_QUAN_TRI]: {}
-}).then(() => {
+}).then(async () => {
+  // Vua chuyen tu may len kho du lieu: file dinh kem ghi chu dang nam trong backend/data/ghi-chu-file
+  // (moKho chi chuyen cac muc JSON) -> day not len kho, bo qua file da co, de may hong van con
+  if (kho.dangDungDB() && fs.existsSync(THU_MUC_TEP)) {
+    let moi = 0;
+    for (const ten of fs.readdirSync(THU_MUC_TEP)) {
+      try {
+        if (await kho.docAnh(ten)) continue;
+        if (await kho.ghiAnh(ten, 'application/octet-stream', fs.readFileSync(path.join(THU_MUC_TEP, ten)))) moi += 1;
+      } catch (err) { console.error(`[KHO] Khong chuyen duoc tep ${ten}:`, err.message); }
+    }
+    if (moi) console.log(`[KHO] Da chuyen ${moi} tep dinh kem ghi chu tu may len co so du lieu`);
+  }
   if (khoFile.dangBat()) khoFile.datPhepTrinhDuyet();
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`CameraTD Backend Server is running on http://localhost:${PORT}`);
+    // Render gói Free cho web ngủ sau 15 phút không ai truy cập. Tự gọi vào địa chỉ công khai của chính mình
+    // mỗi 10 phút (đi qua cổng của Render nên tính là có truy cập) để web không ngủ.
+    // Chỉ chạy trên Render (có RENDER_EXTERNAL_URL); chạy ở máy mình thì bỏ qua.
+    // ponytail: chỉ giữ cho web đang thức không ngủ lại; web đã ngủ thì cần UptimeRobot đánh thức
+    if (process.env.RENDER_EXTERNAL_URL) {
+      setInterval(() => {
+        fetch(`${process.env.RENDER_EXTERNAL_URL}/api/categories`).catch(() => {});
+      }, 10 * 60 * 1000).unref();
+    }
   });
 }).catch((err) => {
   console.error('Không mở được kho dữ liệu:', err.message);

@@ -213,6 +213,19 @@ export const api = {
   updateProject: (id, data) => apiAdmin(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProject: (id) => apiAdmin(`/projects/${id}`, { method: 'DELETE' }),
 
+  // Chấm công
+  getChamCong: () => apiAdmin('/cham-cong'),
+  themNhanVien: (d) => apiAdmin('/cham-cong/nhan-vien', { method: 'POST', body: JSON.stringify(d) }),
+  suaNhanVien: (id, d) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
+  xoaNhanVien: (id) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'DELETE' }),
+  async xuatChamCong(thang) {
+    const res = await fetch(`${API_BASE}/cham-cong/xuat?thang=${thang}`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Không xuất được file');
+    return res.blob();
+  },
+  luuChamCong: (thayDoi) => apiAdmin('/cham-cong/luu', { method: 'PUT', body: JSON.stringify({ thayDoi }) }),
+
   // Ghi chu quan tri
   getGhiChu: () => apiAdmin('/ghi-chu'),
   themGhiChu: (data) => apiAdmin('/ghi-chu', { method: 'POST', body: JSON.stringify(data) }),

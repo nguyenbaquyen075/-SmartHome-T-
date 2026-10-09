@@ -30,7 +30,7 @@ export default function AdminTongQuan({ onBao, diToi }) {
       <div className="qt-tieude">
         <div>
           <h1>Tổng quan</h1>
-          <p>Chào anh 👋 Hôm nay có gì mới để cập nhật?</p>
+          <p>Tình hình cửa hàng</p>
         </div>
       </div>
 

@@ -177,7 +177,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
         <div>
           <button type="button" className="qt-quaylai" onClick={huy}><ArrowLeft size={15} /> Quay lại danh sách sản phẩm</button>
           <h1>{sp ? 'Sửa sản phẩm' : 'Thêm sản phẩm'}</h1>
-          <p>Các phần xếp đúng thứ tự khách thấy ở trang chi tiết. Ô có dấu <b className="qt-sao">*</b> là bắt buộc.</p>
+          <p>Ô có dấu <b className="qt-sao">*</b> là bắt buộc.</p>
         </div>
         {sp && (
           <a className="qt-nut" href={`/#product=${sp.id}`} target="_blank" rel="noreferrer">Xem trên web ↗</a>
@@ -215,7 +215,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
           </Truong>
 
           {loaiCuaDanhMuc.length > 0 && (
-            <Truong nhan="Loại thiết bị" goiY="Dùng để khách lọc sản phẩm ở trang Sản phẩm. Thêm loại mới ở Quản trị > Danh mục">
+            <Truong nhan="Loại thiết bị" goiY="Thêm loại mới ở mục Danh mục">
               <select className="qt-input" value={f.loai || ''} onChange={(e) => doi('loai', e.target.value)}>
                 <option value="">— Chưa chọn —</option>
                 {[...new Set([...loaiCuaDanhMuc, f.loai].filter(Boolean))].map((l) => <option key={l}>{l}</option>)}
@@ -223,7 +223,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             </Truong>
           )}
 
-          <Truong nhan="Thương hiệu" batBuoc loi={loi.brand && !f.brand.trim() && 'Cần nhập thương hiệu'} goiY="Gõ tên mới hoặc chọn hãng đã có">
+          <Truong nhan="Thương hiệu" batBuoc loi={loi.brand && !f.brand.trim() && 'Cần nhập thương hiệu'} goiY="Nhập hoặc chọn hãng">
             <input
               className="qt-input"
               list="qt-ds-hang"
@@ -235,12 +235,12 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             <datalist id="qt-ds-hang">{cacHang.map((h) => <option key={h} value={h} />)}</datalist>
           </Truong>
 
-          <Truong nhan="Mô tả ngắn" rong goiY="Một dòng hiện dưới tên trên thẻ sản phẩm">
+          <Truong nhan="Mô tả ngắn" rong goiY="Hiện dưới tên sản phẩm">
             <input
               className="qt-input"
               value={f.subTitle}
               onChange={(e) => doi('subTitle', e.target.value)}
-              placeholder="VD: Camera IP Dome ngoài trời 2MP, hồng ngoại 30m, chuẩn IP67"
+              placeholder="Mô tả ngắn một dòng"
               maxLength={200}
             />
           </Truong>
@@ -255,7 +255,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             <input type="checkbox" checked={f.featured} onChange={(e) => doi('featured', e.target.checked)} />
             <span>
               <strong>Sản phẩm nổi bật</strong>
-              <small>Đánh dấu để ưu tiên giới thiệu</small>
+              <small>Hiện ở mục nổi bật</small>
             </span>
           </label>
         </div>
@@ -286,7 +286,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
             <label className="qt-anh-them">
               <Upload size={22} />
               <span>{dangTaiAnh ? `Đang tải ${dangTaiAnh}…` : 'Tải ảnh lên'}</span>
-              <small>JPG, PNG, WEBP · chọn nhiều ảnh · tự nén</small>
+              <small>JPG, PNG, WEBP · chọn được nhiều ảnh</small>
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
@@ -307,7 +307,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
               value={duongDanAnh}
               onChange={(e) => setDuongDanAnh(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); themAnhTuDuongDan(); } }}
-              placeholder="Hoặc dán đường dẫn ảnh có sẵn: /images/ten-anh.jpg"
+              placeholder="Hoặc dán đường dẫn ảnh"
             />
             <button type="button" className="qt-nut" onClick={themAnhTuDuongDan}>Thêm</button>
           </div>
@@ -324,7 +324,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
                 className="qt-input"
                 value={muc.tieuDe}
                 onChange={(e) => doiMuc(i, 'tieuDe', e.target.value)}
-                placeholder="Nhập tiêu đề lớn (VD: Thông số kỹ thuật, Đặc điểm nổi bật...)"
+                placeholder="Tiêu đề mục (VD: Thông số kỹ thuật)"
                 aria-label="Tiêu đề lớn"
               />
               <button
@@ -332,7 +332,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
                 className="qt-xoa-o"
                 onClick={() => xoaMuc(i)}
                 aria-label="Xóa mục lớn"
-                title="Xóa mục lớn này"
+                title="Xóa mục"
               >
                 <Trash2 size={16} />
               </button>
@@ -349,7 +349,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
                   const ds = val.split(/\r?\n/).map((s) => s.replace(/^[-•*+]\s*/, '').trim()).filter(Boolean);
                   doi('thongTin', thongTin.map((m, j) => (j === i ? { ...m, vanBan: val, noiDung: ds } : m)));
                 }}
-                placeholder="Dán hoặc nhập nội dung tại đây..."
+                placeholder="Nội dung"
               />
               {(() => {
                 const raw = typeof muc.vanBan === 'string' ? muc.vanBan : (Array.isArray(muc.noiDung) ? muc.noiDung.join('\n') : '');

@@ -52,7 +52,7 @@ export default function AdminDanhMuc({ onBao }) {
       <div className="qt-tieude">
         <div>
           <h1>Danh mục</h1>
-          <p>{ds.length} danh mục, hiện ở trang chủ, menu và form thêm sản phẩm</p>
+          <p>{ds.length} danh mục</p>
         </div>
         {!sua && (
           <button className="btn-primary" onClick={() => setSua({ ten: '', icon: 'package', loai: [] })}>
@@ -70,14 +70,14 @@ export default function AdminDanhMuc({ onBao }) {
             value={sua.ten}
             maxLength={60}
             onChange={(e) => setSua({ ...sua, ten: e.target.value })}
-            placeholder="Tên danh mục, VD: Thiết bị báo động"
+            placeholder="Tên danh mục"
           />
-          <p className="qt-nhan-nhe" style={{ margin: '14px 0 6px' }}>Loại thiết bị (cách nhau bằng dấu phẩy)</p>
+          <p className="qt-nhan-nhe" style={{ margin: '14px 0 6px' }}>Loại thiết bị</p>
           <input
             className="qt-input"
             value={sua.loai.join(', ')}
             onChange={(e) => setSua({ ...sua, loai: e.target.value.split(',').map((x) => x.trimStart()) })}
-            placeholder="VD: Camera, Đầu ghi, Ổ cứng, Phụ kiện"
+            placeholder="Camera, Đầu ghi, Ổ cứng (cách nhau bằng dấu phẩy)"
           />
           <p className="qt-nhan-nhe" style={{ margin: '14px 0 6px' }}>Biểu tượng</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
