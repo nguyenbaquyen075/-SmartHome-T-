@@ -129,6 +129,16 @@ const docAnh = async (id) => {
   return rows[0] || null;
 };
 
+// Do dung luong dang dung: ca co so du lieu va tung nhom anh/tep (khach hang, ghi chu, khac)
+const dungLuong = async () => {
+  const tong = Number((await pool.query('SELECT pg_database_size(current_database()) AS b')).rows[0].b);
+  const { rows } = await pool.query(`SELECT
+      CASE WHEN id LIKE 'kh-anh-%' THEN 'khach' WHEN id LIKE 'gc-tep-%' THEN 'ghichu' ELSE 'khac' END AS loai,
+      count(*)::int AS so, COALESCE(sum(octet_length(du_lieu)), 0)::bigint AS byte
+    FROM anh GROUP BY 1`);
+  return { tong, nhom: rows.map((r) => ({ loai: r.loai, so: r.so, byte: Number(r.byte) })) };
+};
+
 // Liet ke moi anh/tep trong kho (de sao luu)
 const lietKeAnh = async () => (await pool.query('SELECT id, kieu FROM anh ORDER BY tao_luc')).rows;
 
@@ -156,4 +166,4 @@ const xoaAnh = async (id) => {
 
 const dangDungDB = () => Boolean(pool);
 
-module.exports = { moKho, doc, ghi, ghiAnh, ghiAnhDe, lietKeAnh, docAnh, xoaAnh, dangDungDB };
+module.exports = { moKho, doc, ghi, ghiAnh, ghiAnhDe, lietKeAnh, dungLuong, docAnh, xoaAnh, dangDungDB };

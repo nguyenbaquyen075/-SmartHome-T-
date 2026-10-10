@@ -3,6 +3,7 @@ import { KeyRound, ShieldCheck, Database, HardDrive, Cloud, Eye, EyeOff, LogOut,
 import { api, adminToken } from '../utils/api';
 import { Truong, Khoi } from './AdminForm';
 import AdminSaoLuu from './AdminSaoLuu';
+import AdminDungLuong from './AdminDungLuong';
 
 // Mô tả từng kho để anh nhìn là biết dữ liệu có an toàn không
 const KHO_FILE = {
@@ -213,6 +214,7 @@ export default function AdminCaiDat({ onBao }) {
           kho={KHO_FILE[tt.kho.file] || KHO_FILE.may}
         />
       </section>
+      <AdminDungLuong />
       <AdminSaoLuu onBao={onBao} />
     </>
   );

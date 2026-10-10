@@ -7,6 +7,7 @@ const { taoZip, docZip } = require('./zipTinh');
 const { taoXlsx } = require('./xlsxTinh');
 const kho = require('./kho');
 const khoFile = require('./khoFile');
+const khoRiengTu = require('./khoRiengTu');
 
 const app = express();
 // Render dung proxy o truoc: bat cai nay moi doc duoc dia chi that cua khach
@@ -28,6 +29,7 @@ const KHO_DANH_MUC = 'danh-muc';     // danh muc san pham, them/sua/xoa trong tr
 const KHO_GHI_CHU = 'ghi-chu';       // ghi chu rieng cua quan tri (kieu Notes tren iPhone/Mac)
 const KHO_GHI_CHU_TM = 'ghi-chu-thu-muc'; // thu muc chua ghi chu
 const KHO_CHAM_CONG = 'cham-cong';   // nhan vien + bang cham cong theo ngay
+const KHO_KHACH_HANG = 'khach-hang';   // khach hang + thiet bi da lap dat + han bao hanh
 const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
 const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
 
@@ -404,7 +406,7 @@ app.post('/api/upload', canQuyen, async (req, res) => {
 
 // Anh nam trong kho: ten co san ky tu thoi gian nen khong bao gio doi -> cho cache 1 nam
 app.get('/api/anh/:id', async (req, res) => {
-  if (req.params.id.startsWith('gc-tep-')) return res.status(404).json({ error: 'Không tìm thấy ảnh' });   // tệp ghi chú là riêng tư
+  if (req.params.id.startsWith('gc-tep-') || req.params.id.startsWith('kh-anh-')) return res.status(404).json({ error: 'Không tìm thấy ảnh' });   // tệp ghi chú là riêng tư
   if (!kho.dangDungDB()) return res.status(404).json({ error: 'Không có ảnh' });
   try {
     const anh = await kho.docAnh(req.params.id);
@@ -518,7 +520,9 @@ const DUOI_TEP = ['doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'pdf', 'tx
 const TOI_DA_TEP = 15 * 1024 * 1024;
 const TEP_TOI_DA_MOI_GHI_CHU = 20;
 
+const laAnhKhach = (id) => String(id).startsWith('kh-anh-');
 const luuTep = async (id, kieu, buf) => {
+  if (laAnhKhach(id) && khoRiengTu.dangBat()) return khoRiengTu.ghi(id, kieu, buf);   // anh khach hang vao bucket rieng tu
   if (kho.dangDungDB()) return kho.ghiAnh(id, kieu, buf);
   try {
     fs.mkdirSync(THU_MUC_TEP, { recursive: true });
@@ -530,10 +534,12 @@ const luuTep = async (id, kieu, buf) => {
   }
 };
 const docTep = async (id) => {
+  if (laAnhKhach(id) && khoRiengTu.dangBat()) { const b = await khoRiengTu.doc(id); if (b) return b; }   // khong co thi tim o kho du lieu (anh cu)
   if (kho.dangDungDB()) return (await kho.docAnh(id))?.du_lieu || null;
   try { return fs.readFileSync(path.join(THU_MUC_TEP, id)); } catch { return null; }
 };
 const xoaTep = async (id) => {
+  if (laAnhKhach(id) && khoRiengTu.dangBat()) await khoRiengTu.xoa(id);
   if (kho.dangDungDB()) return kho.xoaAnh(id);
   try { fs.rmSync(path.join(THU_MUC_TEP, id), { force: true }); return true; } catch { return false; }
 };
@@ -826,12 +832,41 @@ app.put('/api/cham-cong/luu', canQuyen, (req, res) => tuanTuChamCong(async () =>
   res.json({ success: true });
 }));
 
+// ---- Dung luong dang dung (hien trong Cai dat) ----
+app.get('/api/he-thong/dung-luong', canQuyen, async (req, res) => {
+  try {
+    const gioiHan = (Number(process.env.NEON_GIOI_HAN_MB) || 1024) * 1048576;   // goi mien phi Neon: 1GB
+    const khach = docKhach().flatMap((k) => k.thietBi || []).flatMap((t) => t.anh || []);
+    const rieng = khach.filter((a) => a.kho === 'rieng');
+    const kq = {
+      cheDo: kho.dangDungDB() ? 'db' : 'file',
+      gioiHan: kho.dangDungDB() ? gioiHan : null,
+      khoRieng: { bat: khoRiengTu.dangBat(), soAnh: rieng.length, byte: rieng.reduce((a, x) => a + (x.kichThuoc || 0), 0) },
+      tongAnhKhach: khach.length
+    };
+    if (kho.dangDungDB()) {
+      const d = await kho.dungLuong();
+      kq.tong = d.tong;
+      kq.nhom = d.nhom;
+    } else {
+      const dem = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).reduce((a, f) => a + fs.statSync(path.join(dir, f)).size, 0) : 0);
+      kq.tong = dem(path.join(__dirname, 'data')) + dem(THU_MUC_TEP);
+      kq.nhom = [];
+    }
+    res.json(kq);
+  } catch (err) {
+    console.error('Loi do dung luong:', err.message);
+    res.status(500).json({ error: 'Không đo được dung lượng' });
+  }
+});
+
 // ---- Sao luu / khoi phuc toan bo: 1 file .zip gom du lieu + tep dinh kem + anh luu trong kho ----
 // Khong gom tai khoan dang nhap (quan-tri) de file sao luu lo ra cung khong lo mat khau.
 // Anh/video nam tren kho ngoai (Neon S3, Cloudinary) khong nam trong file, chi giu duong dan; kho ngoai tu ben rieng.
 const DU_LIEU_SAO_LUU = {
   [KHO_SAN_PHAM]: [], [KHO_CONG_TRINH]: [], [KHO_CAI_DAT]: CAI_DAT_MAC_DINH, [KHO_DANH_MUC]: DANH_MUC_MAC_DINH,
-  [KHO_GIAI_TRI]: [], [KHO_GHI_CHU]: [], [KHO_GHI_CHU_TM]: [], [KHO_CHAM_CONG]: { nhanVien: [], cong: {}, chuThich: {} }
+  [KHO_GIAI_TRI]: [], [KHO_GHI_CHU]: [], [KHO_GHI_CHU_TM]: [], [KHO_CHAM_CONG]: { nhanVien: [], cong: {}, chuThich: {} },
+  [KHO_KHACH_HANG]: []
 };
 const KHO_SAO_LUU_NK = 'sao-luu-nhat-ky';
 const KHO_SAO_LUU_TRUOC = 'sao-luu-truoc-khoi-phuc';
@@ -853,25 +888,43 @@ app.get('/api/sao-luu/toan-bo', canQuyen, async (req, res) => {
       muc.push({ ten: `du-lieu/${ten}.json`, duLieu: Buffer.from(JSON.stringify(kho.doc(ten, macDinh), null, 2), 'utf8') });
     }
     let tong = 0;
+    let boQua = 0;   // so anh khach hang bi bo vi file sao luu qua lon
+    const themTep = (id, kieu, buf, anhKhach) => {
+      if (tong + buf.length > TOI_DA_SAO_LUU) { if (anhKhach) boQua += 1; return !anhKhach ? false : true; }
+      tong += buf.length;
+      tep.push({ id, kieu });
+      muc.push({ ten: `tep/${id}`, duLieu: buf });
+      return true;
+    };
+    const daCo = new Set();
     if (kho.dangDungDB()) {
-      for (const a of await kho.lietKeAnh()) {
+      const ds = await kho.lietKeAnh();
+      // Tep ghi chu va anh khac truoc (nho, bat buoc co), anh khach hang sau
+      for (const a of [...ds.filter((x) => !laAnhKhach(x.id)), ...ds.filter((x) => laAnhKhach(x.id))]) {
         const x = await kho.docAnh(a.id);
         if (!x) continue;
-        tong += x.du_lieu.length;
-        if (tong > TOI_DA_SAO_LUU) return res.status(413).json({ error: 'Dữ liệu quá lớn để sao lưu một lần (trên 250MB)' });
-        tep.push({ id: a.id, kieu: a.kieu });
-        muc.push({ ten: `tep/${a.id}`, duLieu: x.du_lieu });
+        if (!themTep(a.id, a.kieu, x.du_lieu, laAnhKhach(a.id))) return res.status(413).json({ error: 'Dữ liệu quá lớn để sao lưu một lần (trên 250MB)' });
+        daCo.add(a.id);
       }
     } else if (fs.existsSync(THU_MUC_TEP)) {
       for (const id of fs.readdirSync(THU_MUC_TEP)) {
-        tep.push({ id, kieu: 'application/octet-stream' });
-        muc.push({ ten: `tep/${id}`, duLieu: fs.readFileSync(path.join(THU_MUC_TEP, id)) });
+        themTep(id, 'application/octet-stream', fs.readFileSync(path.join(THU_MUC_TEP, id)), laAnhKhach(id));
+        daCo.add(id);
+      }
+    }
+    // Anh khach hang nam o kho rieng tu (bucket) khong co trong bang anh -> lay them theo danh sach khach hang
+    if (khoRiengTu.dangBat()) {
+      for (const a of docKhach().flatMap((k) => k.thietBi || []).flatMap((t) => t.anh || [])) {
+        if (daCo.has(a.id)) continue;
+        const buf = await khoRiengTu.doc(a.id);
+        if (buf) themTep(a.id, a.kieu || 'image/jpeg', buf, true);
       }
     }
     const bay = new Date().toISOString();
-    muc.unshift({ ten: 'manifest.json', duLieu: Buffer.from(JSON.stringify({ phienBan: 1, taoLuc: bay, nhom: Object.keys(DU_LIEU_SAO_LUU), tep }, null, 2), 'utf8') });
+    muc.unshift({ ten: 'manifest.json', duLieu: Buffer.from(JSON.stringify({ phienBan: 1, taoLuc: bay, nhom: Object.keys(DU_LIEU_SAO_LUU), tep, boQuaAnh: boQua }, null, 2), 'utf8') });
     const zip = taoZip(muc);
     await kho.ghi(KHO_SAO_LUU_NK, { lanCuoi: bay });
+    res.setHeader('X-Anh-Bo-Qua', String(boQua));
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', `attachment; filename="sao-luu-smarthometd-${bay.slice(0, 10)}.zip"`);
     res.send(zip);
@@ -921,9 +974,11 @@ app.post('/api/sao-luu/khoi-phuc', canQuyen, express.raw({ type: () => true, lim
       const id = x.ten.slice(4);
       if (!MA_TEP_HOP_LE.test(id)) continue;
       const kieu = manifest.tep?.find((t) => t.id === id)?.kieu || 'application/octet-stream';
-      if (kho.dangDungDB()) {
+      if (laAnhKhach(id) && khoRiengTu.dangBat()) {
+        if (await khoRiengTu.ghi(id, kieu, x.duLieu)) soTep += 1;
+      } else if (kho.dangDungDB()) {
         if (await kho.ghiAnhDe(id, kieu, x.duLieu)) soTep += 1;
-      } else if (id.startsWith(TIEN_TO_TEP)) {
+      } else if (id.startsWith(TIEN_TO_TEP) || id.startsWith(TIEN_TO_ANH_KH)) {
         fs.mkdirSync(THU_MUC_TEP, { recursive: true });
         fs.writeFileSync(path.join(THU_MUC_TEP, id), x.duLieu);
         soTep += 1;
@@ -948,6 +1003,154 @@ app.post('/api/sao-luu/hoan-tac', canQuyen, async (req, res) => {
     res.status(500).json(LOI_LUU);
   }
 });
+
+// ---- Khach hang: moi khach co danh sach thiet bi da lap dat (ngay lap + so thang bao hanh) ----
+const docKhach = () => kho.doc(KHO_KHACH_HANG, []);
+let hangKhach = Promise.resolve();   // ghi lan luot, tranh de mat thay doi khi bam nhanh
+const tuanTuKhach = (viec) => (hangKhach = hangKhach.then(viec, viec));
+const ngayChuan = (v) => {
+  const t = String(v || '').trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(t) && new Date(`${t}T00:00:00Z`).toISOString().slice(0, 10) === t ? t : '';
+};
+const chuanKhach = (b = {}) => ({ ten: chuoi(b.ten, 120), sdt: chuoi(b.sdt, 20), diaChi: chuoi(b.diaChi, 250), ghiChu: chuoi(b.ghiChu, 1000) });
+const soTrongKhoang = (v, min, max, macDinh) => {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : macDinh;
+};
+const chuanThietBi = (b = {}) => ({
+  ten: chuoi(b.ten, 150),
+  soLuong: soTrongKhoang(b.soLuong, 1, 9999, 1),
+  congTrinh: chuoi(b.congTrinh, 200),
+  ngayLapDat: ngayChuan(b.ngayLapDat),
+  baoHanhThang: soTrongKhoang(b.baoHanhThang, 0, 120, 12),
+  tenMay: chuoi(b.tenMay, 150),
+  ma: chuoi(b.ma ?? b.seri, 120),
+  ghiChu: chuoi(b.ghiChu, 1000)
+});
+
+// Anh thiet bi (anh may, tem ma): luu rieng tu nhu tep ghi chu, xem phai dang nhap quan tri
+const TIEN_TO_ANH_KH = 'kh-anh-';
+const KIEU_ANH_KH = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const TOI_DA_ANH_KH = 8 * 1024 * 1024;
+const ANH_TOI_DA_MOI_THIET_BI = 4;   // moi thiet bi toi da 4 anh de kho khong phinh
+const xoaAnhThietBi = (tb) => (tb?.anh || []).forEach((a) => xoaTep(a.id));
+
+app.get('/api/khach-hang', canQuyen, (req, res) => res.json(docKhach()));
+
+app.post('/api/khach-hang', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const k = chuanKhach(req.body);
+  if (!k.ten) return res.status(400).json({ error: 'Nhập tên khách hàng' });
+  if (ds.length >= 5000) return res.status(400).json({ error: 'Tối đa 5000 khách hàng' });
+  const moi = { id: `kh-${Date.now()}`, ...k, taoLuc: new Date().toISOString(), thietBi: [] };
+  ds.unshift(moi);
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+}));
+
+app.put('/api/khach-hang/:id', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const i = ds.findIndex((k) => k.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy khách hàng' });
+  const k = chuanKhach(req.body);
+  if (!k.ten) return res.status(400).json({ error: 'Nhập tên khách hàng' });
+  ds[i] = { ...ds[i], ...k };
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  res.json(ds[i]);
+}));
+
+app.delete('/api/khach-hang/:id', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const k = ds.find((x) => x.id === req.params.id);
+  if (!k) return res.status(404).json({ error: 'Không tìm thấy khách hàng' });
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds.filter((x) => x.id !== req.params.id)))) return res.status(500).json(LOI_LUU);
+  (k.thietBi || []).forEach(xoaAnhThietBi);
+  res.json({ success: true });
+}));
+
+app.post('/api/khach-hang/:id/thiet-bi', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const i = ds.findIndex((k) => k.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy khách hàng' });
+  const tb = chuanThietBi(req.body);
+  if (!tb.ten) return res.status(400).json({ error: 'Nhập tên thiết bị' });
+  if (!tb.ngayLapDat) return res.status(400).json({ error: 'Chọn ngày lắp đặt' });
+  if ((ds[i].thietBi || []).length >= 1000) return res.status(400).json({ error: 'Mỗi khách tối đa 1000 thiết bị' });
+  const moi = { id: `tb-${Date.now()}-${crypto.randomBytes(2).toString('hex')}`, ...tb };
+  ds[i].thietBi = [...(ds[i].thietBi || []), moi];
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  res.status(201).json(moi);
+}));
+
+app.put('/api/khach-hang/:id/thiet-bi/:tid', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const i = ds.findIndex((k) => k.id === req.params.id);
+  const j = i === -1 ? -1 : (ds[i].thietBi || []).findIndex((t) => t.id === req.params.tid);
+  if (j === -1) return res.status(404).json({ error: 'Không tìm thấy thiết bị' });
+  const tb = chuanThietBi(req.body);
+  if (!tb.ten) return res.status(400).json({ error: 'Nhập tên thiết bị' });
+  if (!tb.ngayLapDat) return res.status(400).json({ error: 'Chọn ngày lắp đặt' });
+  ds[i].thietBi[j] = { ...ds[i].thietBi[j], ...tb };
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  res.json(ds[i].thietBi[j]);
+}));
+
+app.delete('/api/khach-hang/:id/thiet-bi/:tid', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const i = ds.findIndex((k) => k.id === req.params.id);
+  if (i === -1 || !(ds[i].thietBi || []).some((t) => t.id === req.params.tid)) return res.status(404).json({ error: 'Không tìm thấy thiết bị' });
+  const cu = ds[i].thietBi.find((t) => t.id === req.params.tid);
+  ds[i].thietBi = ds[i].thietBi.filter((t) => t.id !== req.params.tid);
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  xoaAnhThietBi(cu);
+  res.json({ success: true });
+}));
+
+app.post('/api/khach-hang/:id/thiet-bi/:tid/anh', canQuyen, express.raw({ type: () => true, limit: '9mb' }), async (req, res) => {
+  const ten = chuoi(req.query.ten, 120).replace(/[\\/\r\n"]/g, '_') || 'anh';
+  const kieu = KIEU_ANH_KH[ten.split('.').pop().toLowerCase()];
+  if (!kieu) return res.status(400).json({ error: 'Chỉ nhận ảnh JPG, PNG hoặc WEBP' });
+  const buf = req.body;
+  if (!Buffer.isBuffer(buf) || !buf.length) return res.status(400).json({ error: 'Ảnh trống' });
+  if (buf.length > TOI_DA_ANH_KH) return res.status(413).json({ error: 'Ảnh quá nặng, tối đa 8MB' });
+  const tb0 = docKhach().find((k) => k.id === req.params.id)?.thietBi?.find((t) => t.id === req.params.tid);
+  if (!tb0) return res.status(404).json({ error: 'Không tìm thấy thiết bị' });
+  if ((tb0.anh || []).length >= ANH_TOI_DA_MOI_THIET_BI) return res.status(400).json({ error: `Mỗi thiết bị tối đa ${ANH_TOI_DA_MOI_THIET_BI} ảnh` });
+
+  const anh = { id: `${TIEN_TO_ANH_KH}${Date.now()}-${crypto.randomBytes(4).toString('hex')}`, ten, kieu, kichThuoc: buf.length, kho: khoRiengTu.dangBat() ? 'rieng' : 'db' };
+  if (!(await luuTep(anh.id, kieu, buf))) return res.status(500).json(LOI_LUU);
+  // Doc lai ban moi nhat roi moi ghi (luu anh mat vai giay, du lieu co the vua doi)
+  tuanTuKhach(async () => {
+    const ds = docKhach();
+    const k = ds.find((x) => x.id === req.params.id);
+    const tb = k?.thietBi?.find((t) => t.id === req.params.tid);
+    if (!tb) { xoaTep(anh.id); return res.status(404).json({ error: 'Thiết bị đã bị xóa' }); }
+    tb.anh = [...(tb.anh || []), anh];
+    if (!(await kho.ghi(KHO_KHACH_HANG, ds))) { xoaTep(anh.id); return res.status(500).json(LOI_LUU); }
+    res.status(201).json(anh);
+  });
+});
+
+app.get('/api/khach-hang/anh/:aid', canQuyen, async (req, res) => {
+  const anh = docKhach().flatMap((k) => k.thietBi || []).flatMap((t) => t.anh || []).find((a) => a.id === req.params.aid);
+  if (!anh) return res.status(404).json({ error: 'Không tìm thấy ảnh' });
+  const buf = await docTep(anh.id);
+  if (!buf) return res.status(404).json({ error: 'Ảnh không còn trên máy chủ' });
+  res.setHeader('Content-Type', anh.kieu);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'private, max-age=86400');
+  res.send(buf);
+});
+
+app.delete('/api/khach-hang/:id/thiet-bi/:tid/anh/:aid', canQuyen, (req, res) => tuanTuKhach(async () => {
+  const ds = docKhach();
+  const tb = ds.find((k) => k.id === req.params.id)?.thietBi?.find((t) => t.id === req.params.tid);
+  if (!tb || !(tb.anh || []).some((a) => a.id === req.params.aid)) return res.status(404).json({ error: 'Không tìm thấy ảnh' });
+  tb.anh = tb.anh.filter((a) => a.id !== req.params.aid);
+  if (!(await kho.ghi(KHO_KHACH_HANG, ds))) return res.status(500).json(LOI_LUU);
+  xoaTep(req.params.aid);
+  res.json({ success: true });
+}));
 
 // GET /api/brands
 app.get('/api/brands', (req, res) => {
@@ -1378,6 +1581,7 @@ kho.moKho({
   [KHO_GHI_CHU]: [],
   [KHO_GHI_CHU_TM]: [],
   [KHO_CHAM_CONG]: { nhanVien: [], cong: {}, chuThich: {} },
+  [KHO_KHACH_HANG]: [],
   [KHO_QUAN_TRI]: {}
 }).then(async () => {
   // Vua chuyen tu may len kho du lieu: file dinh kem ghi chu dang nam trong backend/data/ghi-chu-file
@@ -1391,6 +1595,17 @@ kho.moKho({
       } catch (err) { console.error(`[KHO] Khong chuyen duoc tep ${ten}:`, err.message); }
     }
     if (moi) console.log(`[KHO] Da chuyen ${moi} tep dinh kem ghi chu tu may len co so du lieu`);
+  }
+  // Vua noi bucket rieng tu: dua anh khach hang dang nam trong kho du lieu sang bucket, roi giai phong cho trong kho du lieu
+  if (kho.dangDungDB() && khoRiengTu.dangBat()) {
+    let chuyen = 0;
+    try {
+      for (const a of (await kho.lietKeAnh()).filter((x) => laAnhKhach(x.id))) {
+        const x = await kho.docAnh(a.id);
+        if (x && await khoRiengTu.ghi(a.id, a.kieu, x.du_lieu)) { await kho.xoaAnh(a.id); chuyen += 1; }
+      }
+    } catch (err) { console.error('[KHO RIENG] Loi khi chuyen anh:', err.message); }
+    if (chuyen) console.log(`[KHO RIENG] Da chuyen ${chuyen} anh khach hang sang bucket rieng tu`);
   }
   if (khoFile.dangBat()) khoFile.datPhepTrinhDuyet();
   app.listen(PORT, '0.0.0.0', () => {
