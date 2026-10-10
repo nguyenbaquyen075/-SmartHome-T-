@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, X, Search, Phone, MapPin, ImagePlus } from 'lucide-react';
 import { api } from '../utils/api';
+import { useLuiVe } from '../utils/luiVe';
 
 // Khách hàng: danh sách khách, mỗi khách có các thiết bị đã lắp đặt kèm hạn bảo hành (tự tính từ ngày lắp + số tháng).
 const pad = (n) => String(n).padStart(2, '0');
@@ -174,6 +175,7 @@ function FormThietBi({ tb, dsCongTrinh, onLuu, onDong }) {
   const [daXoa, setDaXoa] = useState([]);                 // ảnh cũ bấm xóa, xóa thật khi bấm Lưu
   const [anhMoi, setAnhMoi] = useState([]);               // ảnh vừa chọn, tải lên khi bấm Lưu
   const [xem, setXem] = useState('');
+  useLuiVe(Boolean(xem), () => setXem(''));
   const oFile = useRef(null);
   const o = (k) => ({ value: f[k], onChange: (e) => setF({ ...f, [k]: e.target.value }) });
   const han = f.ngayLapDat && Number(f.baoHanhThang) > 0 ? themThang(f.ngayLapDat, Number(f.baoHanhThang)) : null;
@@ -244,6 +246,9 @@ export default function AdminKhachHang({ onBao, diToi, con }) {
   const [formKhach, setFormKhach] = useState(null);    // null | {} (thêm) | khách (sửa)
   const [formTB, setFormTB] = useState(null);          // null | {} (thêm) | thiết bị (sửa)
   const [xemAnh, setXemAnh] = useState('');             // ảnh đang phóng to
+  useLuiVe(Boolean(formKhach), () => setFormKhach(null));
+  useLuiVe(Boolean(formTB), () => setFormTB(null));
+  useLuiVe(Boolean(xemAnh), () => setXemAnh(''));
 
   useEffect(() => {
     api.getKhachHang().then(setDs).catch((e) => onBao(e.message, 'error'));

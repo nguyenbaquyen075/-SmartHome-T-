@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { CalendarCheck, ChevronLeft, ChevronRight, ChevronDown, Download, Check, Plus, Pencil, Trash2, X, MessageSquareText } from 'lucide-react';
 import { api } from '../utils/api';
+import { useLuiVe } from '../utils/luiVe';
 
 // Chấm công: danh sách nhân viên (tổng công mỗi người), xem chi tiết từng người,
 // và màn Chấm công: nhân viên bên trái, lịch tháng bên phải, bấm vào ngày để tích.
@@ -195,6 +196,10 @@ export default function AdminChamCong({ onBao, diToi, con }) {
   const [thang, setThang] = useState(() => { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() + 1 }; });
   const [form, setForm] = useState(null);          // null | {} (thêm) | nhân viên (sửa)
   const [chon, setChon] = useState(null);          // nhân viên đang chấm công
+  useLuiVe(Boolean(form), () => setForm(null));
+  useLuiVe(moDs, () => setMoDs(false));
+  useLuiVe(Boolean(chonNgay), () => setChonNgay(null));
+  useLuiVe(Boolean(moCt), () => setMoCt(null));
 
   useEffect(() => {
     api.getChamCong().then((d) => setGoc({ chuThich: {}, ...d })).catch((e) => onBao(e.message, 'error'));
