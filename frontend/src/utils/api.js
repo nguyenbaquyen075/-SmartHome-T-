@@ -218,13 +218,41 @@ export const api = {
   themNhanVien: (d) => apiAdmin('/cham-cong/nhan-vien', { method: 'POST', body: JSON.stringify(d) }),
   suaNhanVien: (id, d) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
   xoaNhanVien: (id) => apiAdmin(`/cham-cong/nhan-vien/${id}`, { method: 'DELETE' }),
+  // Khách hàng + thiết bị đã lắp đặt
+  getKhachHang: () => apiAdmin('/khach-hang'),
+  themKhachHang: (d) => apiAdmin('/khach-hang', { method: 'POST', body: JSON.stringify(d) }),
+  suaKhachHang: (id, d) => apiAdmin(`/khach-hang/${id}`, { method: 'PUT', body: JSON.stringify(d) }),
+  xoaKhachHang: (id) => apiAdmin(`/khach-hang/${id}`, { method: 'DELETE' }),
+  themThietBi: (id, d) => apiAdmin(`/khach-hang/${id}/thiet-bi`, { method: 'POST', body: JSON.stringify(d) }),
+  suaThietBi: (id, tid, d) => apiAdmin(`/khach-hang/${id}/thiet-bi/${tid}`, { method: 'PUT', body: JSON.stringify(d) }),
+  xoaThietBi: (id, tid) => apiAdmin(`/khach-hang/${id}/thiet-bi/${tid}`, { method: 'DELETE' }),
+
+  async taiAnhThietBi(id, tid, blob, ten) {
+    const res = await fetch(`${API_BASE}/khach-hang/${id}/thiet-bi/${tid}/anh?ten=${encodeURIComponent(ten)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken.get() || ''}`, 'Content-Type': 'application/octet-stream' },
+      body: blob
+    });
+    if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Không tải được ảnh lên');
+    return data;
+  },
+  xoaAnhThietBi: (id, tid, aid) => apiAdmin(`/khach-hang/${id}/thiet-bi/${tid}/anh/${aid}`, { method: 'DELETE' }),
+  async layAnhKhach(aid) {
+    const res = await fetch(`${API_BASE}/khach-hang/anh/${aid}`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
+    if (!res.ok) throw new Error('Không tải được ảnh');
+    return res.blob();
+  },
+
   // Sao lưu / khôi phục toàn bộ
   saoLuuThongTin: () => apiAdmin('/sao-luu/thong-tin'),
+  dungLuong: () => apiAdmin('/he-thong/dung-luong'),
   async saoLuuToanBo() {
     const res = await fetch(`${API_BASE}/sao-luu/toan-bo`, { headers: { Authorization: `Bearer ${adminToken.get() || ''}` } });
     if (res.status === 401) { adminToken.clear(); throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại'); }
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Không tạo được bản sao lưu');
-    return res.blob();
+    return { blob: await res.blob(), boQua: Number(res.headers.get('X-Anh-Bo-Qua')) || 0 };
   },
   async khoiPhucSaoLuu(file) {
     const res = await fetch(`${API_BASE}/sao-luu/khoi-phuc`, {

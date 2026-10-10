@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck
+  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck, Contact
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import AdminLogin from './AdminLogin';
@@ -13,6 +13,7 @@ import AdminSettings from './AdminSettings';
 import AdminCaiDat from './AdminCaiDat';
 import AdminGhiChu from './AdminGhiChu';
 import AdminChamCong from './AdminChamCong';
+import AdminKhachHang from './AdminKhachHang';
 import '../admin.css';
 
 // Menu ☰: các mục của trang chủ xếp đúng thứ tự từ trên xuống như khách thấy.
@@ -23,6 +24,7 @@ const MENU = [
     muc: [
       { duong: 'tong-quan', nhan: 'Tổng quan', moTa: 'Số liệu nhanh', Icon: LayoutDashboard },
       { duong: 'ghi-chu', nhan: 'Ghi chú', moTa: 'Ghi chú riêng', Icon: NotebookPen },
+      { duong: 'khach-hang', nhan: 'Khách hàng', moTa: 'Thiết bị đã lắp, bảo hành', Icon: Contact },
       { duong: 'cham-cong', nhan: 'Chấm công', moTa: 'Nhân viên và ngày công', Icon: CalendarCheck },
       { duong: 'cai-dat', nhan: 'Cài đặt', moTa: 'Tài khoản và bảo mật', Icon: ShieldCheck }
     ]
@@ -182,6 +184,7 @@ export default function AdminApp() {
         {trang === 'san-pham' && <AdminSanPham {...chung} con={con} />}
         {trang === 'cong-trinh' && <AdminProjects {...chung} con={con} />}
         {trang === 'giai-tri' && <AdminGiaiTri onBao={hienBao} />}
+        {trang === 'khach-hang' && <AdminKhachHang {...chung} con={con} />}
         {trang === 'cham-cong' && <AdminChamCong {...chung} con={con} />}
         {trang === 'ghi-chu' && <AdminGhiChu onBao={hienBao} />}
         {trang === 'cai-dat' && <AdminCaiDat onBao={hienBao} />}

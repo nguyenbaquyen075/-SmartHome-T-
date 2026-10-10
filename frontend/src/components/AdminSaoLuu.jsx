@@ -16,13 +16,14 @@ export default function AdminSaoLuu({ onBao }) {
   const saoLuu = async () => {
     setDang('luu');
     try {
-      const url = URL.createObjectURL(await api.saoLuuToanBo());
+      const { blob, boQua } = await api.saoLuuToanBo();
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `sao-luu-smarthometd-${new Date().toISOString().slice(0, 10)}.zip`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
-      onBao('Đã tải bản sao lưu');
+      onBao(boQua ? `Đã tải bản sao lưu, nhưng bỏ ${boQua} ảnh khách hàng vì file quá lớn (ảnh vẫn còn trên kho)` : 'Đã tải bản sao lưu');
       tai();
     } catch (err) { onBao(err.message, 'error'); }
     setDang('');
