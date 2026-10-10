@@ -175,6 +175,24 @@ kho dữ liệu (phục vụ qua `/api/anh/<tên>`), còn **video nằm trên đ
 **Chưa đặt 2 biến này thì web vẫn chạy**, nhưng dữ liệu chỉ nằm trong máy chủ và sẽ mất khi
 deploy lại. Trong log sẽ có dòng `[CANH BAO] Chua dat DATABASE_URL`.
 
+### Kho ảnh riêng tư cho ảnh khách hàng (không bắt buộc)
+
+Ảnh thiết bị của khách hàng không nên để ở bucket công khai. Tạo một bucket **riêng tư** để chứa chúng:
+
+1. Neon → dự án → **Object storage** → **Tạo thùng chứa**, tên `khach-rieng`, mức hiển thị **Private** (không công khai)
+2. Tạo khóa có quyền `storage:read` + `storage:write` (khóa bí mật chỉ hiện một lần, copy ngay)
+3. Render → **Settings → Environment**, thêm 4 dòng:
+
+| Key | Value |
+|---|---|
+| `NEON_S3_RT_ENDPOINT` | `https://br-....storage....neon.tech` |
+| `NEON_S3_RT_BUCKET` | `khach-rieng` |
+| `NEON_S3_RT_KEY` | `nak_live_...` |
+| `NEON_S3_RT_SECRET` | `nsk_live_...` |
+
+Bật xong, ảnh khách hàng mới lưu ở bucket này; ảnh cũ trong kho dữ liệu tự chuyển sang lúc server khởi động lại.
+Chưa đặt 4 biến này thì ảnh vẫn lưu trong kho dữ liệu như cũ. Xem mức đã dùng ở admin → **Cài đặt → Dung lượng**.
+
 ### Lấy `DATABASE_URL` (kho dữ liệu Neon — miễn phí)
 
 1. Vào [neon.com](https://neon.com) → **Sign up** bằng tài khoản Google/GitHub
