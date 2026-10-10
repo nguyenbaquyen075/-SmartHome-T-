@@ -3,6 +3,7 @@ import {
   Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck, Contact
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
+import { useLuiVe } from '../utils/luiVe';
 import AdminLogin from './AdminLogin';
 import AdminTongQuan from './AdminTongQuan';
 import AdminSanPham from './AdminSanPham';
@@ -53,6 +54,7 @@ export default function AdminApp() {
   const [duong, setDuong] = useState(docDuong);
   const [moMenu, setMoMenu] = useState(false);
   const [bao, setBao] = useState(null);
+  useLuiVe(moMenu, () => setMoMenu(false));
 
   useEffect(() => {
     document.title = 'Quản trị · Điện Nước Camera';

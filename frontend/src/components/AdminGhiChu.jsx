@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { SquarePen, Search, Pin, PinOff, Trash2, ChevronLeft, ChevronRight, X, Folder, Plus, Pencil, Paperclip, Check, Download, FileDown } from 'lucide-react';
 import { api } from '../utils/api';
+import { useLuiVe } from '../utils/luiVe';
 
 // Sổ ghi chú riêng của quản trị, theo kiểu Ghi chú trên iPhone/Mac: thư mục > ghi chú.
 // danh sách bên trái, soạn bên phải (ô tiêu đề riêng + nội dung), gõ tới đâu tự lưu tới đó.
@@ -231,6 +232,10 @@ export default function AdminGhiChu({ onBao }) {
       api.xoaGhiChu(id).catch(() => {});
     }
   };
+
+  // Back trên điện thoại: ghi chú đang soạn -> về danh sách; danh sách thư mục -> về màn chính
+  useLuiVe(man === 'soan' && chon !== null, () => { roiKhoi(chon); setMan('ds'); setChon(null); });
+  useLuiVe(tmChon !== null, () => { setTmChon(null); setTim(''); });
 
   const mo = async (id) => {
     if (chon && chon !== id) await roiKhoi(chon);
