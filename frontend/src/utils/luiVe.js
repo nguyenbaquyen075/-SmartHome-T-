@@ -4,7 +4,12 @@ import { useEffect, useRef } from 'react';
 // thay vì văng ra khỏi trang. Mở màn = thêm 1 mục lịch sử; Back = đóng màn đó.
 // Đóng bằng nút trên màn hình thì tự lùi mục lịch sử đã thêm, không để thừa.
 let boQua = false;   // đang tự lùi lịch sử (do đóng bằng nút): các màn khác đừng coi là bấm Back
-window.addEventListener('popstate', () => setTimeout(() => { boQua = false; }, 0));
+let soMo = 0;        // số màn đang mở
+window.addEventListener('popstate', () => setTimeout(() => {
+  boQua = false;
+  // Màn đã đóng bằng cách chuyển trang (bấm mục menu...) để lại 1 mục lịch sử thừa: lùi qua nó
+  if (window.history.state?.qtLop && soMo === 0) window.history.back();
+}, 0));
 
 export function useLuiVe(dangMo, dong) {
   const dongRef = useRef(dong);
@@ -18,14 +23,17 @@ export function useLuiVe(dangMo, dong) {
       if (boQua) { hen = setTimeout(day, 10); return; }   // chờ lần tự lùi trước xong
       window.history.pushState({ ...window.history.state, qtLop: true }, '');
       daDay = true;
+      soMo++;
     };
     day();
-    const khiBack = () => { if (!boQua && daDay) { daDay = false; dongRef.current(); } };
+    const khiBack = () => { if (!boQua && daDay) { daDay = false; soMo--; dongRef.current(); } };
     window.addEventListener('popstate', khiBack);
     return () => {
       clearTimeout(hen);
       window.removeEventListener('popstate', khiBack);
-      if (daDay && window.history.state?.qtLop) { boQua = true; window.history.back(); }
+      if (!daDay) return;
+      soMo--;
+      if (window.history.state?.qtLop) { boQua = true; window.history.back(); }
     };
   }, [dangMo]);
 }
