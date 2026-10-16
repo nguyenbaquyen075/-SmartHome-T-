@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import ProjectDiary from './components/ProjectDiary';
 import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
+import DichVu from './components/DichVu';
 import { api } from './utils/api';
 import { useDanhMuc, iconDanhMuc } from './utils/danhMuc';
 import { gomAnhTheoDanhMuc } from './utils/anhChay';
@@ -272,6 +273,9 @@ export default function App() {
               dem={demDanhMuc}
               anhTheoDanhMuc={anhTheoDanhMuc}
             />
+
+            {/* Dịch vụ thi công: điện, nước, camera, smarthome, mạng, bảo trì */}
+            <DichVu />
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
             <div style={{
