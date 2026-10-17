@@ -3,7 +3,7 @@ import {
   Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck, Contact
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
-import { useLuiVe } from '../utils/luiVe';
+import { useLuiVe, useLinkQuanTri, chuyenTrang } from '../utils/luiVe';
 import AdminLogin from './AdminLogin';
 import AdminTongQuan from './AdminTongQuan';
 import AdminSanPham from './AdminSanPham';
@@ -47,7 +47,7 @@ const TAT_CA_MUC = MENU.flatMap((n) => n.muc);
 // Trang con nam sau dau #, vd "#/san-pham/moi" -> ['san-pham', 'moi'].
 // Dung hash nen khong can thu vien router, bam Back hay tai lai trang van giu dung cho.
 const docDuong = () => window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
-const diToi = (...phan) => { window.location.hash = '/' + phan.join('/'); };
+const diToi = (...phan) => chuyenTrang('/' + phan.join('/'));
 
 export default function AdminApp() {
   const [daVao, setDaVao] = useState(null);   // null = đang kiểm tra phiên đăng nhập
@@ -55,6 +55,7 @@ export default function AdminApp() {
   const [moMenu, setMoMenu] = useState(false);
   const [bao, setBao] = useState(null);
   useLuiVe(moMenu, () => setMoMenu(false));
+  useLinkQuanTri();
 
   useEffect(() => {
     document.title = 'Quản trị · Điện Nước Camera';
