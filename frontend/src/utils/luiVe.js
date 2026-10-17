@@ -11,6 +11,36 @@ window.addEventListener('popstate', () => setTimeout(() => {
   if (window.history.state?.qtLop && soMo === 0) window.history.back();
 }, 0));
 
+// Chuyển trang quản trị (hash "#/...") an toàn khi đang mở menu/form/ảnh.
+// Không được để link tự chuyển trang: khi màn đóng, nó gọi history.back() để dọn mục lịch sử của mình,
+// mà lệnh lùi đó chạy SAU khi trình duyệt đã sang trang mới -> kéo ngược về trang cũ, bấm như không bấm.
+// Ở đây ghi đè thẳng mục lịch sử của màn đang mở bằng trang mới: không còn gì để lùi, không tranh chấp.
+export function chuyenTrang(duong) {
+  const hash = '#' + duong.replace(/^#/, '');
+  if (window.history.state?.qtLop) {
+    window.history.replaceState(null, '', hash);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  } else {
+    window.location.hash = hash;
+  }
+}
+
+// Bắt mọi lần bấm link "#/..." trong trang quản trị và chuyển qua chuyenTrang.
+// Gắn 1 lần ở AdminApp nên link nào (menu, logo, nút về danh sách...) cũng an toàn, kể cả link thêm sau này.
+export function useLinkQuanTri() {
+  useEffect(() => {
+    const khiBam = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest?.('a[href^="#/"]');
+      if (!a || a.target) return;
+      e.preventDefault();
+      chuyenTrang(a.getAttribute('href'));
+    };
+    document.addEventListener('click', khiBam, true);   // bắt trước React để chuyển trang trước khi màn kịp đóng
+    return () => document.removeEventListener('click', khiBam, true);
+  }, []);
+}
+
 export function useLuiVe(dangMo, dong) {
   const dongRef = useRef(dong);
   dongRef.current = dong;

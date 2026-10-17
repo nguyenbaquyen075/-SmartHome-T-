@@ -19,7 +19,8 @@ npm run dev:frontend     # chỉ giao diện
 npm run dev:backend      # chỉ API
 npm run build            # bản build Render: cài sạch rồi vite build → frontend/dist
 npm --prefix frontend run lint     # oxlint
-node backend/kho.test.js           # bài test duy nhất (kho dữ liệu chế độ file; phải KHÔNG đặt DATABASE_URL)
+node backend/kho.test.js           # test kho dữ liệu chế độ file (phải KHÔNG đặt DATABASE_URL)
+npm --prefix frontend run thu:menu # cần `npm run dev` đang chạy: Chrome headless bấm từng mục menu quản trị + Back
 ```
 
 Xem thử nhiều cỡ điện thoại cùng lúc: `http://localhost:5174/mobile.html` (3 khung iframe 320/390/430px).
@@ -50,6 +51,10 @@ gói Free: `backend/index.js` vừa trả `/api/*` vừa phục vụ `frontend/d
 - `App.jsx` (trang khách) tự điều hướng bằng `history.pushState` với `state.v` = `home | products | detail`
   (+ `n` đếm bước để nút Back biết về trang chủ hay lùi lịch sử, `y` nhớ vị trí cuộn). `ProductDetailPage`,
   `ProductsPage`, `ComparisonModal` tải lười.
+- **Nút Back trong quản trị** (`utils/luiVe.js`): mỗi màn mở (menu ☰, form, ảnh phóng to) thêm 1 mục lịch sử `qtLop`,
+  đóng màn thì tự `history.back()`. Vì vậy **không được** để link/code tự đặt `location.hash` khi một màn đang mở —
+  lệnh lùi sẽ chạy sau và kéo về trang cũ (lỗi "bấm mục menu không vào được"). Chuyển trang luôn qua `chuyenTrang()` /
+  `diToi`; link `<a href="#/...">` đã được `useLinkQuanTri()` bắt tự động. Sửa gì ở đây thì chạy `thu:menu`.
 - `AdminApp.jsx` điều hướng bằng hash (`#/san-pham/moi`, `#/san-pham/<id>`, …); menu ☰ khai báo trong mảng ở đầu file,
   mỗi mục ứng với một component `Admin*.jsx`.
 - **Mọi lời gọi API đi qua `frontend/src/utils/api.js`**; token quản trị giữ trong `sessionStorage`.
