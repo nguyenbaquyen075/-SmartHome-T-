@@ -274,8 +274,9 @@ export default function App() {
               anhTheoDanhMuc={anhTheoDanhMuc}
             />
 
-            {/* Dịch vụ thi công: điện, nước, camera, smarthome, mạng, bảo trì */}
-            <DichVu />
+            {/* Dịch vụ thi công: còn là bản demo (ảnh tạm) nên chỉ hiện khi chạy trên máy (npm run dev),
+                web thật chưa hiện. Xong demo thì bỏ điều kiện import.meta.env.DEV */}
+            {import.meta.env.DEV && <DichVu />}
 
             {/* Tiêu đề SẢN PHẨM NỔI BẬT - ẩn khi đang hiện 3 nhóm (mỗi nhóm có tiêu đề riêng) */}
             <div style={{
