@@ -23,6 +23,9 @@ node backend/kho.test.js           # test kho dữ liệu chế độ file (ph�
 npm --prefix frontend run thu:menu # cần `npm run dev` đang chạy: Chrome headless bấm từng mục menu quản trị + Back
 ```
 
+GitHub Actions (`.github/workflows/kiem-tra.yml`) chạy lint, build, `kho.test.js` và `thu:menu` mỗi lần push/PR.
+Bài nào đỏ thì sửa trước khi merge, không tắt bài kiểm tra.
+
 Xem thử nhiều cỡ điện thoại cùng lúc: `http://localhost:5174/mobile.html` (3 khung iframe 320/390/430px).
 Chụp màn hình kiểm tra bằng Chrome headless lên trang này, vì headless ở cửa sổ hẹp tự nới viewport, chụp sai bố cục điện thoại.
 

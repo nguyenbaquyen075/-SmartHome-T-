@@ -24,6 +24,15 @@ _Cập nhật: 2026-10-16_
   `frontend/scripts/thu-menu-quan-tri.mjs`, `frontend/package.json` (script `thu:menu`), `CLAUDE.md`.
   Nhánh `fix/menu-quan-tri`.
 
+- **Kiểm tra tự động trên GitHub (2026-10-18), CHƯA commit/push:** `.github/workflows/kiem-tra.yml`,
+  `frontend/scripts/thu-menu-quan-tri.mjs`, `CLAUDE.md`. Sau khi push: vào GitHub → Settings → Branches → luật của `main`
+  → bật "Require status checks" chọn `kiem-tra` để main không nhận code đỏ.
+
+- **Ô danh mục nhỏ lại trên điện thoại (2026-10-18), CHƯA commit:** `frontend/src/components/CategoryFilter.jsx`.
+
+- **Giá dự tính sản phẩm (2026-10-19): đã commit + push (212030b):** `backend/index.js`, `utils/sanPham.jsx`, `AdminSanPhamForm.jsx`,
+  `ProductCard.jsx`, `ProductDetailPage.jsx`, `index.css`, `admin.css`.
+
 ## Việc tiếp theo
 
 - Thay ảnh dịch vụ bằng ảnh nét hơn (giữ nguyên tên file trong `images/dich-vu/`).
