@@ -39,9 +39,20 @@ let id = 0; const cho = new Map();
 ws.addEventListener('message', (e) => { const m = JSON.parse(e.data); if (m.id && cho.has(m.id)) { cho.get(m.id)(m); cho.delete(m.id); } });
 const goi = (method, params = {}) => new Promise((r) => { const i = ++id; cho.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 const tinh = async (expr) => (await goi('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result.result.value;
+// Bấm như người thật: cuộn tới mục cần bấm, chắc chắn mục đó đang nằm trên cùng tại điểm bấm
+// (không bị đáy menu "Về trang web" che — font trên Linux to hơn làm menu dài hơn trên Mac).
 const bam = async (selector) => {
-  const r = await tinh(`(() => { const el = document.querySelector(${JSON.stringify(selector)}); if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })()`);
+  const r = await tinh(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return null;
+    el.scrollIntoView({ block: 'center' });
+    const b = el.getBoundingClientRect();
+    const x = b.x + b.width / 2, y = b.y + b.height / 2;
+    const tren = document.elementFromPoint(x, y);
+    return { x, y, trung: !!tren && (tren === el || el.contains(tren)) };
+  })()`);
   if (!r) return false;
+  if (!r.trung) throw new Error(`${selector} bị phần khác che, không bấm được`);
   for (const type of ['mousePressed', 'mouseReleased']) await goi('Input.dispatchMouseEvent', { type, x: r.x, y: r.y, button: 'left', clickCount: 1 });
   return true;
 };
@@ -62,7 +73,7 @@ await goi('Page.reload');
 await choThay('.qt-ba-soc');
 console.log('Trang đang hiện:', (await tinh(`document.body.innerText.slice(0, 120)`)).replace(/\s+/g, ' '));
 
-const MUC = ['ghi-chu', 'khach-hang', 'cham-cong', 'san-pham', 'danh-muc', 'cai-dat', 'tong-quan'];
+const MUC = ['ghi-chu', 'khach-hang', 'cham-cong', 'san-pham', 'danh-muc', 'lien-he', 'cai-dat', 'tong-quan'];
 let loi = 0;
 for (const d of MUC) {
   const truoc = await tinh('location.hash');
