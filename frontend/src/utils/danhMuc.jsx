@@ -18,13 +18,16 @@ export const ICON_DANH_MUC = {
 };
 export const iconDanhMuc = (khoa) => (ICON_DANH_MUC[khoa] || ICON_DANH_MUC.package).Icon;
 
-export const ANH_TAT_CA = '/images/cat_style_new/prod_all.jpg';
+// Danh mục cũ trong kho dữ liệu còn trỏ ảnh minh hoạ .png/.jpg nặng 25-35KB: đổi sang bản .webp ~5KB cùng tên
+export const anhNhe = (url) => (url || '').replace(/^(\/images\/cat_style_new\/[^/?]+)\.(png|jpg)$/, '$1.webp');
+
+export const ANH_TAT_CA = '/images/cat_style_new/prod_all.webp';
 
 // Hiện tạm khi chưa tải xong, trùng với danh mục mặc định của backend nên không bị giật
 const DU_PHONG = [
-  { id: 'dm-mang', ten: 'Thiết bị mạng', icon: 'cctv', anh: '/images/cat_style_new/prod_3.png' },
-  { id: 'dm-dien', ten: 'Thiết bị điện', icon: 'zap', anh: '/images/cat_style_new/prod_1.png' },
-  { id: 'dm-nuoc', ten: 'Thiết bị nước', icon: 'droplets', anh: '/images/cat_style_new/prod_2.png' }
+  { id: 'dm-mang', ten: 'Thiết bị mạng', icon: 'cctv', anh: '/images/cat_style_new/prod_3.webp' },
+  { id: 'dm-dien', ten: 'Thiết bị điện', icon: 'zap', anh: '/images/cat_style_new/prod_1.webp' },
+  { id: 'dm-nuoc', ten: 'Thiết bị nước', icon: 'droplets', anh: '/images/cat_style_new/prod_2.webp' }
 ];
 
 let bo = null;                    // danh sách đã tải, dùng chung cho mọi component

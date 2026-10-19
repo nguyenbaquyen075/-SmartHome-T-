@@ -3,17 +3,18 @@ import { Plus, Trash2, Upload, RotateCcw } from 'lucide-react';
 import { api } from '../utils/api';
 import { nenAnhFile, coFile } from '../utils/anh';
 
-// phan = 'ticker' | 'banner': mỗi mục trong menu quản trị chỉ hiện đúng phần của nó.
-// Lưu vẫn gửi cả 2 giá trị để không làm mất phần kia.
+// phan = 'ticker' | 'banner' | 'lien-he': mỗi mục trong menu quản trị chỉ hiện đúng phần của nó.
+// Lưu thanh chạy / banner không gửi lienHe nên máy chủ giữ nguyên số liên hệ cũ.
 export default function AdminSettings({ onBao, phan }) {
   const [ticker, setTicker] = useState([]);
   const [banner, setBanner] = useState(null);
+  const [lienHe, setLienHe] = useState({ dienThoai: '', zalo: '' });
   const [dangTai, setDangTai] = useState(true);
   const [dangLuu, setDangLuu] = useState(false);
 
   useEffect(() => {
     api.getSettings()
-      .then((s) => { setTicker(s.ticker || []); setBanner(s.banner || null); })
+      .then((s) => { setTicker(s.ticker || []); setBanner(s.banner || null); setLienHe(s.lienHe || { dienThoai: '', zalo: '' }); })
       .catch(() => onBao('Không tải được cài đặt', 'error'))
       .finally(() => setDangTai(false));
   }, []);
@@ -24,6 +25,7 @@ export default function AdminSettings({ onBao, phan }) {
       const kq = await api.saveSettings(duLieu);
       setTicker(kq.ticker || []);
       setBanner(kq.banner || null);
+      if (kq.lienHe) setLienHe(kq.lienHe);
       onBao('Đã lưu');
     } catch (err) {
       onBao(err.message, 'error');
@@ -58,8 +60,41 @@ export default function AdminSettings({ onBao, phan }) {
 
   return (
     <div className="adm-caidat">
+      {/* ===== Nút gọi & Zalo nổi ở góc dưới phải trang khách ===== */}
+      {phan === 'lien-he' && (
+      <section>
+        <p className="adm-ghichu">
+          Hai nút tròn ở góc dưới bên phải trang web. Khách bấm nút xanh lá để gọi, nút Zalo để nhắn tin.
+          Để trống ô nào thì nút đó ẩn.
+        </p>
+        <label className="adm-lien-he">
+          <span>Số điện thoại (nút Gọi)</span>
+          <input
+            inputMode="tel"
+            value={lienHe.dienThoai}
+            onChange={(e) => setLienHe({ ...lienHe, dienThoai: e.target.value })}
+            placeholder="VD: 0987654321"
+          />
+        </label>
+        <label className="adm-lien-he">
+          <span>Số Zalo (nút Zalo)</span>
+          <input
+            inputMode="tel"
+            value={lienHe.zalo}
+            onChange={(e) => setLienHe({ ...lienHe, zalo: e.target.value })}
+            placeholder="VD: 0368338988"
+          />
+        </label>
+        <div className="adm-caidat-nut">
+          <button className="btn-primary" disabled={dangLuu} onClick={() => luu({ ticker, banner, lienHe })}>
+            {dangLuu ? 'Đang lưu…' : 'Lưu số liên hệ'}
+          </button>
+        </div>
+      </section>
+      )}
+
       {/* ===== Thanh chạy ===== */}
-      {phan !== 'banner' && (
+      {phan === 'ticker' && (
       <section>
         <p className="adm-ghichu">Mỗi dòng là một thông báo, chạy lần lượt trên trang chủ.</p>
 
@@ -92,7 +127,7 @@ export default function AdminSettings({ onBao, phan }) {
       )}
 
       {/* ===== Ảnh banner ===== */}
-      {phan !== 'ticker' && (
+      {phan === 'banner' && (
       <section>
         <p className="adm-ghichu">
           Dùng ảnh ngang, tỉ lệ khoảng 1024×317, dưới 400KB.

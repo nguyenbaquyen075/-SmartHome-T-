@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LayoutGrid, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { AnhChay } from '../utils/anhChay';
-import { useDanhMuc, iconDanhMuc, ANH_TAT_CA } from '../utils/danhMuc';
+import { useDanhMuc, iconDanhMuc, ANH_TAT_CA, anhNhe } from '../utils/danhMuc';
 
-// Số ô trên một hàng, khớp với CSS bên dưới (<=480px: 2 ô, còn lại 4 ô)
+// Số ô trên một hàng, khớp với CSS bên dưới (<=480px: 3 ô nhỏ, còn lại 4 ô)
 function useCotMotHang() {
-  const [cot, setCot] = useState(() => (window.matchMedia('(max-width: 480px)').matches ? 2 : 4));
+  const [cot, setCot] = useState(() => (window.matchMedia('(max-width: 480px)').matches ? 3 : 4));
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 480px)');
-    const f = () => setCot(mq.matches ? 2 : 4);
+    const f = () => setCot(mq.matches ? 3 : 4);
     mq.addEventListener('change', f);
     return () => mq.removeEventListener('change', f);
   }, []);
@@ -36,7 +36,7 @@ export default function CategoryFilter({
       name: d.ten,
       label: d.ten,
       icon: iconDanhMuc(d.icon),
-      image: d.anh || ANH_TAT_CA,
+      image: anhNhe(d.anh) || ANH_TAT_CA,
       alt: d.ten
     }))
   ];
@@ -136,7 +136,8 @@ export default function CategoryFilter({
           padding: '10px 10px 4px 0', margin: '-10px 0 0', scrollbarWidth: 'none'
         } : {
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          // minmax(0, 1fr): tên danh mục dài không được nới cột ra ngoài màn hình
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '12px'
         }}
       >
@@ -164,9 +165,10 @@ export default function CategoryFilter({
               }}
               className="cat-card-item"
               style={{
+                // Viền xanh nhạt mỏng, ô nào cũng có sẵn (không cần rê chuột), bo góc nhỏ
                 backgroundColor: '#ffffff',
-                borderRadius: '10px', // Bo góc nhẹ
-                border: (isActive || isHovered) ? '1.5px solid #0066cc' : '1.5px solid #60a5fa', // Viền xanh mặc định, đậm hơn khi chọn/rê chuột
+                borderRadius: '3px',
+                border: '1px solid #93c5fd',
                 padding: '10px 14px 12px 14px',
                 height: '122px', // Chiều cao chuẩn thanh thoát
                 display: 'flex',
@@ -175,11 +177,9 @@ export default function CategoryFilter({
                 cursor: 'pointer',
                 position: 'relative',
                 overflow: 'visible', // để số đếm nằm trên viền góc phải
-                boxShadow: isActive
-                  ? '0 4px 16px rgba(96, 165, 250, 0.22)'
-                  : isHovered
-                    ? '0 4px 12px rgba(96, 165, 250, 0.15)'
-                    : '0 2px 8px rgba(0, 0, 0, 0.04)',
+                boxShadow: isActive || isHovered
+                  ? '0 4px 14px rgba(15, 23, 42, 0.10)'
+                  : '0 1px 4px rgba(15, 23, 42, 0.07)',
                 transform: isActive || isHovered ? 'translateY(-2px)' : 'none',
                 transition: 'all 0.18s ease',
                 userSelect: 'none',
@@ -194,7 +194,7 @@ export default function CategoryFilter({
 
               {/* Ảnh đại diện: chỉ ảnh chính của sản phẩm, tự đảo vài giây 1 lần.
                   Danh mục chưa có hàng thì dùng ảnh minh họa mặc định. */}
-              <div style={{
+              <div className="cat-card-anh" style={{
                 height: '66px',
                 display: 'flex',
                 alignItems: 'center',
@@ -217,15 +217,16 @@ export default function CategoryFilter({
               </div>
 
               {/* Bottom bar: Circular Blue Icon + Title */}
-              <div style={{
+              <div className="cat-card-chan" style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 marginTop: 'auto',
-                paddingTop: '4px'
+                paddingTop: '4px',
+                minWidth: 0
               }}>
                 {/* Icon Pill Circle */}
-                <div style={{
+                <div className="cat-card-icon" style={{
                   width: '26px',
                   height: '26px',
                   borderRadius: '50%',
@@ -251,7 +252,8 @@ export default function CategoryFilter({
                     lineHeight: 1.25,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                    textOverflow: 'ellipsis',
+                    minWidth: 0
                   }}
                 >
                   {cat.label}
@@ -284,7 +286,7 @@ export default function CategoryFilter({
         @keyframes catHien { from { opacity: 0; transform: translateY(8px) scale(0.92); } to { opacity: 1; transform: none; } }
         @media (max-width: 768px) {
           .category-cards-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
             gap: 8px !important;
           }
           .cat-card-item {
@@ -298,17 +300,34 @@ export default function CategoryFilter({
             font-size: 0.72rem !important;
           }
         }
+        /* Điện thoại: 3 ô nhỏ một hàng, bỏ vòng icon để tên có chỗ xuống 2 dòng */
         @media (max-width: 480px) {
           .category-cards-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
             gap: 8px !important;
           }
           .cat-card-item {
-            height: 112px !important;
-            padding: 8px 10px !important;
+            height: 96px !important;
+            padding: 6px 6px 7px !important;
           }
+          .cat-card-anh { height: 46px !important; }
+          .cat-card-item img {
+            max-height: 44px !important;
+          }
+          .cat-card-icon { display: none !important; }
+          .cat-card-chan { justify-content: center; }
           .cat-card-title {
-            font-size: 0.82rem !important;
+            font-size: 0.7rem !important;
+            white-space: normal !important;
+            text-align: center;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+          .cat-card-so {
+            top: -7px; right: -6px;
+            min-width: 15px; height: 17px; line-height: 17px; padding: 0 4px;
+            font-size: 0.66rem;
           }
         }
       `}</style>

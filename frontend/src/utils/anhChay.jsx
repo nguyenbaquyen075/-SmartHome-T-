@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { anhNhe } from './danhMuc';
 
 // Ảnh đại diện của ô danh mục tự đảo: cứ vài giây lại sang ảnh chính của sản phẩm tiếp theo.
 // Chỉ lấy ảnh đại diện (ảnh đầu tiên) của mỗi sản phẩm, không lấy ảnh phụ.
@@ -29,7 +30,7 @@ export function AnhChay({ ds = [], macDinh, alt = '', className, style }) {
   }, [ds.length]);
 
   // Danh mục chưa có hàng thì dùng ảnh minh họa sẵn có
-  const src = ds.length ? ds[i % ds.length] : macDinh;
+  const src = anhNhe(ds.length ? ds[i % ds.length] : macDinh);
   if (!src) return null;
 
   return (

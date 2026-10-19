@@ -1913,3 +1913,99 @@ body {
 @media (max-width: 768px) {
   .navbar-name-main { font-size: clamp(0.72rem, 3.7vw, 1rem); letter-spacing: -0.2px; }
 }
+
+/* ================= NÚT GỌI & ZALO NỔI (góc dưới phải trang khách) ================= */
+.nut-lien-he {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  z-index: 900;              /* dưới các lớp phủ (1000+), trên nội dung */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nut-lien-he a {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+  transition: transform 0.15s ease;
+}
+.nut-lien-he a:active { transform: scale(0.92); }
+/* Nút Zalo: nguyên logo Zalo (nền trong suốt), nhảy nhẹ lên xuống */
+.nut-lien-he a.nut-lien-he-zalo {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  animation: zaloNhay 1.8s ease-in-out infinite;
+}
+.nut-lien-he-zalo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.3));
+}
+/* Viền xanh toả nhẹ ra quanh logo Zalo */
+.nut-lien-he a.nut-lien-he-zalo { position: relative; }
+.nut-lien-he-zalo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;   /* vòng toả hình tròn */
+  background: #3b8bff;
+  z-index: -1;
+  animation: zaloToa 2s ease-out infinite;
+}
+@keyframes zaloToa {
+  from { transform: scale(1); opacity: 0.55; }
+  to { transform: scale(1.5); opacity: 0; }
+}
+@keyframes zaloNhay {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-7px); }
+  45% { transform: translateY(0); }
+  52% { transform: translateY(-3px); }
+}
+.nut-lien-he-goi {
+  position: relative;
+  background: #16a34a;
+  animation: goiLac 2.4s ease-in-out infinite;
+}
+/* Vòng sóng lan ra quanh nút gọi cho dễ thấy */
+.nut-lien-he-goi::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #16a34a;
+  z-index: -1;
+  animation: goiSong 2.4s ease-out infinite;
+}
+@keyframes goiSong {
+  from { transform: scale(1); opacity: 0.55; }
+  to { transform: scale(1.7); opacity: 0; }
+}
+@keyframes goiLac {
+  0%, 70%, 100% { transform: rotate(0); }
+  75% { transform: rotate(-14deg); }
+  80% { transform: rotate(14deg); }
+  85% { transform: rotate(-10deg); }
+  90% { transform: rotate(8deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nut-lien-he-goi, .nut-lien-he-goi::before, .nut-lien-he a.nut-lien-he-zalo, .nut-lien-he-zalo::before { animation: none; }
+}
+/* Điện thoại: nằm trên thanh điều hướng dưới */
+@media (max-width: 768px) {
+  .nut-lien-he {
+    right: 12px;
+    bottom: calc(84px + env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+  .nut-lien-he a { width: 48px; height: 48px; }
+}

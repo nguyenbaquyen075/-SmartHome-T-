@@ -1,4 +1,5 @@
 import React from 'react';
+import { anhNhe } from '../utils/danhMuc';
 import { GiaDuTinh } from '../utils/sanPham';
 
 export default function ProductCard({
@@ -6,9 +7,9 @@ export default function ProductCard({
   index = 0,
   onViewDetails
 }) {
-  // 4 anh dau nam ngay trong man hinh dau tien -> tai ngay, dung lazy.
-  // loading="lazy" tren anh trong viewport lam trinh duyet hoan tai => LCP cham.
-  const isAboveFold = index < 4;
+  // Thẻ sản phẩm luôn nằm dưới banner + danh mục, không thuộc màn hình đầu trên điện thoại:
+  // tải lười để không giành mạng với ảnh banner (phần Lighthouse tính LCP).
+  const isAboveFold = false;
 
   return (
     <div
@@ -33,7 +34,7 @@ export default function ProductCard({
         }}
       >
         <img
-          src={product.image}
+          src={anhNhe(product.image)}
           alt={product.name}
           loading={isAboveFold ? 'eager' : 'lazy'}
           fetchPriority={isAboveFold ? 'high' : 'auto'}

@@ -34,7 +34,7 @@ export default function AdminLogin({ onSuccess }) {
   return (
     <div className="qt-dn">
       <form className="qt-dn-khung" onSubmit={guiDi}>
-        <img className="qt-dn-logo" src="/images/logoTD.png" alt="SmartHome TD" onError={(e) => { e.currentTarget.hidden = true; }} />
+        <img className="qt-dn-logo" src="/images/logoTD.webp" alt="SmartHome TD" onError={(e) => { e.currentTarget.hidden = true; }} />
         <div className="qt-dn-icon"><Lock size={24} /></div>
         <h1>Đăng nhập quản trị</h1>
         <p>Dành cho chủ cửa hàng</p>

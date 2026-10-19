@@ -63,10 +63,10 @@ export default function Navbar({
             className="navbar-brand"
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flexShrink: 0 }}
           >
-            {/* Logo: thay file o frontend/public/images/logoTD.png.
+            {/* Logo: thay file o frontend/public/images/logoTD.webp (ban webp nhe ~5KB, giu ca logoTD.png goc).
                 Chua co file thi tu quay ve bieu tuong cu, trang khong bi vo. */}
             <img
-              src="/images/logoTD.png"
+              src="/images/logoTD.webp"
               alt="Thiết bị điện SmartHome TĐ"
               className="navbar-logo"
               onError={(e) => {

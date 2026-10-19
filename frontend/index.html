@@ -12,14 +12,19 @@
     <meta property="og:description" content="Giải Pháp Camera, Mạng &amp; Thiết Bị Điện Cho Ngôi Nhà Bạn" />
     <meta property="og:url" content="https://smarthome-td.onrender.com/" />
     <meta property="og:image" content="https://smarthome-td.onrender.com/images/cat_style_new/prod_all.jpg" />
-    <!-- Chi preload anh NHO xuat hien ngay man hinh dau.
-         Khong preload banner: anh to se gianh bang thong voi JS/CSS lam trang cham hien hon. -->
-    <link rel="preload" as="image" href="/images/cat_style_new/prod_all.jpg" />
+    <!-- Tải sẵn ảnh banner đầu (phần to nhất màn hình đầu, Lighthouse tính LCP theo ảnh này).
+         Bản WebP nhỏ 20-120KB theo cỡ màn hình nên không giành mạng của JS/CSS như JPG 360KB trước đây.
+         Đổi ảnh slide 1 thì sửa cả HeroBanner.jsx. -->
+    <link rel="preload" as="image" fetchpriority="high"
+      imagesrcset="/images/slide_1-480.webp 480w, /images/slide_1-800.webp 800w, /images/slide_1-1200.webp 1200w, /images/slide_1-1800.webp 1800w"
+      imagesizes="(max-width: 1280px) 100vw, 1230px" />
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: tải song song, không chặn trang hiện (media=print rồi đổi sang all khi tải xong).
+         Chỉ lấy Plus Jakarta Sans nét 400-800 (1 file biến thiên); trang không dùng nét 300 và Space Grotesk. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap"></noscript>
   </head>
   <body>
     <div id="root"></div>

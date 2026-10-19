@@ -10,6 +10,7 @@ import ProjectDiary from './components/ProjectDiary';
 import GiaiTri from './components/GiaiTri';
 import PromoTicker from './components/PromoTicker';
 import DichVu from './components/DichVu';
+import NutLienHe from './components/NutLienHe';
 import { api } from './utils/api';
 import { useDanhMuc, iconDanhMuc } from './utils/danhMuc';
 import { gomAnhTheoDanhMuc } from './utils/anhChay';
@@ -425,6 +426,9 @@ export default function App() {
           onToggleAdmin={moQuanTri}
         />
       </div>
+
+      {/* Nút Gọi / Zalo nổi ở góc dưới phải, trang nào của khách cũng có */}
+      <NutLienHe />
 
       {/* Comparison Modal */}
       {isCompareOpen && (

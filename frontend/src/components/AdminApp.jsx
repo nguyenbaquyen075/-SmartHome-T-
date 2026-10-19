@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck, Contact
+  Menu, X, Plus, LayoutDashboard, Megaphone, Image, Package, HardHat, Clapperboard, Phone, LogOut, ArrowLeft, ShieldCheck, LayoutGrid, NotebookPen, CalendarCheck, Contact
 } from 'lucide-react';
 import { api, adminToken } from '../utils/api';
 import { useLuiVe, useLinkQuanTri, chuyenTrang } from '../utils/luiVe';
@@ -35,6 +35,7 @@ const MENU = [
     muc: [
       { duong: 'thanh-chay', nhan: 'Thanh chữ chạy', moTa: 'Chữ chạy trên banner', Icon: Megaphone },
       { duong: 'banner', nhan: 'Ảnh banner', moTa: 'Ảnh đầu trang', Icon: Image },
+      { duong: 'lien-he', nhan: 'Nút gọi & Zalo', moTa: 'Số điện thoại, Zalo góc màn hình', Icon: Phone },
       { duong: 'danh-muc', nhan: 'Danh mục', moTa: 'Nhóm sản phẩm', Icon: LayoutGrid },
       { duong: 'san-pham', nhan: 'Sản phẩm', moTa: 'Quản lý sản phẩm', Icon: Package, them: true },
       { duong: 'cong-trinh', nhan: 'Nhật ký thi công', moTa: 'Công trình đã làm', Icon: HardHat, them: true },
@@ -107,7 +108,7 @@ export default function AdminApp() {
 
   const logo = (
     <a className="qt-logo" href="#/tong-quan" onClick={dongMenu}>
-      <img src="/images/logoTD.png" alt="" onError={(e) => { e.currentTarget.hidden = true; }} />
+      <img src="/images/logoTD.webp" alt="" onError={(e) => { e.currentTarget.hidden = true; }} />
       <span><b>Quản trị</b></span>
     </a>
   );
@@ -191,7 +192,7 @@ export default function AdminApp() {
         {trang === 'cham-cong' && <AdminChamCong {...chung} con={con} />}
         {trang === 'ghi-chu' && <AdminGhiChu onBao={hienBao} />}
         {trang === 'cai-dat' && <AdminCaiDat onBao={hienBao} />}
-        {(trang === 'thanh-chay' || trang === 'banner') && (
+        {(trang === 'thanh-chay' || trang === 'banner' || trang === 'lien-he') && (
           <>
             <div className="qt-tieude">
               <div>
@@ -200,7 +201,7 @@ export default function AdminApp() {
               </div>
             </div>
             <div className="qt-khung">
-              <AdminSettings key={trang} onBao={hienBao} phan={trang === 'banner' ? 'banner' : 'ticker'} />
+              <AdminSettings key={trang} onBao={hienBao} phan={trang === 'thanh-chay' ? 'ticker' : trang} />
             </div>
           </>
         )}
