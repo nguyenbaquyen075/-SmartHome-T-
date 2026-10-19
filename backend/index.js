@@ -31,7 +31,10 @@ const KHO_GHI_CHU_TM = 'ghi-chu-thu-muc'; // thu muc chua ghi chu
 const KHO_CHAM_CONG = 'cham-cong';   // nhan vien + bang cham cong theo ngay
 const KHO_KHACH_HANG = 'khach-hang';   // khach hang + thiet bi da lap dat + han bao hanh
 const KHO_QUAN_TRI = 'quan-tri';     // tai khoan/mat khau doi trong trang Cai dat
-const CAI_DAT_MAC_DINH = { ticker: [], banner: null };
+// lienHe: số cho nút Gọi / Zalo nổi ở góc dưới phải trang khách (sửa ở Quản trị > Nút gọi & Zalo)
+const LIEN_HE_MAC_DINH = { dienThoai: '0987654321', zalo: '0368338988' };
+const CAI_DAT_MAC_DINH = { ticker: [], banner: null, lienHe: LIEN_HE_MAC_DINH };
+const soDienThoai = (v) => String(v ?? '').replace(/[^\d+]/g, '').slice(0, 15);
 
 // Danh muc luc moi cai dat: dung 3 danh muc web dang co. icon la khoa trong frontend/src/utils/danhMuc.jsx
 const DANH_MUC_MAC_DINH = [
@@ -275,7 +278,8 @@ app.delete('/api/projects/:id', canQuyen, async (req, res) => {
 // GET /api/settings (thanh chay + anh banner) - ai cung doc duoc
 app.get('/api/settings', (req, res) => {
   const s = kho.doc(KHO_CAI_DAT, CAI_DAT_MAC_DINH);
-  res.json(Array.isArray(s) ? { ticker: [], banner: null } : s);
+  const cu = Array.isArray(s) ? { ticker: [], banner: null } : s;
+  res.json({ ...cu, lienHe: cu.lienHe || LIEN_HE_MAC_DINH });
 });
 
 // PUT /api/settings
@@ -283,7 +287,10 @@ app.put('/api/settings', canQuyen, async (req, res) => {
   const hienTai = kho.doc(KHO_CAI_DAT, CAI_DAT_MAC_DINH);
   const moi = {
     ticker: Array.isArray(req.body.ticker) ? req.body.ticker.filter((t) => t.trim()) : hienTai.ticker,
-    banner: 'banner' in req.body ? req.body.banner : hienTai.banner
+    banner: 'banner' in req.body ? req.body.banner : hienTai.banner,
+    lienHe: req.body.lienHe && typeof req.body.lienHe === 'object'
+      ? { dienThoai: soDienThoai(req.body.lienHe.dienThoai), zalo: soDienThoai(req.body.lienHe.zalo) }
+      : (hienTai.lienHe || LIEN_HE_MAC_DINH)
   };
   if (!(await kho.ghi(KHO_CAI_DAT, moi))) return res.status(500).json(LOI_LUU);
   res.json(moi);
