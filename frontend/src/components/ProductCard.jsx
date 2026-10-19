@@ -1,4 +1,5 @@
 import React from 'react';
+import { GiaDuTinh } from '../utils/sanPham';
 
 export default function ProductCard({
   product,
@@ -81,6 +82,8 @@ export default function ProductCard({
       }}>
         {product.subTitle || product.description || 'Chính hãng 100%'}
       </p>
+
+      <GiaDuTinh g={product.giaDuTinh} gon />
 
       {/* Xem chi tiet */}
       <div style={{ marginTop: 'auto' }}>

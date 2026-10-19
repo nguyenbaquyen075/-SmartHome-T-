@@ -668,6 +668,65 @@ body {
   .home-group-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
 
+/* ================= GIÁ DỰ TÍNH (thẻ + trang chi tiết sản phẩm) ================= */
+.gia-du-tinh {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+}
+.gia-du-tinh-nhan {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0066cc;
+}
+.gia-du-tinh-nhan small {
+  font-weight: 500;
+  color: #64748b;
+}
+.gia-du-tinh-so {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0066cc;
+}
+.gia-du-tinh.gon {
+  padding: 0;
+  margin-bottom: 6px;
+  background: none;
+  border: none;
+  gap: 0;
+}
+.gia-du-tinh.gon .gia-du-tinh-nhan {
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gia-du-tinh-so {
+  white-space: nowrap;   /* giá luôn nằm 1 hàng */
+}
+.gia-du-tinh.gon .gia-du-tinh-so {
+  font-size: 0.84rem;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 480px) {
+  .gia-du-tinh.gon .gia-du-tinh-so { font-size: 0.74rem; }
+}
+/* Thẻ hẹp (điện thoại nhỏ) không đủ chỗ cho giá đầy đủ thì hiện dạng rút gọn "850k - ~1,2tr" */
+.gia-du-tinh.gon { container-type: inline-size; }
+.gia-rut-gon { display: none; }
+@container (max-width: 150px) {
+  .gia-du-tinh.gon .gia-day-du { display: none; }
+  .gia-du-tinh.gon .gia-rut-gon { display: inline; }
+}
+
 /* ================= DỊCH VỤ THI CÔNG (trang chủ) ================= */
 .dich-vu {
   margin-top: 6px;

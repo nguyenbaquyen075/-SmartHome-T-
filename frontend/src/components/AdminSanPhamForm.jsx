@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Trash2, Upload, Plus, Link } from 'lucide-react';
 import { api } from '../utils/api';
 import { nenAnhFile, coFile } from '../utils/anh';
-import { DON_VI, doiNhan } from '../utils/sanPham';
+import { DON_VI, doiNhan, chuGiaDuTinh } from '../utils/sanPham';
 import { useDanhMuc } from '../utils/danhMuc';
 import { Truong, Khoi, ThanhLuu } from './AdminForm';
 import { useBanNhap, gioPhut } from '../utils/banNhap';
@@ -37,6 +37,10 @@ const thongTinTuDuLieuCu = (sp) => {
   return muc.length ? muc : [{ tieuDe: '', noiDung: [], vanBan: '' }];
 };
 
+// Ô giá: hiện "1.200.000" cho dễ đọc, lưu đi là số
+const chuSo = (v) => String(v ?? '').replace(/[^\d]/g, '').slice(0, 11);
+const coDauCham = (v) => { const so = chuSo(v); return so ? Number(so).toLocaleString('vi-VN') : ''; };
+
 const tuSanPham = (sp) => ({
   name: sp?.name || '',
   category: sp?.category || '',
@@ -45,6 +49,9 @@ const tuSanPham = (sp) => ({
   subTitle: sp?.subTitle || '',
   unit: sp?.unit || 'chiếc',
   featured: sp ? Boolean(sp.featured) : true,
+  giaTu: coDauCham(sp?.giaDuTinh?.tu),
+  giaDen: coDauCham(sp?.giaDuTinh?.den),
+  giaGhiChu: sp?.giaDuTinh?.ghiChu || '',
   images: sp?.images?.length ? [...sp.images] : sp?.image ? [sp.image] : [],
   thongTin: thongTinTuDuLieuCu(sp)
 });
@@ -140,6 +147,7 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
       subTitle: f.subTitle,
       unit: f.unit,
       featured: f.featured,
+      giaDuTinh: { tu: chuSo(f.giaTu), den: chuSo(f.giaDen), ghiChu: f.giaGhiChu || '' },
       images: f.images,
       noiBat: [],
       description: '',
@@ -250,6 +258,43 @@ export default function AdminSanPhamForm({ sp, ds, onBao, onXong, onHuy }) {
               {[...new Set([...DON_VI, f.unit])].map((d) => <option key={d}>{d}</option>)}
             </select>
           </Truong>
+
+          <Truong nhan="Giá dự tính từ" goiY="Đơn vị: đồng. Để trống thì khách thấy &quot;Liên hệ&quot;">
+            <input
+              className="qt-input"
+              inputMode="numeric"
+              value={f.giaTu || ''}
+              onChange={(e) => doi('giaTu', coDauCham(e.target.value))}
+              placeholder="VD: 500.000"
+            />
+          </Truong>
+
+          <Truong nhan="đến khoảng" goiY="Khách thấy dấu ~ trước số này">
+            <input
+              className="qt-input"
+              inputMode="numeric"
+              value={f.giaDen || ''}
+              onChange={(e) => doi('giaDen', coDauCham(e.target.value))}
+              placeholder="VD: 1.200.000"
+            />
+          </Truong>
+
+          <Truong nhan="Giá bao gồm" rong goiY="Hiện trong ngoặc cạnh chữ Giá dự tính">
+            <input
+              className="qt-input"
+              value={f.giaGhiChu || ''}
+              onChange={(e) => doi('giaGhiChu', e.target.value)}
+              placeholder="VD: gồm công lắp đặt, chưa gồm dây"
+              maxLength={120}
+            />
+          </Truong>
+
+          {chuGiaDuTinh({ tu: chuSo(f.giaTu), den: chuSo(f.giaDen), ghiChu: f.giaGhiChu }) && (
+            <p className="qt-xem-gia">
+              Khách sẽ thấy: <b>Giá dự tính{f.giaGhiChu?.trim() ? ` (${f.giaGhiChu.trim()})` : ''}</b>{' '}
+              {chuGiaDuTinh({ tu: chuSo(f.giaTu), den: chuSo(f.giaDen) }).gia}
+            </p>
+          )}
 
           <label className="qt-cong-tac">
             <input type="checkbox" checked={f.featured} onChange={(e) => doi('featured', e.target.checked)} />

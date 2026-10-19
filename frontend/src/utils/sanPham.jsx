@@ -166,3 +166,41 @@ export const MAU_HUONG_DAN = {
 };
 
 export const BAO_HANH_MAC_DINH = { thoiGian: '24 tháng', doiTra: '1 đổi 1 trong 7 ngày' };
+
+// ---- Giá dự tính: { tu, den, ghiChu } (đồng) ----
+// Khách thấy: "Giá dự tính (gồm công lắp đặt)  500.000đ - ~1.200.000đ". Chưa nhập giá thì hiện "Liên hệ".
+export const dinhDangTien = (n) => `${Number(n).toLocaleString('vi-VN')}đ`;
+
+// Dạng rút gọn cho thẻ hẹp: 850.000 -> "850k", 1.200.000 -> "1,2tr", 1.500.000.000 -> "1,5tỷ"
+const tienGon = (n) => {
+  const lam = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
+  if (n >= 1e9) return `${lam(n / 1e9)}tỷ`;
+  if (n >= 1e6) return `${lam(n / 1e6)}tr`;
+  if (n >= 1e3) return `${lam(n / 1e3)}k`;
+  return `${n}đ`;
+};
+
+export function chuGiaDuTinh(g) {
+  const tu = Number(g?.tu) || 0;
+  const den = Number(g?.den) || 0;
+  if (!tu && !den) return null;
+  const ghep = (f) => (tu && den && tu !== den ? `${f(tu)} - ~${f(den)}` : tu ? `Từ ${f(tu)}` : `~${f(den)}`);
+  return { gia: ghep(dinhDangTien), giaGon: ghep(tienGon), ghiChu: (g.ghiChu || '').trim() };
+}
+
+// gon = dạng 1-2 dòng cho thẻ sản phẩm; mặc định = khối to ở trang chi tiết
+export function GiaDuTinh({ g, gon = false }) {
+  // Sản phẩm nào cũng có dòng giá: chưa nhập thì "Liên hệ"
+  const c = chuGiaDuTinh(g) || { gia: 'Liên hệ', giaGon: 'Liên hệ', ghiChu: (g?.ghiChu || '').trim() };
+  return (
+    <div className={gon ? 'gia-du-tinh gon' : 'gia-du-tinh'}>
+      <span className="gia-du-tinh-nhan">
+        Giá dự tính{c.ghiChu && <small> ({c.ghiChu})</small>}
+      </span>
+      <strong className="gia-du-tinh-so">
+        <span className="gia-day-du">{c.gia}</span>
+        {gon && <span className="gia-rut-gon">{c.giaGon}</span>}
+      </strong>
+    </div>
+  );
+}

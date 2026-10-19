@@ -1236,6 +1236,17 @@ app.get('/api/products/:id', (req, res) => {
 const chuoi = (v, max) => String(v ?? '').trim().slice(0, max);
 const dsChuoi = (v, soDong, max = 500) =>
   (Array.isArray(v) ? v : []).map((x) => chuoi(x, max)).filter(Boolean).slice(0, soDong);
+// Giá dự tính (đồng): nhận số hoặc chuỗi "1.200.000", sai/<=0 thì bỏ; nhập ngược "từ" > "đến" thì tự đổi chỗ
+const soTien = (v) => {
+  const n = Number(String(v ?? '').replace(/[^\d]/g, ''));
+  return n > 0 && n < 1e12 ? n : null;
+};
+const chuanHoaGia = (g) => {
+  let tu = soTien(g?.tu);
+  let den = soTien(g?.den);
+  if (tu && den && tu > den) [tu, den] = [den, tu];
+  return { tu, den, ghiChu: chuoi(g?.ghiChu, 120) };
+};
 const dsThongTin = (v) => (Array.isArray(v) ? v : [])
   .map((m) => ({ tieuDe: chuoi(m?.tieuDe, 120), noiDung: dsChuoi(m?.noiDung, 30, 1000) }))
   .filter((m) => m.tieuDe && m.noiDung.length)
@@ -1267,7 +1278,8 @@ const chuanHoaSanPham = (b = {}) => {
     thongTin: dsThongTin(b.thongTin),
     specs,
     huongDan: dsChuoi(b.huongDan, 12),
-    baoHanh: { thoiGian: chuoi(b.baoHanh?.thoiGian, 60), doiTra: chuoi(b.baoHanh?.doiTra, 120) }
+    baoHanh: { thoiGian: chuoi(b.baoHanh?.thoiGian, 60), doiTra: chuoi(b.baoHanh?.doiTra, 120) },
+    giaDuTinh: chuanHoaGia(b.giaDuTinh)
   };
 };
 
