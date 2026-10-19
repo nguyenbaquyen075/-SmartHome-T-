@@ -1,0 +1,49 @@
+# Tự kiểm tra mỗi lần push hoặc mở Pull Request: lint, build, test kho dữ liệu,
+# và mở Chrome bấm thử menu trang quản trị (chống lỗi "bấm mục menu không vào được").
+# Lỗi ở bước nào thì GitHub báo đỏ ở commit đó.
+name: Kiem tra
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  kiem-tra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Cai thu vien
+        run: npm --prefix backend ci && npm --prefix frontend ci
+
+      - name: Lint
+        run: npm --prefix frontend run lint
+
+      - name: Build
+        run: npm --prefix frontend run build
+
+      - name: Test kho du lieu
+        run: node backend/kho.test.js
+
+      - name: Thu menu trang quan tri
+        run: |
+          npm run dev > dev.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:5174/ > /dev/null && curl -sf http://localhost:5001/api/health > /dev/null && break
+            sleep 1
+          done
+          npm --prefix frontend run thu:menu
+
+      - name: Log may chu khi loi
+        if: failure()
+        run: cat dev.log || true
