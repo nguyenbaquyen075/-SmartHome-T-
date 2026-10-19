@@ -11,7 +11,7 @@ import {
   CircleCheck,
 } from 'lucide-react';
 import ProductCard from './ProductCard';
-import { doiNhan } from '../utils/sanPham';
+import { doiNhan, GiaDuTinh } from '../utils/sanPham';
 
 export default function ProductDetailPage({
   product,
@@ -232,6 +232,8 @@ export default function ProductDetailPage({
                 {product.subTitle}
               </p>
             )}
+
+            <GiaDuTinh g={product.giaDuTinh} />
 
             {/* Extra Utilities */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '0.85rem', color: '#64748b' }}>
