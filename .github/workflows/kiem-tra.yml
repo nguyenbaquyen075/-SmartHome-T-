@@ -32,8 +32,8 @@ jobs:
       - name: Build
         run: npm --prefix frontend run build
 
-      - name: Test kho du lieu
-        run: node backend/kho.test.js
+      - name: Test backend (kho du lieu + toan bo API)
+        run: npm --prefix backend test
 
       - name: Thu menu trang quan tri
         run: |

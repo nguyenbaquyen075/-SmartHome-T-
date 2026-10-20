@@ -1,12 +1,13 @@
-// Kiem tra kho du lieu o che do luu file: node backend/kho.test.js
+// Kiem tra kho du lieu o che do luu file: npm --prefix backend test
 // (Che do co so du lieu can DATABASE_URL that, thu bang cach chay server voi bien do.)
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const kho = require('./kho');
+const kho = require('../src/lib/kho');
+const { THU_MUC_DU_LIEU } = require('../src/config');
 
 const TEN = 'thu-kho-tam';
-const FILE = path.join(__dirname, 'data', `${TEN}.json`);
+const FILE = path.join(THU_MUC_DU_LIEU, `${TEN}.json`);
 
 (async () => {
   assert.ok(!process.env.DATABASE_URL, 'Bo DATABASE_URL roi hay chay lai: day la bai thu che do file');

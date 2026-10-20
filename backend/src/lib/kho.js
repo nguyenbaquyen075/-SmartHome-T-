@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const THU_MUC = path.join(__dirname, 'data');
+const { THU_MUC_DU_LIEU: THU_MUC } = require('../config');
 const duongDan = (ten) => path.join(THU_MUC, `${ten}.json`);
 
 const docFile = (ten, macDinh) => {

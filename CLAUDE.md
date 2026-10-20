@@ -19,11 +19,11 @@ npm run dev:frontend     # chỉ giao diện
 npm run dev:backend      # chỉ API
 npm run build            # bản build Render: cài sạch rồi vite build → frontend/dist
 npm --prefix frontend run lint     # oxlint
-node backend/kho.test.js           # test kho dữ liệu chế độ file (phải KHÔNG đặt DATABASE_URL)
+npm --prefix backend test          # test kho dữ liệu + toàn bộ API (chạy server ở thư mục tạm, không đụng backend/data)
 npm --prefix frontend run thu:menu # cần `npm run dev` đang chạy: Chrome headless bấm từng mục menu quản trị + Back
 ```
 
-GitHub Actions (`.github/workflows/kiem-tra.yml`) chạy lint, build, `kho.test.js` và `thu:menu` mỗi lần push/PR.
+GitHub Actions (`.github/workflows/kiem-tra.yml`) chạy lint, build, test backend và `thu:menu` mỗi lần push/PR.
 Bài nào đỏ thì sửa trước khi merge, không tắt bài kiểm tra.
 
 Xem thử nhiều cỡ điện thoại cùng lúc: `http://localhost:5174/mobile.html` (3 khung iframe 320/390/430px).
@@ -35,19 +35,23 @@ Web **trưng bày** (không giỏ hàng/thanh toán) + trang **quản trị nộ
 gói Free: `backend/index.js` vừa trả `/api/*` vừa phục vụ `frontend/dist` (route cuối `/{*path}` trả `index.html`).
 `server/index.js` chỉ là cầu nối cho Start Command cũ trên Render, không có logic.
 
-**Backend** (Express 5, CommonJS, gần như mọi route nằm trong `backend/index.js`):
-- `kho.js` — lớp lưu dữ liệu. Có `DATABASE_URL` thì dùng Postgres với **một bảng** `du_lieu(ten, noi_dung jsonb)`,
+**Backend** (Express 5, CommonJS, mô hình MVC trong `backend/src/`, xem `backend/README.md`):
+- `index.js` chỉ khởi động; `src/app.js` dựng Express; `src/routes/` (URL + `canQuyen`) → `src/controllers/` (req/res)
+  → `src/models/` (đọc/ghi + chuẩn hoá dữ liệu); `src/views/` dựng file trả về (xlsx, zip); `src/config.js` là nơi
+  duy nhất đọc biến môi trường. Thêm API mới: model → controller → route, rồi thêm ca vào `backend/test/api.test.js`.
+- `src/lib/kho.js` — lớp lưu dữ liệu. Có `DATABASE_URL` thì dùng Postgres với **một bảng** `du_lieu(ten, noi_dung jsonb)`,
   mỗi "kho" (`products`, `projects`, `settings`, `danh-muc`, `ghi-chu`, `cham-cong`, `khach-hang`, …) là một dòng;
   toàn bộ được đọc vào bộ nhớ lúc khởi động, route đọc từ bộ nhớ (`kho.doc`) và ghi qua `kho.ghi`.
   Không có biến thì lùi về file `backend/data/<ten>.json` (ghi file tạm rồi đổi tên). Ổ đĩa Render mất mỗi lần deploy.
-- `khoFile.js` + `kyS3.js` — kho file công khai Neon Object Storage (`NEON_S3_*`). Server chỉ ký URL tải lên
+- `src/lib/khoFile.js` + `kyS3.js` — kho file công khai Neon Object Storage (`NEON_S3_*`). Server chỉ ký URL tải lên
   (`/api/tai-len/chu-ky`), trình duyệt tải thẳng file lên bucket; ảnh được nén trên máy trước khi tải. Chưa cấu hình
   thì ảnh lưu vào bảng ảnh của `kho.js` (phục vụ qua `/api/anh/:id`), video lưu đĩa.
-- `khoRiengTu.js` — bucket riêng tư cho ảnh khách hàng (`NEON_S3_RT_*`), chỉ đọc qua route có quyền.
-- `zipTinh.js` / `xlsxTinh.js` — tự viết định dạng zip (sao lưu/khôi phục toàn bộ) và xlsx (xuất chấm công), không dùng thư viện.
-- Xác thực: token ký HMAC có hạn 7 ngày (`phienHopLe`), middleware `canQuyen` cho mọi route ghi; khóa tạm sau nhiều lần sai.
+- `src/lib/khoRiengTu.js` — bucket riêng tư cho ảnh khách hàng (`NEON_S3_RT_*`), chỉ đọc qua route có quyền.
+- `src/lib/zipTinh.js` / `xlsxTinh.js` — tự viết định dạng zip (sao lưu/khôi phục toàn bộ) và xlsx (xuất chấm công), không dùng thư viện.
+- Xác thực: token ký HMAC có hạn 7 ngày (`models/taiKhoan.js`), middleware `canQuyen` (`middleware/xacThuc.js`) cho mọi route ghi; khóa tạm sau nhiều lần sai.
   Tài khoản từ `ADMIN_TAI_KHOAN` / `ADMIN_PASSWORD` hoặc đổi trong trang Cài đặt (kho `quan-tri`).
-- Kho dễ bị ghi đồng thời (chấm công, khách hàng) chạy tuần tự qua hàng đợi promise `tuanTuChamCong` / `tuanTuKhach`.
+- Kho dễ bị ghi đồng thời (chấm công, khách hàng) chạy tuần tự qua hàng đợi `tuanTu` trong model (`utils/hangDoi.js`).
+- Lỗi không lường trước rơi vào `middleware/loi.js` → trả JSON, không phải trang HTML.
 
 **Frontend** (React 19 + Vite, không router, không thư viện state):
 - `main.jsx`: đường dẫn `/admin` → `AdminApp` (tải lười, kèm `admin.css`); còn lại → `App`.
