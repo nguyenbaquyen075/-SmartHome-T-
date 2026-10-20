@@ -12,7 +12,7 @@ Kèm **trang quản trị** tại `/admin` dùng làm công cụ nội bộ củ
 
 - **Frontend:** React 19 + Vite 8, icon `lucide-react`, lint `oxlint`. Không dùng router —
   trang khách dùng `history.state`, trang quản trị dùng hash (`#/san-pham/moi`...).
-- **Backend:** Node + Express 5 (CommonJS), `pg`, `compression`. Một file chính `backend/index.js` (~1600 dòng).
+- **Backend:** Node + Express 5 (CommonJS), `pg`, `compression`. Cấu trúc MVC trong `backend/src/` (tách từ 1 file 1600 dòng ngày 2026-10-20).
 - **Deploy:** Render gói Free, 1 service (Express phục vụ cả API lẫn bản build React). Cấu hình ở `render.yaml`.
 - **Dữ liệu:** Postgres Neon (`DATABASE_URL`); file ảnh/video ở Neon Object Storage (`NEON_S3_*`);
   ảnh khách hàng ở bucket riêng tư (`NEON_S3_RT_*`). Chưa đặt biến → lưu tạm `backend/data/*.json` (mất khi deploy).
@@ -29,12 +29,11 @@ npm run dev           # frontend 5174 + backend 5001 → http://localhost:5174
 ## Cấu trúc chính
 
 ```
-backend/
-  index.js        toàn bộ API
-  kho.js          lưu dữ liệu (Postgres hoặc file JSON)   kho.test.js
-  khoFile.js      kho file công khai (Neon S3)            kyS3.js  ký request S3
-  khoRiengTu.js   kho ảnh khách hàng riêng tư
-  zipTinh.js, xlsxTinh.js   tự tạo file zip (sao lưu) / xlsx (xuất chấm công)
+backend/          MVC trong src/ (xem backend/README.md)
+  index.js        chỉ khởi động; src/app.js dựng Express; src/config.js đọc biến môi trường
+  src/routes/ → src/controllers/ → src/models/ ; src/views/ (xlsx, zip) ; src/middleware/ (canQuyen, lỗi)
+  src/lib/        kho dữ liệu, kho file Neon S3, bucket riêng tư, Cloudinary, zip/xlsx tự viết
+  test/           npm --prefix backend test (kho + toàn bộ API, chạy ở thư mục tạm)
   data/           dữ liệu chạy thử trên máy
 frontend/src/
   main.jsx        /admin → AdminApp (tải lười), còn lại → App
