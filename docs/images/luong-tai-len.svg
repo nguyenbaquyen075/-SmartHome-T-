@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 420" width="1100" height="420" role="img" aria-label="Đăng ảnh/video không làm nặng máy chủ" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<defs><filter id="g" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3"/></filter><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F172A"/><stop offset="1" stop-color="#1E1B4B"/></linearGradient></defs>
+<rect width="1100" height="420" rx="16" fill="url(#bg)"/>
+<text x="550.0" y="38" text-anchor="middle" fill="#F1F5F9" font-size="20" font-weight="700">Đăng ảnh/video không làm nặng máy chủ</text>
+<path d="M242.6 110.0 L345.8 110.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<path d="M514.2 110.0 L645.0 110.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<path d="M775.0 110.0 L871.6 110.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<path d="M960.0 132.0 L960.0 231.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<path d="M871.6 260.0 L773.0 260.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<path d="M607.0 260.0 L506.8 260.0" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#ar)"><animate attributeName="stroke-dashoffset" from="26" to="0" dur="1s" repeatCount="indefinite"/></path>
+<g>
+<rect x="54.4" y="85.0" width="191.2" height="50" rx="14" fill="#38BDF8" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.0001;0.1500;1" values="0;1;0;0"/></rect>
+<rect x="57.4" y="88.0" width="185.2" height="44" rx="11" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+<text x="150.0" y="115.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Chủ chọn ảnh/video</text>
+</g>
+<g>
+<rect x="342.8" y="78.0" width="174.4" height="64" rx="14" fill="#FBBF24" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.1250;0.1255;0.2750;1" values="0;0;1;0;0"/></rect>
+<rect x="345.8" y="81.0" width="168.4" height="58" rx="11" fill="#1E293B" stroke="#FBBF24" stroke-width="2"/>
+<text x="430.0" y="105.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Nén ảnh trên máy</text>
+<text x="430.0" y="124.0" text-anchor="middle" fill="#94A3B8" font-size="12">4MB → ~250KB</text>
+</g>
+<g>
+<rect x="642.0" y="78.0" width="136.0" height="64" rx="14" fill="#34D399" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.2500;0.2505;0.4000;1" values="0;0;1;0;0"/></rect>
+<rect x="645.0" y="81.0" width="130.0" height="58" rx="11" fill="#1E293B" stroke="#34D399" stroke-width="2"/>
+<text x="710.0" y="105.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Xin chữ ký</text>
+<text x="710.0" y="124.0" text-anchor="middle" fill="#94A3B8" font-size="12">cần đăng nhập</text>
+</g>
+<g>
+<rect x="868.6" y="85.0" width="182.8" height="50" rx="14" fill="#A78BFA" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.3750;0.3755;0.5250;1" values="0;0;1;0;0"/></rect>
+<rect x="871.6" y="88.0" width="176.8" height="44" rx="11" fill="#1E293B" stroke="#A78BFA" stroke-width="2"/>
+<text x="960.0" y="115.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Giấy phép 15 phút</text>
+</g>
+<g>
+<rect x="868.6" y="228.0" width="182.8" height="64" rx="14" fill="#4ADE80" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.5000;0.5005;0.6500;1" values="0;0;1;0;0"/></rect>
+<rect x="871.6" y="231.0" width="176.8" height="58" rx="11" fill="#1E293B" stroke="#4ADE80" stroke-width="2"/>
+<text x="960.0" y="255.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Tải thẳng lên kho</text>
+<text x="960.0" y="274.0" text-anchor="middle" fill="#94A3B8" font-size="12">Neon Object Storage</text>
+</g>
+<g>
+<rect x="604.0" y="228.0" width="172.0" height="64" rx="14" fill="#34D399" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.6250;0.6255;0.7750;1" values="0;0;1;0;0"/></rect>
+<rect x="607.0" y="231.0" width="166.0" height="58" rx="11" fill="#1E293B" stroke="#34D399" stroke-width="2"/>
+<text x="690.0" y="255.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Báo xong</text>
+<text x="690.0" y="274.0" text-anchor="middle" fill="#94A3B8" font-size="12">lưu chú thích + ngày</text>
+</g>
+<g>
+<rect x="310.2" y="228.0" width="199.6" height="64" rx="14" fill="#4ADE80" opacity="0" filter="url(#g)"><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.7500;0.7505;0.9000;1" values="0;0;1;0;0"/></rect>
+<rect x="313.2" y="231.0" width="193.6" height="58" rx="11" fill="#1E293B" stroke="#4ADE80" stroke-width="2"/>
+<text x="410.0" y="255.0" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Hiện trên trang chủ</text>
+<text x="410.0" y="274.0" text-anchor="middle" fill="#94A3B8" font-size="12">chậm tối đa 1 phút</text>
+</g>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.0001;0.1250;1" path="M242.6 110.0 L345.8 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.0001;0.1250;1" values="0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.0001;0.1250;1" path="M242.6 110.0 L345.8 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.0001;0.1250;1" values="0;1;0;0"/></circle>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.1250;0.2500;1" path="M514.2 110.0 L645.0 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.1250;0.1255;0.2500;1" values="0;0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.1250;0.2500;1" path="M514.2 110.0 L645.0 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.1250;0.1255;0.2500;1" values="0;0;1;0;0"/></circle>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.2500;0.3750;1" path="M775.0 110.0 L871.6 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.2500;0.2505;0.3750;1" values="0;0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.2500;0.3750;1" path="M775.0 110.0 L871.6 110.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.2500;0.2505;0.3750;1" values="0;0;1;0;0"/></circle>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.3750;0.5000;1" path="M960.0 132.0 L960.0 231.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.3750;0.3755;0.5000;1" values="0;0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.3750;0.5000;1" path="M960.0 132.0 L960.0 231.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.3750;0.3755;0.5000;1" values="0;0;1;0;0"/></circle>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.5000;0.6250;1" path="M871.6 260.0 L773.0 260.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.5000;0.5005;0.6250;1" values="0;0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.5000;0.6250;1" path="M871.6 260.0 L773.0 260.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.5000;0.5005;0.6250;1" values="0;0;1;0;0"/></circle>
+<circle r="6" fill="#FDE68A" filter="url(#g)" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.6250;0.7500;1" path="M607.0 260.0 L506.8 260.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.6250;0.6255;0.7500;1" values="0;0;1;0;0"/></circle>
+<circle r="3.5" fill="#FFFBEB" opacity="0"><animateMotion dur="12.0s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.6250;0.7500;1" path="M607.0 260.0 L506.8 260.0"/><animate attributeName="opacity" dur="12.0s" repeatCount="indefinite" keyTimes="0;0.6250;0.6255;0.7500;1" values="0;0;1;0;0"/></circle>
+</svg>
